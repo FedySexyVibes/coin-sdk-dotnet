@@ -1,0 +1,102 @@
+
+*.class
+*.log
+
+#IntelliJ
+.idea
+
+# sbt specific
+.cache
+.history
+.lib/
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+
+# IDE specific
+*.iml
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# compiled output
+/dist
+*/resources/dist
+*/build/dist
+/tmp
+/out-tsc
+
+# dependencies
+/node_modules
+
+# misc
+/.sass-cache
+/connect.lock
+/coverage
+/libpeerconnection.log
+npm-debug.log
+yarn-error.log
+testem.log
+/typings
+*/package-lock.json
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Secrets
+*private-key.pem
+*sharedkey.encrypted
+
+# Python
+venv
+
+# Autosave files
+*~
+
+# build
+[Oo]bj/
+[Bb]in/
+packages/
+TestResults/
+
+# globs
+Makefile.in
+*.DS_Store
+*.sln.cache
+*.suo
+*.cache
+*.pidb
+*.userprefs
+*.usertasks
+config.log
+config.make
+config.status
+aclocal.m4
+install-sh
+autom4te.cache/
+*.user
+*.tar.gz
+tarballs/
+test-results/
+Thumbs.db
+
+# Mac bundle stuff
+*.dmg
+*.app
+
+# resharper
+*_Resharper.*
+*.Resharper
+
+# dotCover
+*.dotCover
+/.vs
+/Backup
+/UpgradeLog.htm
