@@ -4,15 +4,22 @@ using System.Threading.Tasks;
 using Coin.Common.Client;
 using Coin.NP.Messages.V1;
 using Newtonsoft.Json;
+using static Coin.Common.Crypto.CtpApiClientUtil;
 using static Coin.NP.Messages.V1.Utils;
 
-namespace Coin.np.Service.impl
+namespace Coin.NP.Service.Impl
 {
 
     public class NumberPortabilityService : CtpApiRestTemplateSupport, INumberPortabilityService
     {
 
         readonly string _apiUrl;
+
+        public NumberPortabilityService(string apiUrl, string consumerName, string privateKeyFile, string encryptedHmacSecretFile) : this(
+            apiUrl, consumerName, ReadPrivateKeyFile(privateKeyFile), encryptedHmacSecretFile) {}
+
+        public NumberPortabilityService(string apiUrl, string consumerName, RSA privateKey, string encryptedHmacSecretFile) :
+            this(apiUrl, consumerName, HmacFromEncryptedBase64EncodedSecretFile(encryptedHmacSecretFile, privateKey), privateKey) {}
 
         public NumberPortabilityService(string apiUrl, string consumerName, HMACSHA256 signer, RSA privateKey) : base(consumerName, signer, privateKey)
         {

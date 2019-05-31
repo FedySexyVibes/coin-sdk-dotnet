@@ -34,12 +34,12 @@ namespace Coin.Common.Client
             {
                 request.Headers.Add(pair.Key, pair.Value);
             }
-            var requestLine = $"{request.Method} {request.RequestUri} HTTP/{request.Version}";
+            var requestLine = $"{request.Method} {request.RequestUri.LocalPath} HTTP/1.1";
             request.Headers.Add("authorization", CtpApiClientUtil.CalculateHttpRequestHmac(_signer, _consumerName, hmacHeaders, requestLine));
             
             var jwt = CtpApiClientUtil.CreateJwt(_privateKey, _consumerName, _validPeriodInSeconds);
             CookieContainer = new CookieContainer();
-            CookieContainer.Add(new Cookie("jwt", jwt));
+            CookieContainer.Add(request.RequestUri, new Cookie("jwt", jwt));
             return await base.SendAsync(request, cancellationToken);
         }
     }

@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using Coin.NP.Messages.V1;
 
-namespace Coin.np.Service
+namespace Coin.NP.Service
 {
 
     public interface INumberPortabilityMessageListener

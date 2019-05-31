@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace Coin.NP.Messages.V1
@@ -17,7 +18,7 @@ namespace Coin.NP.Messages.V1
                 case ActivationServiceNumber _: return "activationsn";
                 case DeactivationServiceNumber _: return "deactivationsn";
                 case TariffChangeServiceNumber _: return "tariffchangesn";
-                default: return content.GetType().ToString().ToLower().Replace("message", "");
+                default: return content.GetType().Name.Split('.').Last().ToLower().Replace("message", "");
             }
         }
 

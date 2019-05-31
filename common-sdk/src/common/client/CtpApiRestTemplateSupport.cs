@@ -1,5 +1,6 @@
 using System.Net.Http;
 using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using Coin.Common.Crypto;
 using Newtonsoft.Json;
@@ -24,7 +25,7 @@ namespace Coin.Common.Client
         public Task<HttpResponseMessage> SendWithToken<T>(HttpMethod method, string url, T content) {
             var request = new HttpRequestMessage(method, url);
             var bodyAsString = JsonConvert.SerializeObject(content);
-            request.Content = new StringContent(bodyAsString);
+            request.Content = new StringContent(bodyAsString, Encoding.Default, "application/json");
             return _httpClient.SendAsync(request);
         }
     }

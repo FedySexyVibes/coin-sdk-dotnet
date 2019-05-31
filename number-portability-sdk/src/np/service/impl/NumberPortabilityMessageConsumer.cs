@@ -4,13 +4,12 @@ using System.Security.Cryptography;
 using System.Threading;
 using Coin.Common.Client;
 using Coin.NP.Messages.V1;
-using Coin.np.Service;
 using EvtSource;
 using NLog;
 using static Coin.Common.Crypto.CtpApiClientUtil;
 using static Coin.NP.Messages.V1.Utils;
 
-namespace Coin.NP.Service.impl
+namespace Coin.NP.Service.Impl
 {
     public class NumberPortabilityMessageConsumer : CtpApiRestTemplateSupport
     {
@@ -22,6 +21,13 @@ namespace Coin.NP.Service.impl
         readonly CoinHttpClientHandler _coinHttpClientHandler;
         readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
+        public NumberPortabilityMessageConsumer(
+            INumberPortabilityMessageListener listener, string sseUri, string consumerName, int backOffPeriod, string privateKeyFile, string encryptedHmacSecretFile) :
+            this(listener, sseUri, consumerName, backOffPeriod, ReadPrivateKeyFile(privateKeyFile), encryptedHmacSecretFile) {}
+
+        public NumberPortabilityMessageConsumer(INumberPortabilityMessageListener listener, string sseUri, string consumerName, int backOffPeriod, RSA privateKey, string encryptedHmacSecretFile) :
+            this(listener, sseUri, consumerName, backOffPeriod, HmacFromEncryptedBase64EncodedSecretFile(encryptedHmacSecretFile, privateKey), privateKey) {}
+        
         public NumberPortabilityMessageConsumer(INumberPortabilityMessageListener listener, string sseUri, string consumerName, int backOffPeriod,
             HMACSHA256 signer, RSA privateKey, HmacSignatureType hmacSignatureType = HmacSignatureType.XDateAndDigest, int? numberOfRetries = null,
             int validPeriodInSeconds = DefaultValidPeriodInSecs) : base(consumerName, signer, privateKey, hmacSignatureType, validPeriodInSeconds)
@@ -77,7 +83,7 @@ namespace Coin.NP.Service.impl
                 reader.Dispose();
                 var persistedOffset = offsetPersister?.Offset ?? initialOffset;
                 var recoveredOffset = recoverOffset?.Invoke(persistedOffset) ?? persistedOffset;
-                if (retriesLeft != null && --retriesLeft == 0)
+                if (retriesLeft != null && retriesLeft-- == 0)
                 {
                     _logger.Info("Reached maximum number of connection retries, stopped consuming event stream.");
                     return;

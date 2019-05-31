@@ -39,7 +39,7 @@ namespace Coin.Common.Crypto
             return new HMACSHA256(sharedKey);
         }
 
-        const string HmacHeaderFormat = "hmac username=\"{0}\", algorithm=\"hmac-sha256\", headers=\"{q} request-line\", signature=\"{2}\"";
+        const string HmacHeaderFormat = "hmac username=\"{0}\", algorithm=\"hmac-sha256\", headers=\"{1} request-line\", signature=\"{2}\"";
 
         public static string CreateJwt(RSA privateKey, string consumerName, int validPeriodInSeconds)
         {
@@ -72,12 +72,29 @@ namespace Coin.Common.Crypto
             return string.Join("\n", headers.Select(p => $"{p.Key}: {p.Value}")) + "\n" + requestLine;
         }
 
-        public RSA ReadPrivateKeyFile(string path)
+        public static RSA ReadPrivateKeyFile(string path)
         {
             using (var reader = File.OpenText(path))
             {
                 var keyPair = (AsymmetricCipherKeyPair) new PemReader(reader).ReadObject();
-                return DotNetUtilities.ToRSA((RsaPrivateCrtKeyParameters) keyPair.Private);
+                var parameters = DotNetUtilities.ToRSAParameters((RsaPrivateCrtKeyParameters) keyPair.Private);
+                
+                return Create(parameters);
+            }
+        }
+        
+        static RSA Create(RSAParameters parameters)
+        {
+            var rsa = RSA.Create();
+            try
+            {
+                rsa.ImportParameters(parameters);
+                return rsa;
+            }
+            catch
+            {
+                rsa.Dispose();
+                throw;
             }
         }
 

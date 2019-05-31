@@ -4,6 +4,49 @@ using Newtonsoft.Json;
 
 namespace Coin.NP.Messages.V1 {
 
+    public class MessageResponse {
+
+        [DataMember(Name="transactionId", EmitDefaultValue=false)]
+        [JsonProperty(PropertyName = "transactionId")]
+        public string TransactionId;
+    }
+
+    public class Header {
+
+        [DataMember(Name="receiver", EmitDefaultValue=false)]
+        [JsonProperty(PropertyName = "receiver")]
+        public Receiver Receiver;
+
+        [DataMember(Name="sender", EmitDefaultValue=false)]
+        [JsonProperty(PropertyName = "sender")]
+        public Sender Sender;
+
+        [DataMember(Name = "timestamp", EmitDefaultValue = false)] [JsonProperty(PropertyName = "timestamp")]
+        public string Timestamp;
+    }
+
+    public class Sender {
+
+        [DataMember(Name="networkoperator", EmitDefaultValue=false)]
+        [JsonProperty(PropertyName = "networkoperator")]
+        public string NetworkOperator;
+
+        [DataMember(Name="serviceprovider", EmitDefaultValue=false)]
+        [JsonProperty(PropertyName = "serviceprovider")]
+        public string ServiceProvider;
+    }
+
+    public class Receiver {
+
+        [DataMember(Name="networkoperator", EmitDefaultValue=false)]
+        [JsonProperty(PropertyName = "networkoperator")]
+        public string NetworkOperator;
+
+        [DataMember(Name="serviceprovider", EmitDefaultValue=false)]
+        [JsonProperty(PropertyName = "serviceprovider")]
+        public string ServiceProvider;
+    }
+
     public class NumberSeries {
 
         [DataMember(Name="start", EmitDefaultValue=false)]
@@ -63,25 +106,6 @@ namespace Coin.NP.Messages.V1 {
         [DataMember(Name="profileid", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "profileid")]
         public string ProfileId;
-    }
-
-    public class EnumOperatorContent : INpMessageContent {
-
-        [DataMember(Name="dossierid", EmitDefaultValue=false)]
-        [JsonProperty(PropertyName = "dossierid")]
-        public string DossierId { get; set; }
-
-        [DataMember(Name="currentnetworkoperator", EmitDefaultValue=false)]
-        [JsonProperty(PropertyName = "currentnetworkoperator")]
-        public string CurrentNetworkOperator;
-
-        [DataMember(Name="typeofnumber", EmitDefaultValue=false)]
-        [JsonProperty(PropertyName = "typeofnumber")]
-        public string TypeOfNumber;
-
-        [DataMember(Name="repeats", EmitDefaultValue=false)]
-        [JsonProperty(PropertyName = "repeats")]
-        public List<EnumOperatorRepeats> Repeats;
     }
 
     public class EnumOperatorRepeats {
