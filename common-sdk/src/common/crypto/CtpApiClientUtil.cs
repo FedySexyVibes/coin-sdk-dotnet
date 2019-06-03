@@ -13,11 +13,9 @@ using Org.BouncyCastle.Security;
 
 namespace Coin.Common.Crypto
 {
-    public class CtpApiClientUtil
+    public static class CtpApiClientUtil
     {
         public const int DefaultValidPeriodInSecs = 30;
-
-        CtpApiClientUtil() {}
 
         public enum HmacSignatureType
         {
