@@ -1,9 +1,10 @@
+using System.Net;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Coin.Common.Client;
 using Coin.NP.Messages.V1;
-using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using static Coin.Common.Crypto.CtpApiClientUtil;
 using static Coin.NP.Messages.V1.Utils;
 
@@ -26,7 +27,7 @@ namespace Coin.NP.Service.Impl
             _apiUrl = apiUrl;
         }
 
-        public Task sendConfirmation(string id)
+        public Task<HttpResponseMessage> sendConfirmation(string id)
         {
             var confirmationMessage = new ConfirmationMessage {TransactionId = id};
             var url = $"{_apiUrl}/dossiers/confirmations/{id}";
@@ -38,7 +39,16 @@ namespace Coin.NP.Service.Impl
             var url = $"{_apiUrl}/dossiers/{TypeName(envelope)}";
             var responseMessage = await SendWithToken(HttpMethod.Post, url, envelope);
             var responseBody = await responseMessage.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<MessageResponse>(responseBody);
+            var json = JObject.Parse(responseBody);
+            if (responseMessage.IsSuccessStatusCode)
+            {
+                return json.ToObject<MessageResponse>();
+            }
+            if (json.TryGetValue("transactionId", out _))
+            {
+                return json.ToObject<ErrorResponse>();
+            }
+            throw new HttpListenerException((int) responseMessage.StatusCode, responseBody);
         }
     }
 }

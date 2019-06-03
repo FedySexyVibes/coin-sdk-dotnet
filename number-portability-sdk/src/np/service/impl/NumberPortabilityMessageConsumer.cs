@@ -19,6 +19,7 @@ namespace Coin.NP.Service.Impl
         readonly int? _numberOfRetries;
         readonly int _backOffPeriod;
         readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        EventSourceReader _eventSourceReader;
 
         public NumberPortabilityMessageConsumer(string consumerName, string privateKeyFile, string encryptedHmacSecretFile,
             INumberPortabilityMessageListener listener, string sseUri, int backOffPeriod, int? numberOfRetries = null,
@@ -41,6 +42,8 @@ namespace Coin.NP.Service.Impl
             _numberOfRetries = numberOfRetries;
         }
 
+        public void StopConsuming() => _eventSourceReader?.Dispose();
+        
         public void StartConsuming(
             ConfirmationStatus confirmationStatus = ConfirmationStatus.Unconfirmed,
             long initialOffset = DefaultOffset,
@@ -56,10 +59,10 @@ namespace Coin.NP.Service.Impl
 
             void StartReading(long offset)
             {
-                var eventSourceReader = new EventSourceReader(CreateUri(offset, confirmationStatus, messageTypes), coinHttpClientHandler);
-                eventSourceReader.MessageReceived += (sender, e) => HandleEvent(e);
-                eventSourceReader.Start();
-                eventSourceReader.Disconnected += (sender, e) => HandleDisconnect(eventSourceReader, e);
+                _eventSourceReader = new EventSourceReader(CreateUri(offset, confirmationStatus, messageTypes), coinHttpClientHandler);
+                _eventSourceReader.MessageReceived += (sender, e) => HandleEvent(e);
+                _eventSourceReader.Start();
+                _eventSourceReader.Disconnected += (sender, e) => HandleDisconnect(e);
                 _logger.Info("Stream started");
             }
             
@@ -78,11 +81,11 @@ namespace Coin.NP.Service.Impl
                 }
             }
 
-            void HandleDisconnect(EventSourceReader reader, DisconnectEventArgs e)
+            void HandleDisconnect(DisconnectEventArgs e)
             {
                 _logger.Debug($"Error: {e.Exception.Message}");
                 _logger.Debug("Restarting stream");
-                reader.Dispose();
+                _eventSourceReader?.Dispose();
                 var persistedOffset = offsetPersister?.Offset ?? initialOffset;
                 var recoveredOffset = recoverOffset?.Invoke(persistedOffset) ?? persistedOffset;
                 if (retriesLeft != null && retriesLeft-- == 0)

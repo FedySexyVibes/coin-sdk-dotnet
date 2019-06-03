@@ -6,9 +6,23 @@ namespace Coin.NP.Messages.V1 {
 
     public class MessageResponse {
 
-        [DataMember(Name="transactionId", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "transactionId")]
         public string TransactionId;
+    }
+
+    public class ErrorResponse : MessageResponse {
+
+        [JsonProperty(PropertyName = "errors")]
+        public List<ErrorContent> Errors;
+    }
+
+    public class ErrorContent {
+
+        [JsonProperty(PropertyName = "code")]
+        public string Code;
+        
+        [JsonProperty(PropertyName = "message")]
+        public string Message;
     }
 
     public class Header {

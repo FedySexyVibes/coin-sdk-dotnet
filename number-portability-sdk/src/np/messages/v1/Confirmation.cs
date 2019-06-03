@@ -11,7 +11,6 @@ namespace Coin.NP.Messages.V1 {
     }
 
     public enum ConfirmationStatus {
-        //Confirmed,
         Unconfirmed,
         All
     }
