@@ -16,7 +16,7 @@ namespace Tests
         const string Operator = "<YOUR OPERATOR>";
         readonly string _timestamp = DateTime.Now.ToString("yyyyMMddhhmmss");
         const string PhoneNumber = "0612345678";
-        
+
         [SetUp]
         public void Setup()
         {
@@ -110,7 +110,14 @@ namespace Tests
         public void ConsumeMessages()
         {
             _messageConsumer.StartConsuming();
-            Thread.Sleep(10000);
+            Thread.Sleep(1000);
+        }
+        
+        [Test]
+        public void SendConfirmation()
+        {
+            const string messageId = "<ENTER MESSAGE ID>";
+            _numberPortabilityService.sendConfirmation(messageId).Wait();
         }
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Coin.NP.Messages.V1
 {
@@ -24,28 +25,29 @@ namespace Coin.NP.Messages.V1
 
         public static INpMessage<INpMessageContent> Deserialize(string type, string json)
         {
+            var message = JObject.Parse(json).First.First;
             switch (type)
             {
-                case "activationsn": return JsonConvert.DeserializeObject<ActivationServiceNumberMessage>(json);
-                case "cancel": return JsonConvert.DeserializeObject<CancelMessage>(json);
-                case "deactivation": return JsonConvert.DeserializeObject<DeactivationMessage>(json);
-                case "deactivationsn": return JsonConvert.DeserializeObject<DeactivationServiceNumberMessage>(json);
-                case "enumactivationnumber": return JsonConvert.DeserializeObject<EnumActivationNumberMessage>(json);
-                case "enumactivationoperator": return JsonConvert.DeserializeObject<EnumActivationOperatorMessage>(json);
-                case "enumactivationrange": return JsonConvert.DeserializeObject<EnumActivationRangeMessage>(json);
-                case "enumdeactivationnumber": return JsonConvert.DeserializeObject<EnumDeactivationNumberMessage>(json);
-                case "enumdeactivationoperator": return JsonConvert.DeserializeObject<EnumDeactivationOperatorMessage>(json);
-                case "enumdeactivationrange": return JsonConvert.DeserializeObject<EnumDeactivationRangeMessage>(json);
-                case "enumprofileactivation": return JsonConvert.DeserializeObject<EnumProfileActivationMessage>(json);
-                case "enumprofiledeactivation": return JsonConvert.DeserializeObject<EnumProfileDeactivationMessage>(json);
-                case "errorfound": return JsonConvert.DeserializeObject<ErrorFoundMessage>(json);
-                case "portingperformed": return JsonConvert.DeserializeObject<PortingPerformedMessage>(json);
-                case "portingrequest": return JsonConvert.DeserializeObject<PortingRequestMessage>(json);
-                case "portingrequestanswer": return JsonConvert.DeserializeObject<PortingRequestAnswerMessage>(json);
-                case "pradelayed": return JsonConvert.DeserializeObject<PortingRequestAnswerDelayedMessage>(json);
-                case "rangeactivation": return JsonConvert.DeserializeObject<RangeActivationMessage>(json);
-                case "rangedeactivation": return JsonConvert.DeserializeObject<RangeDeactivationMessage>(json);
-                case "tariffchangesn": return JsonConvert.DeserializeObject<TariffChangeServiceNumberMessage>(json);
+                case "activationsn-v1": return message.ToObject<ActivationServiceNumberMessage>();
+                case "cancel-v1": return message.ToObject<CancelMessage>();
+                case "deactivation-v1": return message.ToObject<DeactivationMessage>();
+                case "deactivationsn-v1": return message.ToObject<DeactivationServiceNumberMessage>();
+                case "enumactivationnumber-v1": return message.ToObject<EnumActivationNumberMessage>();
+                case "enumactivationoperator-v1": return message.ToObject<EnumActivationOperatorMessage>();
+                case "enumactivationrange-v1": return message.ToObject<EnumActivationRangeMessage>();
+                case "enumdeactivationnumber-v1": return message.ToObject<EnumDeactivationNumberMessage>();
+                case "enumdeactivationoperator-v1": return message.ToObject<EnumDeactivationOperatorMessage>();
+                case "enumdeactivationrange-v1": return message.ToObject<EnumDeactivationRangeMessage>();
+                case "enumprofileactivation-v1": return message.ToObject<EnumProfileActivationMessage>();
+                case "enumprofiledeactivation-v1": return message.ToObject<EnumProfileDeactivationMessage>();
+                case "errorfound-v1": return message.ToObject<ErrorFoundMessage>();
+                case "portingperformed-v1": return message.ToObject<PortingPerformedMessage>();
+                case "portingrequest-v1": return message.ToObject<PortingRequestMessage>();
+                case "portingrequestanswer-v1": return message.ToObject<PortingRequestAnswerMessage>();
+                case "pradelayed-v1": return message.ToObject<PortingRequestAnswerDelayedMessage>();
+                case "rangeactivation-v1": return message.ToObject<RangeActivationMessage>();
+                case "rangedeactivation-v1": return message.ToObject<RangeDeactivationMessage>();
+                case "tariffchangesn-v1": return message.ToObject<TariffChangeServiceNumberMessage>();
                 default: throw new JsonException($"Unknown message type {type}");
             }
         }

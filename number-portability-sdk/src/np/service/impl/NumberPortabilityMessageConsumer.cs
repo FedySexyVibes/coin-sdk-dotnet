@@ -94,6 +94,7 @@ namespace Coin.NP.Service.Impl
         }
 
         Uri CreateUri(long offset, ConfirmationStatus confirmationStatus, string[] messageTypes) =>
-            new Uri($"{_sseUri}?offset={offset}&confirmationStatus={confirmationStatus}&messageTypes={string.Join(",", messageTypes)}");
+            new Uri($"{_sseUri}?offset={offset}&confirmationStatus={confirmationStatus}"
+                    + (messageTypes.Length == 0 ? "" : $"&messageTypes={string.Join(",", messageTypes)}"));
     }
 }

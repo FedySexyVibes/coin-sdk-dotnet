@@ -28,6 +28,7 @@ namespace Coin.Common.Client
         
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
+            request.Content = request.Content ?? new ByteArrayContent(new byte[0]);
             var content = await request.Content.ReadAsByteArrayAsync();
             var hmacHeaders = CtpApiClientUtil.GetHmacHeaders(_hmacSignatureType, content);
             foreach (var pair in hmacHeaders)

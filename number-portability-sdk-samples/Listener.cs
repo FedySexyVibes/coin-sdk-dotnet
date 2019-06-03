@@ -8,9 +8,7 @@ namespace Tests
 {
     public class Listener : INumberPortabilityMessageListener
     {
-        public void OnMessage(string messageId, INpMessage<INpMessageContent> message)
-        {
+        public void OnMessage(string messageId, INpMessage<INpMessageContent> message) =>
             Console.WriteLine($"{TypeName(message)} {messageId}:\n{JsonConvert.SerializeObject(message, Formatting.Indented)}\n");
-        }
     }
 }
