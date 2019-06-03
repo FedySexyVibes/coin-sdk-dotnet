@@ -18,25 +18,27 @@ namespace Coin.NP.Service.Impl
         readonly string _sseUri;
         readonly int? _numberOfRetries;
         readonly int _backOffPeriod;
-        readonly CoinHttpClientHandler _coinHttpClientHandler;
         readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        public NumberPortabilityMessageConsumer(
-            INumberPortabilityMessageListener listener, string sseUri, string consumerName, int backOffPeriod, string privateKeyFile, string encryptedHmacSecretFile) :
-            this(listener, sseUri, consumerName, backOffPeriod, ReadPrivateKeyFile(privateKeyFile), encryptedHmacSecretFile) {}
+        public NumberPortabilityMessageConsumer(string consumerName, string privateKeyFile, string encryptedHmacSecretFile,
+            INumberPortabilityMessageListener listener, string sseUri, int backOffPeriod, int? numberOfRetries = null,
+            HmacSignatureType hmacSignatureType = HmacSignatureType.XDateAndDigest, int validPeriodInSeconds = DefaultValidPeriodInSecs) :
+            this(consumerName, ReadPrivateKeyFile(privateKeyFile), encryptedHmacSecretFile,
+                listener, sseUri, backOffPeriod, numberOfRetries, hmacSignatureType, validPeriodInSeconds) {}
 
-        public NumberPortabilityMessageConsumer(INumberPortabilityMessageListener listener, string sseUri, string consumerName, int backOffPeriod, RSA privateKey, string encryptedHmacSecretFile) :
-            this(listener, sseUri, consumerName, backOffPeriod, HmacFromEncryptedBase64EncodedSecretFile(encryptedHmacSecretFile, privateKey), privateKey) {}
+        NumberPortabilityMessageConsumer(string consumerName, RSA privateKey, string encryptedHmacSecretFile, INumberPortabilityMessageListener listener,
+            string sseUri, int backOffPeriod, int? numberOfRetries, HmacSignatureType hmacSignatureType, int validPeriodInSeconds) :
+            this(consumerName, privateKey, HmacFromEncryptedBase64EncodedSecretFile(encryptedHmacSecretFile, privateKey),
+                listener, sseUri, backOffPeriod, numberOfRetries, hmacSignatureType, validPeriodInSeconds) {}
         
-        public NumberPortabilityMessageConsumer(INumberPortabilityMessageListener listener, string sseUri, string consumerName, int backOffPeriod,
-            HMACSHA256 signer, RSA privateKey, HmacSignatureType hmacSignatureType = HmacSignatureType.XDateAndDigest, int? numberOfRetries = null,
-            int validPeriodInSeconds = DefaultValidPeriodInSecs) : base(consumerName, signer, privateKey, hmacSignatureType, validPeriodInSeconds)
+        public NumberPortabilityMessageConsumer(string consumerName, RSA privateKey, HMACSHA256 signer, INumberPortabilityMessageListener listener,
+            string sseUri, int backOffPeriod, int? numberOfRetries = null, HmacSignatureType hmacSignatureType = HmacSignatureType.XDateAndDigest,
+            int validPeriodInSeconds = DefaultValidPeriodInSecs) : base(consumerName, privateKey, signer, hmacSignatureType, validPeriodInSeconds)
         {
             _listener = listener;
             _sseUri = sseUri;
-            _numberOfRetries = numberOfRetries;
             _backOffPeriod = backOffPeriod;
-            _coinHttpClientHandler = new CoinHttpClientHandler(consumerName, signer, privateKey, hmacSignatureType, validPeriodInSeconds);
+            _numberOfRetries = numberOfRetries;
         }
 
         public void StartConsuming(
@@ -54,7 +56,7 @@ namespace Coin.NP.Service.Impl
 
             void StartReading(long offset)
             {
-                var eventSourceReader = new EventSourceReader(CreateUri(offset, confirmationStatus, messageTypes), _coinHttpClientHandler);
+                var eventSourceReader = new EventSourceReader(CreateUri(offset, confirmationStatus, messageTypes), coinHttpClientHandler);
                 eventSourceReader.MessageReceived += (sender, e) => HandleEvent(e);
                 eventSourceReader.Start();
                 eventSourceReader.Disconnected += (sender, e) => HandleDisconnect(eventSourceReader, e);

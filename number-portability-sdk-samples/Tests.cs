@@ -28,7 +28,7 @@ namespace Tests
             const int backOffPeriod = 1;
             var listener = new Listener();
             _numberPortabilityService = new NumberPortabilityService(apiUrl, consumer, privateKeyFile, encryptedHmacSecretFile);
-            _messageConsumer = new NumberPortabilityMessageConsumer(listener, sseUrl, consumer, backOffPeriod, privateKeyFile, encryptedHmacSecretFile);
+            _messageConsumer = new NumberPortabilityMessageConsumer(consumer, privateKeyFile, encryptedHmacSecretFile, listener, sseUrl, backOffPeriod);
         }
 
         [Test]

@@ -21,7 +21,7 @@ namespace Coin.NP.Service.Impl
         public NumberPortabilityService(string apiUrl, string consumerName, RSA privateKey, string encryptedHmacSecretFile) :
             this(apiUrl, consumerName, HmacFromEncryptedBase64EncodedSecretFile(encryptedHmacSecretFile, privateKey), privateKey) {}
 
-        public NumberPortabilityService(string apiUrl, string consumerName, HMACSHA256 signer, RSA privateKey) : base(consumerName, signer, privateKey)
+        public NumberPortabilityService(string apiUrl, string consumerName, HMACSHA256 signer, RSA privateKey) : base(consumerName, privateKey, signer)
         {
             _apiUrl = apiUrl;
         }

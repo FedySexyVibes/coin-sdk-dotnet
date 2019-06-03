@@ -2,31 +2,34 @@ using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using Coin.Common.Crypto;
 using Newtonsoft.Json;
+using static Coin.Common.Crypto.CtpApiClientUtil;
 
 namespace Coin.Common.Client
 {
-    public abstract class CtpApiRestTemplateSupport : AbstractCtpApiSupport
+    public abstract class CtpApiRestTemplateSupport
     {
-        readonly HttpClient _httpClient;
+        protected readonly HttpClient HttpClient;
+        protected readonly CoinHttpClientHandler coinHttpClientHandler;
 
-        protected CtpApiRestTemplateSupport(
-            string consumerName,
-            HMACSHA256 signer,
-            RSA privateKey,
-            CtpApiClientUtil.HmacSignatureType hmacSignatureType = CtpApiClientUtil.HmacSignatureType.XDateAndDigest,
-            int validPeriodInSeconds = CtpApiClientUtil.DefaultValidPeriodInSecs) :
-            base(consumerName, signer, privateKey, hmacSignatureType, validPeriodInSeconds)
+        protected CtpApiRestTemplateSupport(string consumerName, string privateKeyFile, string encryptedHmacSecretFile) :
+            this(consumerName, ReadPrivateKeyFile(privateKeyFile), encryptedHmacSecretFile) {}
+
+        CtpApiRestTemplateSupport(string consumerName, RSA privateKey, string encryptedHmacSecretFile) :
+            this(consumerName, privateKey, HmacFromEncryptedBase64EncodedSecretFile(encryptedHmacSecretFile, privateKey)) {}
+        
+        protected CtpApiRestTemplateSupport(string consumerName, RSA privateKey, HMACSHA256 signer, 
+            HmacSignatureType hmacSignatureType = HmacSignatureType.XDateAndDigest, int validPeriodInSeconds = DefaultValidPeriodInSecs)
         {
-            _httpClient = new HttpClient(new CoinHttpClientHandler(consumerName, signer, privateKey, hmacSignatureType, validPeriodInSeconds));
+            coinHttpClientHandler = new CoinHttpClientHandler(consumerName, privateKey, signer, hmacSignatureType, validPeriodInSeconds);
+            HttpClient = new HttpClient(coinHttpClientHandler);
         }
 
         public Task<HttpResponseMessage> SendWithToken<T>(HttpMethod method, string url, T content) {
             var request = new HttpRequestMessage(method, url);
             var bodyAsString = JsonConvert.SerializeObject(content);
             request.Content = new StringContent(bodyAsString, Encoding.Default, "application/json");
-            return _httpClient.SendAsync(request);
+            return HttpClient.SendAsync(request);
         }
     }
 }
