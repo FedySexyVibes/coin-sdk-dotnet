@@ -1,30 +1,29 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using Coin.NP.Messages.V1;
-using Coin.NP.Service.Impl;
+using Coin.Sdk.NP.Messages.V1;
+using Coin.Sdk.NP.Service.Impl;
 using NUnit.Framework;
-using static Tests.TestUtils;
 
-namespace Tests
+namespace Coin.Sdk.NP.Sample
 {
     public class Tests
     {
         NumberPortabilityService _numberPortabilityService;
         NumberPortabilityMessageConsumer _messageConsumer;
         
-        const string Operator = "<YOUR OPERATOR>";
+        const string Operator = "LOADA";
         readonly string _timestamp = DateTime.Now.ToString("yyyyMMddhhmmss");
         const string PhoneNumber = "0612345678";
 
         [SetUp]
         public void Setup()
         {
-            const string apiUrl = "https://test-api.coin.nl/number-portability/v1";
+            const string apiUrl = "https://dev-api.coin.nl/number-portability/v1";
             const string sseUrl = apiUrl + "/dossiers/events"; 
-            const string consumer = "<YOUR CONSUMER>";
-            var privateKeyFile = GetPath("private-key.pem");
-            var encryptedHmacSecretFile =  GetPath("sharedkey.encrypted");
+            const string consumer = "bart test";
+            var privateKeyFile = TestUtils.GetPath("private-key.pem");
+            var encryptedHmacSecretFile =  TestUtils.GetPath("sharedkey.encrypted");
             const int backOffPeriod = 1;
             var listener = new Listener();
             _numberPortabilityService = new NumberPortabilityService(apiUrl, consumer, privateKeyFile, encryptedHmacSecretFile);
@@ -34,7 +33,7 @@ namespace Tests
         [Test]
         public void SendPortingRequest()
         {
-            var dossierId = GenerateDossierId(Operator);
+            var dossierId = TestUtils.GenerateDossierId(Operator);
             Console.WriteLine($"Sending porting request with dossier id {dossierId}");
 
             var message = new MessageEnvelope<PortingRequest>
@@ -50,7 +49,7 @@ namespace Tests
                         },
                         Receiver = new Receiver
                         {
-                            NetworkOperator = CrdbReceiver,
+                            NetworkOperator = TestUtils.CrdbReceiver,
                             //ServiceProvider = ""
                         },
                         Timestamp = _timestamp
@@ -59,7 +58,7 @@ namespace Tests
                     {
                         Content = new PortingRequest
                         {
-                            DossierId = dossierId,
+                            DossierId = dossierId + "sdn njksbg lkj",
                             //DonorNetworkOperator = "",
                             //DonorServiceProvider = "",
                             RecipientNetworkOperator = Operator,
