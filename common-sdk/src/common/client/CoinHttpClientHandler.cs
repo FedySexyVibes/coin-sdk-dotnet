@@ -4,9 +4,9 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
-using static Coin.Common.Crypto.CtpApiClientUtil;
+using static Coin.Sdk.Common.Crypto.CtpApiClientUtil;
 
-namespace Coin.Common.Client
+namespace Coin.Sdk.Common.Client
 {
     public class CoinHttpClientHandler : HttpClientHandler
     {

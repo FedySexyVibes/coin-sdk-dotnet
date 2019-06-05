@@ -2,10 +2,10 @@ using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using static Coin.Sdk.Common.Crypto.CtpApiClientUtil;
 using Newtonsoft.Json;
-using static Coin.Common.Crypto.CtpApiClientUtil;
 
-namespace Coin.Common.Client
+namespace Coin.Sdk.Common.Client
 {
     public abstract class CtpApiRestTemplateSupport
     {

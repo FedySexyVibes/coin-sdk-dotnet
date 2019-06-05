@@ -1,10 +1,10 @@
 using System;
-using Coin.NP.Messages.V1;
-using static Coin.NP.Messages.V1.Utils;
-using Coin.NP.Service;
+using Coin.Sdk.NP.Messages.V1;
+using static Coin.Sdk.NP.Messages.V1.Utils;
+using Coin.Sdk.NP.Service;
 using Newtonsoft.Json;
 
-namespace Tests
+namespace Coin.Sdk.NP.Sample
 {
     public class Listener : INumberPortabilityMessageListener
     {

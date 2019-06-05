@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using Coin.NP.Messages.V1;
-using Coin.NP.Service.Impl;
+using Coin.Sdk.NP.Messages.V1;
+using Coin.Sdk.NP.Service.Impl;
 using NUnit.Framework;
 using static Tests.TestUtils;
 
-namespace Tests
+namespace Coin.Sdk.NP.Sample
 {
     public class Tests
     {

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 
-namespace Coin.NP.Messages.V1 {
+namespace Coin.Sdk.NP.Messages.V1 {
 
     public class ActivationServiceNumberMessage : INpMessage<ActivationServiceNumber> {
 

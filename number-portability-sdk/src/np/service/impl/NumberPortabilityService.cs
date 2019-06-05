@@ -2,13 +2,13 @@ using System.Net;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
-using Coin.Common.Client;
-using Coin.NP.Messages.V1;
+using Coin.Sdk.NP.Messages.V1;
+using Coin.Sdk.Common.Client;
 using Newtonsoft.Json.Linq;
-using static Coin.Common.Crypto.CtpApiClientUtil;
-using static Coin.NP.Messages.V1.Utils;
+using static Coin.Sdk.Common.Crypto.CtpApiClientUtil;
+using static Coin.Sdk.NP.Messages.V1.Utils;
 
-namespace Coin.NP.Service.Impl
+namespace Coin.Sdk.NP.Service.Impl
 {
 
     public class NumberPortabilityService : CtpApiRestTemplateSupport, INumberPortabilityService

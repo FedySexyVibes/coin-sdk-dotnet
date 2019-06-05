@@ -1,8 +1,8 @@
 using System.Net.Http;
 using System.Threading.Tasks;
-using Coin.NP.Messages.V1;
+using Coin.Sdk.NP.Messages.V1;
 
-namespace Coin.NP.Service
+namespace Coin.Sdk.NP.Service
 {
 
     public interface INumberPortabilityMessageListener

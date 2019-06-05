@@ -11,7 +11,7 @@ using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.OpenSsl;
 using Org.BouncyCastle.Security;
 
-namespace Coin.Common.Crypto
+namespace Coin.Sdk.Common.Crypto
 {
     public static class CtpApiClientUtil
     {

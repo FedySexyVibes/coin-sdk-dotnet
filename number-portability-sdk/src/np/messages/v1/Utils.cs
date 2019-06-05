@@ -3,7 +3,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Coin.NP.Messages.V1
+namespace Coin.Sdk.NP.Messages.V1
 {
     public static class Utils
     {
