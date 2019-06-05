@@ -1,8 +1,8 @@
-# Java Common SDK
+# .NET Common SDK
 
 ## Introduction
 
-The C# Common SDK contains the basics for secured access to all COIN APIs.
+The .NEt Common SDK contains the basics for secured access to all COIN APIs.
 It contains no specific API implementation.
 
 ## Configure Credentials

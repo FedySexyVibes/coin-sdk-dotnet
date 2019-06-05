@@ -1,4 +1,4 @@
-# C# Number Portability SDK
+# .NET Number Portability SDK
 
 ## Introduction
 

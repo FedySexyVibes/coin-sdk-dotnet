@@ -63,7 +63,7 @@ namespace Tests
                             //DonorNetworkOperator = "",
                             //DonorServiceProvider = "",
                             RecipientNetworkOperator = Operator,
-                            //Recipientserviceprovider = "",
+                            //RecipientServiceProvider = "",
                             Repeats = new List<PortingRequestRepeats>
                             {
                                 new PortingRequestRepeats
@@ -109,6 +109,7 @@ namespace Tests
             {
                 Console.WriteLine($"Error {content.Code}: {content.Message}");
             }
+            Assert.Fail();
         }
 
         [Test]
@@ -122,10 +123,12 @@ namespace Tests
         public void SendConfirmation()
         {
             const string messageId = "<ENTER MESSAGE ID>";
-            var response = _numberPortabilityService.sendConfirmation(messageId).Result;
+            var response = _numberPortabilityService.SendConfirmation(messageId).Result;
             Console.WriteLine(response.IsSuccessStatusCode
                 ? $"Successfully sent confirmation of message {messageId}"
                 : $"Confirmation failed with status {response.StatusCode}. Response: {response.Content.ReadAsStringAsync().Result}.");
+
+            Assert.True(response.IsSuccessStatusCode);
         }
     }
 }

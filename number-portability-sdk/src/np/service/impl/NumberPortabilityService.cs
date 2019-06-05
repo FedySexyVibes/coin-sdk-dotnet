@@ -27,7 +27,7 @@ namespace Coin.NP.Service.Impl
             _apiUrl = apiUrl;
         }
 
-        public Task<HttpResponseMessage> sendConfirmation(string id)
+        public Task<HttpResponseMessage> SendConfirmation(string id)
         {
             var confirmationMessage = new ConfirmationMessage {TransactionId = id};
             var url = $"{_apiUrl}/dossiers/confirmations/{id}";

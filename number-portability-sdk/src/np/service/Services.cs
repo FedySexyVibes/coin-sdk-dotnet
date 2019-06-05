@@ -12,7 +12,7 @@ namespace Coin.NP.Service
 
     public interface INumberPortabilityService {
 
-        Task<HttpResponseMessage> sendConfirmation(string id);
+        Task<HttpResponseMessage> SendConfirmation(string id);
 
         Task<MessageResponse> SendMessage(IMessageEnvelope<INpMessageContent> message);
     }

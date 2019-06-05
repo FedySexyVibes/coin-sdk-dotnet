@@ -31,7 +31,7 @@ namespace Coin.NP.Messages.V1 {
 
         [DataMember(Name="recipientserviceprovider", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "recipientserviceprovider")]
-        public string Recipientserviceprovider;
+        public string RecipientServiceProvider;
 
         [DataMember(Name="recipientnetworkoperator", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "recipientnetworkoperator")]

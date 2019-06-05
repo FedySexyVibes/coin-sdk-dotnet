@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
@@ -46,7 +47,8 @@ namespace Coin.Common.Client
             }
             var requestLine = $"{request.Method} {request.RequestUri.LocalPath} HTTP/1.1";
             request.Headers.Add("authorization", CalculateHttpRequestHmac(_signer, _consumerName, hmacHeaders, requestLine));
-            
+            request.Headers.Add("User-Agent", $"coin-sdk-dotnet-v{Assembly.GetAssembly(typeof(CoinHttpClientHandler)).GetName().Version}");
+
             var jwt = CreateJwt(_privateKey, _consumerName, _validPeriodInSeconds);
             CookieContainer = new CookieContainer();
             CookieContainer.Add(request.RequestUri, new Cookie("jwt", jwt));
