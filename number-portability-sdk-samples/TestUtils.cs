@@ -1,6 +1,6 @@
 using System;
 
-namespace Tests
+namespace Coin.Sdk.NP.Sample
 {
     public static class TestUtils {
 

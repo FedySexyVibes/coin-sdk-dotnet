@@ -1,7 +1,13 @@
-stages:
-  - build
+variables:
+  AWS_DEFAULT_REGION: eu-central-1
 
-build:
-  stage: build
+test:
+  before_script:
+    - aws ecr get-login --no-include-email | sh
+    - ./setup/start-dockercompose
+    - ./setup/setup_kong.sh ./number-portability-sdk-tests
+    - docker build . -t coin-sdk-dotnet
   script:
-    - docker build .
+    - ./setup/start-dockercompose sdk
+  after_script:
+    - ./setup/stop-dockercompose

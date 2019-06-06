@@ -1,34 +1,25 @@
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using Coin.Sdk.NP.Messages.V1;
 using Coin.Sdk.NP.Service.Impl;
 using NUnit.Framework;
-using static Coin.Sdk.NP.Sample.TestUtils;
+using static Coin.Sdk.NP.Tests.TestSettings;
+using static Coin.Sdk.NP.Tests.TestUtils;
 
-namespace Coin.Sdk.NP.Sample
+namespace Coin.Sdk.NP.Tests
 {
-    public class Tests
+    public class PortingRequestTests
     {
         NumberPortabilityService _numberPortabilityService;
         NumberPortabilityMessageConsumer _messageConsumer;
-        
-        const string Operator = "<YOUR OPERATOR>";
-        readonly string _timestamp = DateTime.Now.ToString("yyyyMMddhhmmss");
-        const string PhoneNumber = "0612345678";
 
         [SetUp]
         public void Setup()
         {
-            const string apiUrl = "https://test-api.coin.nl/number-portability/v1";
-            const string sseUrl = apiUrl + "/dossiers/events"; 
-            const string consumer = "<YOUR CONSUMER>";
-            var privateKeyFile = GetPath("private-key.pem");
-            var encryptedHmacSecretFile =  GetPath("sharedkey.encrypted");
             const int backOffPeriod = 1;
-            var listener = new Listener();
-            _numberPortabilityService = new NumberPortabilityService(apiUrl, consumer, privateKeyFile, encryptedHmacSecretFile);
-            _messageConsumer = new NumberPortabilityMessageConsumer(consumer, privateKeyFile, encryptedHmacSecretFile, listener, sseUrl, backOffPeriod);
+            var listener = new TestListener();
+            _numberPortabilityService = new NumberPortabilityService(ApiUrl, Consumer, PrivateKeyFile, EncryptedHmacSecretFile);
+            _messageConsumer = new NumberPortabilityMessageConsumer(Consumer, PrivateKeyFile, EncryptedHmacSecretFile, listener, SseUrl, backOffPeriod);
         }
 
         [Test]
@@ -53,7 +44,7 @@ namespace Coin.Sdk.NP.Sample
                             NetworkOperator = CrdbReceiver,
                             //ServiceProvider = ""
                         },
-                        Timestamp = _timestamp
+                        Timestamp = Timestamp
                     },
                     Body = new PortingRequestBody
                     {
@@ -110,25 +101,6 @@ namespace Coin.Sdk.NP.Sample
                 Console.WriteLine($"Error {content.Code}: {content.Message}");
             }
             Assert.Fail();
-        }
-
-        [Test]
-        public void ConsumeMessages()
-        {
-            _messageConsumer.StartConsuming();
-            Thread.Sleep(1000);
-        }
-        
-        [Test]
-        public void SendConfirmation()
-        {
-            const string messageId = "<ENTER MESSAGE ID>";
-            var response = _numberPortabilityService.SendConfirmation(messageId).Result;
-            Console.WriteLine(response.IsSuccessStatusCode
-                ? $"Successfully sent confirmation of message {messageId}"
-                : $"Confirmation failed with status {response.StatusCode}. Response: {response.Content.ReadAsStringAsync().Result}.");
-
-            Assert.True(response.IsSuccessStatusCode);
         }
     }
 }

@@ -1,0 +1,79 @@
+version: '2.4'
+
+services:
+  docker0:
+    image: alpine/socat
+    command: -u udp-recv:8125 -
+    networks:
+      - kong-network
+
+  kong-database:
+    image: postgres:10-alpine
+    environment:
+      - POSTGRES_USER=kong
+      - POSTGRES_DB=kong
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "kong"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - kong-network
+
+  kong-migration:
+    image: 280925583500.dkr.ecr.eu-central-1.amazonaws.com/kong:latest
+    depends_on:
+      kong-database:
+        condition: service_healthy
+    environment:
+      - KONG_PG_USER=kong
+      - KONG_PG_DATABASE=kong
+      - KONG_PG_HOST=kong-database
+      - RUN_LOCALLY=true
+    command: "/usr/local/bin/start_migrations"
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /tmp/migrations-completed" ]
+      interval: 10s
+      timeout: 5s
+      retries: 900
+    networks:
+      - kong-network
+
+  kong:
+    image: 280925583500.dkr.ecr.eu-central-1.amazonaws.com/kong:latest
+    depends_on:
+      kong-database:
+        condition: service_healthy
+      kong-migration:
+        condition: service_healthy
+    environment:
+      - KONG_PG_USER=kong
+      - KONG_PG_HOST=kong-database
+      - KONG_PG_DATABASE=kong
+      - RUN_LOCALLY=true
+      - KONG_ADMIN_LISTEN=0.0.0.0:8001
+    ports:
+      - "8000:8000"
+      - "8001:8001"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -I -s -L http://127.0.0.1:8000 || exit 1"]
+      interval: 5s
+      retries: 10
+    networks:
+      - kong-network
+
+  api-stub:
+    image: 280925583500.dkr.ecr.eu-central-1.amazonaws.com/crdb/rest-api-stub:latest
+    networks:
+      - kong-network
+
+  coin-sdk:
+    image: coin-sdk-dotnet
+    depends_on:
+      kong:
+        condition: service_healthy
+    networks:
+      - kong-network
+
+networks:
+  kong-network:

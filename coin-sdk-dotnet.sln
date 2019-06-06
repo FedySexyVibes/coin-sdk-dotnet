@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "number-portability-sdk", "n
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "number-portability-sdk-samples", "number-portability-sdk-samples\number-portability-sdk-samples.csproj", "{E36C7AA1-B996-4174-AE19-D0264FE4B9EC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "number-portability-sdk-tests", "number-portability-sdk-tests\number-portability-sdk-tests.csproj", "{FE6CE0B2-6005-4A69-86D5-3C4CADC43E3C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{E36C7AA1-B996-4174-AE19-D0264FE4B9EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E36C7AA1-B996-4174-AE19-D0264FE4B9EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E36C7AA1-B996-4174-AE19-D0264FE4B9EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE6CE0B2-6005-4A69-86D5-3C4CADC43E3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE6CE0B2-6005-4A69-86D5-3C4CADC43E3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE6CE0B2-6005-4A69-86D5-3C4CADC43E3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE6CE0B2-6005-4A69-86D5-3C4CADC43E3C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

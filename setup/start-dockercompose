@@ -1,0 +1,20 @@
+#!/bin/bash
+
+
+if [[ $1 == sdk ]] || [[ $2 == sdk ]]
+then
+    SERVICES="coin-sdk"
+    ACTION="run"
+else
+    SERVICES="docker0 kong-database kong-migration kong api-stub"
+    ACTION="up -d --build"
+fi
+
+if [[ $1 == local ]]
+then
+    docker-compose --project-name coin-sdk-dotnet-local ${ACTION} ${SERVICES}
+else
+	# remove port exposure to avoid conflicts
+	sed -e 's/"[0-9][0-9]*:\([0-9][0-9]*\)"/"\1"/g' docker-compose.yaml > /tmp/docker-compose.yaml
+	docker-compose --project-name coin-sdk-dotnet-${CI_JOB_ID} --file /tmp/docker-compose.yaml --project-directory ${PWD} ${ACTION} ${SERVICES}
+fi

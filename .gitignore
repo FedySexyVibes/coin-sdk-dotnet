@@ -102,4 +102,5 @@ Thumbs.db
 /UpgradeLog.htm
 
 *.pem
+*.pem.pub
 *.encrypted
