@@ -50,7 +50,6 @@ namespace Coin.Sdk.Common.Client
             request.Headers.Add("User-Agent", $"coin-sdk-dotnet-v{Assembly.GetAssembly(typeof(CoinHttpClientHandler)).GetName().Version}");
 
             var jwt = CreateJwt(_privateKey, _consumerName, _validPeriodInSeconds);
-            CookieContainer = new CookieContainer();
             CookieContainer.Add(request.RequestUri, new Cookie("jwt", jwt));
             return await base.SendAsync(request, cancellationToken);
         }

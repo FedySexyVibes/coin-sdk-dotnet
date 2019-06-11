@@ -67,8 +67,22 @@ services:
     networks:
       - kong-network
 
+  setup:
+    build: ./setup
+    volumes:
+      - $PWD/number-portability-sdk-tests/keys/:/keys
+    environment:
+      - KONG_APP_URL=kong:8000
+      - KONG_ADMIN_URL=kong:8001
+      - KEYS_LOCATION=/keys
+    depends_on:
+      kong:
+        condition: service_healthy
+    networks:
+      - kong-network
+
   coin-sdk:
-    image: coin-sdk-dotnet
+    build: .
     depends_on:
       kong:
         condition: service_healthy

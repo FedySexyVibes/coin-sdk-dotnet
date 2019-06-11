@@ -17,4 +17,8 @@
         <ProjectReference Include="..\number-portability-sdk\number-portability-sdk.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="keys" />
+    </ItemGroup>
+
 </Project>

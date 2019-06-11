@@ -2,7 +2,7 @@
 
 if [[ $1 == local ]]
 then
-    docker-compose --project-name coin-sdk-dotnet-local down
+    docker-compose down
 else
 	docker-compose --project-name coin-sdk-dotnet-${CI_JOB_ID} --file /tmp/docker-compose.yaml --project-directory ${PWD} down
 fi

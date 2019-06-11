@@ -25,7 +25,7 @@ namespace Coin.Sdk.Common.Client
             HttpClient = new HttpClient(coinHttpClientHandler);
         }
 
-        public Task<HttpResponseMessage> SendWithToken<T>(HttpMethod method, string url, T content) {
+        protected Task<HttpResponseMessage> SendWithToken<T>(HttpMethod method, string url, T content) {
             var request = new HttpRequestMessage(method, url);
             var bodyAsString = JsonConvert.SerializeObject(content);
             request.Content = new StringContent(bodyAsString, Encoding.Default, "application/json");

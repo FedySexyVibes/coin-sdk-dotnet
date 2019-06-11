@@ -7,6 +7,7 @@ namespace Coin.Sdk.NP.Messages.V1
 {
     public static class Utils
     {
+        public static string TypeName<T>() where T : INpMessageContent, new() => TypeName(new T());
 
         public static string TypeName(IMessageEnvelope<INpMessageContent> envelope) => TypeName(envelope.Message.Body.Content);
         public static string TypeName(INpMessage<INpMessageContent> message) => TypeName(message.Body.Content);
