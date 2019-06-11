@@ -17,7 +17,7 @@ namespace Coin.Sdk.NP.Tests
         {
             const int backOffPeriod = 1;
             _listener = new TestListener();
-            _messageConsumer = new NumberPortabilityMessageConsumer(Consumer, PrivateKeyFile, EncryptedHmacSecretFile, _listener, SseUrl, backOffPeriod);
+            _messageConsumer = new NumberPortabilityMessageConsumer(Consumer, PrivateKeyFile, EncryptedHmacSecretFile, _listener, SseUrl, backOffPeriod, 5);
             _listener.Clear();
         }
 

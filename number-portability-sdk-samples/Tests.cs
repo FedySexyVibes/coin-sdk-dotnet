@@ -25,10 +25,9 @@ namespace Coin.Sdk.NP.Sample
             const string consumer = "<YOUR CONSUMER>";
             var privateKeyFile = GetPath("private-key.pem");
             var encryptedHmacSecretFile =  GetPath("sharedkey.encrypted");
-            const int backOffPeriod = 1;
             var listener = new Listener();
             _numberPortabilityService = new NumberPortabilityService(apiUrl, consumer, privateKeyFile, encryptedHmacSecretFile);
-            _messageConsumer = new NumberPortabilityMessageConsumer(consumer, privateKeyFile, encryptedHmacSecretFile, listener, sseUrl, backOffPeriod);
+            _messageConsumer = new NumberPortabilityMessageConsumer(consumer, privateKeyFile, encryptedHmacSecretFile, listener, sseUrl);
         }
 
         [Test]

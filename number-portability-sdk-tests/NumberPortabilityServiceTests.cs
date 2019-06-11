@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Threading;
 using Coin.Sdk.NP.Messages.V1;
 using Coin.Sdk.NP.Service.Impl;
 using NUnit.Framework;
