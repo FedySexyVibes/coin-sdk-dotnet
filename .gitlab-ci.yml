@@ -5,7 +5,7 @@ test:
   before_script:
     - aws ecr get-login --no-include-email | sh
     - ./setup/start-docker-compose
-    - ./setup/setup_kong.sh ./number-portability-sdk-tests/keys
+    - ./setup/setup-kong.sh ./number-portability-sdk-tests/keys
   script:
     - ./setup/start-docker-compose sdk
   after_script:
