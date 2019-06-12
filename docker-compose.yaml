@@ -88,6 +88,8 @@ services:
     depends_on:
       kong:
         condition: service_healthy
+      setup:
+        condition: service_started
     networks:
       - kong-network
 

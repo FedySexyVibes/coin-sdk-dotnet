@@ -38,7 +38,7 @@ namespace Coin.Sdk.NP.Tests
             _messageConsumer.StartConsuming(ConfirmationStatus.All, 3, new TestOffsetPersister(), v => v - 2, e => Assert.Fail("Disconnected"), TypeName<PortingRequest>(), TypeName<PortingPerformed>());
             for (var i = 0; i < 5; i++)
             {
-                Thread.Sleep(100);
+                Thread.Sleep(1000);
             }
             _messageConsumer.StopConsuming();
         }
