@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This SDK supports secured access to the number portability API.
+This SDK supports secured access to the number portability API. We are still working on the part of making the SDK available as a NuGet package. At this moment the dll-files should be build in the project.
 
 For a quick start, follow the steps below:
 * [Setup](#setup)
