@@ -27,7 +27,7 @@ namespace Coin.Sdk.NP.Sample
             var encryptedHmacSecretFile =  GetPath("sharedkey.encrypted");
             var listener = new Listener();
             _numberPortabilityService = new NumberPortabilityService(apiUrl, consumer, privateKeyFile, encryptedHmacSecretFile);
-            _messageConsumer = new NumberPortabilityMessageConsumer(consumer, privateKeyFile, encryptedHmacSecretFile, listener, sseUrl);
+            _messageConsumer = new NumberPortabilityMessageConsumer(consumer, privateKeyFile, encryptedHmacSecretFile, listener, sseUrl, 1, 0);
         }
 
         [Test]
@@ -114,7 +114,7 @@ namespace Coin.Sdk.NP.Sample
         [Test]
         public void ConsumeMessages()
         {
-            _messageConsumer.StartConsuming();
+            _messageConsumer.StartConsuming(onFinalDisconnect: e => Assert.Fail("Disconnected"));
             Thread.Sleep(1000);
         }
         

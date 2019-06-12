@@ -52,6 +52,7 @@ namespace Coin.Sdk.NP.Service.Impl
             long initialOffset = DefaultOffset,
             IOffsetPersister offsetPersister = null,
             Func<long, long> recoverOffset = null,
+            Action<Exception> onFinalDisconnect = null,
             params string[] messageTypes)
         {
             if (confirmationStatus == ConfirmationStatus.All && offsetPersister == null) {
@@ -87,16 +88,18 @@ namespace Coin.Sdk.NP.Service.Impl
             void HandleDisconnect(DisconnectEventArgs e)
             {
                 _logger.Debug($"Error: {e.Exception.Message}");
-                _logger.Debug("Restarting stream");
                 _eventSourceReader?.Dispose();
                 var persistedOffset = offsetPersister?.Offset ?? initialOffset;
                 var recoveredOffset = recoverOffset?.Invoke(persistedOffset) ?? persistedOffset;
                 if (retriesLeft-- == 0)
                 {
-                    _logger.Info("Reached maximum number of connection retries, stopped consuming event stream.");
+                    _logger.Error("Reached maximum number of connection retries, stopped consuming event stream.");
+                    onFinalDisconnect?.Invoke(e.Exception);
                     return;
+
                 }
                 Thread.Sleep(_backOffPeriod * 1000);
+                _logger.Debug("Restarting stream");
                 StartReading(recoveredOffset);
             }
         }

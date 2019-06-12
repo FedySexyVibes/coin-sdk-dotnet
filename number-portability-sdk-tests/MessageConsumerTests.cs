@@ -17,17 +17,17 @@ namespace Coin.Sdk.NP.Tests
         {
             const int backOffPeriod = 1;
             _listener = new TestListener();
-            _messageConsumer = new NumberPortabilityMessageConsumer(Consumer, PrivateKeyFile, EncryptedHmacSecretFile, _listener, SseUrl, backOffPeriod, 5);
+            _messageConsumer = new NumberPortabilityMessageConsumer(Consumer, PrivateKeyFile, EncryptedHmacSecretFile, _listener, SseUrl, backOffPeriod, 0);
             _listener.Clear();
         }
 
         [Test]
         public void ConsumeAll()
         {
-            _messageConsumer.StartConsuming();
+            _messageConsumer.StartConsuming(onFinalDisconnect: e => Assert.Fail("Disconnected"));
             for (var i = 0; i < 5; i++)
             {
-                Thread.Sleep(100);
+                Thread.Sleep(1000);
             }
             _messageConsumer.StopConsuming();
         }
@@ -35,7 +35,7 @@ namespace Coin.Sdk.NP.Tests
         [Test]
         public void ConsumeFiltered()
         {
-            _messageConsumer.StartConsuming(ConfirmationStatus.All, 3, new TestOffsetPersister(), v => v - 2, TypeName<PortingRequest>(), TypeName<PortingPerformed>());
+            _messageConsumer.StartConsuming(ConfirmationStatus.All, 3, new TestOffsetPersister(), v => v - 2, e => Assert.Fail("Disconnected"), TypeName<PortingRequest>(), TypeName<PortingPerformed>());
             for (var i = 0; i < 5; i++)
             {
                 Thread.Sleep(100);
