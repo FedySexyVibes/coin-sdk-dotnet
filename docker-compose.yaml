@@ -83,6 +83,8 @@ services:
 
   coin-sdk:
     build: .
+    environment:
+      - STUB_HOST_AND_PORT=kong:8000
     depends_on:
       kong:
         condition: service_healthy

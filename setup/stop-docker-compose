@@ -1,8 +1,3 @@
 #!/bin/bash
 
-if [[ $1 == local ]]
-then
-    docker-compose down
-else
-	docker-compose --project-name coin-sdk-dotnet-${CI_JOB_ID} --file /tmp/docker-compose.yaml --project-directory ${PWD} down
-fi
+docker-compose --project-name coin-sdk-dotnet-${CI_JOB_ID} --file /tmp/docker-compose.yaml --project-directory ${PWD} down

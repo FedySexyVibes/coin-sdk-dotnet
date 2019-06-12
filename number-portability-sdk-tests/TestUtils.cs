@@ -19,7 +19,7 @@ namespace Coin.Sdk.NP.Tests
         public const string PrivateKeyFile = "../../../keys/private-key.pem";
         public const string EncryptedHmacSecretFile =  "../../../keys/sharedkey.encrypted";
         
-        public static string ApiUrl = (Environment.GetEnvironmentVariable("STUB_HOST_AND_PORT") ?? "http://localhost:8000") + "/number-portability/v1";
+        public static string ApiUrl = "http://" + (Environment.GetEnvironmentVariable("STUB_HOST_AND_PORT") ?? "localhost:8000") + "/number-portability/v1";
         public static string SseUrl = ApiUrl + "/dossiers/events";
 
         public const string Consumer = "loadtest-loada";

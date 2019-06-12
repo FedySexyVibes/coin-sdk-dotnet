@@ -7,6 +7,6 @@ test:
     - ./setup/start-docker-compose
     - ./setup/setup-kong.sh ./number-portability-sdk-tests/keys
   script:
-    - ./setup/start-docker-compose sdk
+    - ./setup/run-tests
   after_script:
     - ./setup/stop-docker-compose
