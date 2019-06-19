@@ -65,10 +65,8 @@ namespace Coin.Sdk.Common.Crypto
             return string.Format(HmacHeaderFormat, consumerName, string.Join(" ", headers.Select(p => p.Key)), signature);
         }
         
-        static string generateHmacMessage(Dictionary<string, string> headers, string requestLine)
-        {
-            return string.Join("\n", headers.Select(p => $"{p.Key}: {p.Value}")) + "\n" + requestLine;
-        }
+        static string generateHmacMessage(Dictionary<string, string> headers, string requestLine) =>
+            string.Join("\n", headers.Select(p => $"{p.Key}: {p.Value}")) + "\n" + requestLine;
 
         public static RSA ReadPrivateKeyFile(string path)
         {
@@ -96,10 +94,8 @@ namespace Coin.Sdk.Common.Crypto
             }
         }
 
-        public static Dictionary<string, string> GetHmacHeaders(HmacSignatureType hmacSignatureType, string body = null)
-        {
-            return GetHmacHeaders(hmacSignatureType, body == null ? new byte[0] : Encoding.UTF8.GetBytes(body));
-        }
+        public static Dictionary<string, string> GetHmacHeaders(HmacSignatureType hmacSignatureType, string body = null) =>
+            GetHmacHeaders(hmacSignatureType, body == null ? new byte[0] : Encoding.UTF8.GetBytes(body));
 
         public static Dictionary<string, string> GetHmacHeaders(HmacSignatureType hmacSignatureType, byte[] body)
         {
