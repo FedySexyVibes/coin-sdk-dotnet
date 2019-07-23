@@ -5,6 +5,8 @@ using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using static Coin.Sdk.Common.Crypto.CtpApiClientUtil;
+using Coin.Sdk.Common;
+using static Coin.Sdk.Common.SdkInfo;
 
 namespace Coin.Sdk.Common.Client
 {
@@ -47,8 +49,8 @@ namespace Coin.Sdk.Common.Client
             }
             var requestLine = $"{request.Method} {request.RequestUri.LocalPath} HTTP/1.1";
             request.Headers.Add("authorization", CalculateHttpRequestHmac(_signer, _consumerName, hmacHeaders, requestLine));
-            request.Headers.Add("User-Agent", $"coin-sdk-dotnet-{Assembly.GetAssembly(typeof(CoinHttpClientHandler)).GetName().Version}");
-
+            request.Headers.Add("User-Agent", $"coin-sdk-dotnet-{SdkInfo.UserAgent}");
+            
             var jwt = CreateJwt(_privateKey, _consumerName, _validPeriodInSeconds);
             CookieContainer.Add(request.RequestUri, new Cookie("jwt", jwt));
             return await base.SendAsync(request, cancellationToken);
