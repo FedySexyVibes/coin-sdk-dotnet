@@ -22,8 +22,8 @@ namespace Coin.Sdk.NP.Service.Impl
         readonly string _sseUri;
         readonly Logger _logger = LogManager.GetCurrentClassLogger();
         EventSourceReader _eventSourceReader;
-        ReadTimeOutTimer timer = new ReadTimeOutTimer();
-        BackoffHandler backoffHandler;
+        ReadTimeOutTimer _timer = new ReadTimeOutTimer();
+        BackoffHandler _backoffHandler;
                
         public NumberPortabilityMessageConsumer(string consumerName, string privateKeyFile, string encryptedHmacSecretFile,
             INumberPortabilityMessageListener listener, string sseUri, int backOffPeriod = 1, int numberOfRetries = 3,
@@ -42,13 +42,13 @@ namespace Coin.Sdk.NP.Service.Impl
         {
             _listener = listener;
             _sseUri = sseUri;
-            backoffHandler = new BackoffHandler(backOffPeriod, numberOfRetries);
+            _backoffHandler = new BackoffHandler(backOffPeriod, numberOfRetries);
         }
 
         public void StopConsuming()
         {
             System.Diagnostics.Debug.WriteLine("Quitting because testcase ended!");
-            timer.Stop();
+            _timer.Stop();
             if (_eventSourceReader?.IsDisposed == false) _eventSourceReader.Dispose();
         }
 
@@ -65,7 +65,7 @@ namespace Coin.Sdk.NP.Service.Impl
             }
 
             this.coinHttpClientHandler.CancellationTokenSource = new CancellationTokenSource();
-            timer.SetToken(this.coinHttpClientHandler.CancellationTokenSource);
+            _timer.SetToken(this.coinHttpClientHandler.CancellationTokenSource);
             _eventSourceReader = new EventSourceReader(CreateUri(initialOffset, confirmationStatus, messageTypes), coinHttpClientHandler);
 
             StartReading();
@@ -76,13 +76,13 @@ namespace Coin.Sdk.NP.Service.Impl
                 _eventSourceReader.Start();
                 _eventSourceReader.Disconnected += (sender, e) => HandleDisconnect(e);
                 _logger.Info("Stream started");
-                timer.Start();
+                _timer.Start();
 
             }
 
             void HandleEvent(EventSourceMessageEventArgs messageEvent)
             {
-                timer.UpdateTimestamp();
+                _timer.UpdateTimestamp();
                 try { 
                     if (messageEvent.Event == "message")
                     {
@@ -101,29 +101,29 @@ namespace Coin.Sdk.NP.Service.Impl
                     _logger.Error(ex);
                     _listener.OnException(ex);
                 }
-                backoffHandler.Reset();
-                timer.Reset();
+                _backoffHandler.Reset();
+                _timer.Reset();
             }
 
             void HandleDisconnect(DisconnectEventArgs e)
             {
-                timer.Stop();
+                _timer.Stop();
                 _logger.Debug($"Error: {e.Exception.Message}");
                 var persistedOffset = offsetPersister?.Offset ?? initialOffset;
                 var recoveredOffset = recoverOffset?.Invoke(persistedOffset) ?? persistedOffset;
-                if (backoffHandler.MaximumNumberOfRetriesUsed())
+                if (_backoffHandler.MaximumNumberOfRetriesUsed())
                 {
                     _logger.Error("Reached maximum number of connection retries, stopped consuming event stream.");
                     onFinalDisconnect?.Invoke(e.Exception);
                     return;
 
                 }
-                backoffHandler.WaitBackOffPeriod();
+                _backoffHandler.WaitBackOffPeriod();
 
                 _logger.Debug("Restarting stream");
                 _eventSourceReader = new EventSourceReader(CreateUri(recoveredOffset, confirmationStatus, messageTypes), coinHttpClientHandler);
                 this.coinHttpClientHandler.CancellationTokenSource = new CancellationTokenSource();
-                timer.SetToken(this.coinHttpClientHandler.CancellationTokenSource);
+                _timer.SetToken(this.coinHttpClientHandler.CancellationTokenSource);
                 StartReading();
             }
         }
