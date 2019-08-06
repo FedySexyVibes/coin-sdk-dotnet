@@ -7,16 +7,19 @@ using System.Threading.Tasks;
 using static Coin.Sdk.Common.Crypto.CtpApiClientUtil;
 using Coin.Sdk.Common;
 using static Coin.Sdk.Common.SdkInfo;
+using System.Collections.Generic;
 
 namespace Coin.Sdk.Common.Client
 {
-    public class CoinHttpClientHandler : HttpClientHandler
+    public class CoinHttpClientHandler : WebRequestHandler
     {
         readonly HmacSignatureType _hmacSignatureType;
         readonly HMACSHA256 _signer;
         readonly RSA _privateKey;
         readonly string _consumerName;
         readonly int _validPeriodInSeconds;
+        public CancellationTokenSource CancellationTokenSource
+        { get; set; }
 
         public CoinHttpClientHandler(string consumerName, string privateKeyFile, string encryptedHmacSecretFile,
             HmacSignatureType hmacSignatureHmacSignatureType = HmacSignatureType.XDateAndDigest, int validPeriodInSeconds = DefaultValidPeriodInSecs) :
@@ -37,12 +40,24 @@ namespace Coin.Sdk.Common.Client
             _validPeriodInSeconds = validPeriodInSeconds;
             UseCookies = true;
         }
-        
+
+        private async Task<Dictionary<string, string>> getHmacHeaders(HttpRequestMessage request)
+        {
+            if (request.Method.Equals(HttpMethod.Get))
+            {
+                return GetHmacHeaders(_hmacSignatureType, new byte[0]);
+            }
+            else
+            {
+                request.Content = request.Content ?? new ByteArrayContent(new byte[0]);
+                var content = await request.Content.ReadAsByteArrayAsync();
+                return GetHmacHeaders(_hmacSignatureType, new byte[0]);
+            }
+        }
+
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            request.Content = request.Content ?? new ByteArrayContent(new byte[0]);
-            var content = await request.Content.ReadAsByteArrayAsync();
-            var hmacHeaders = GetHmacHeaders(_hmacSignatureType, content);
+            var hmacHeaders = await getHmacHeaders(request);
             foreach (var pair in hmacHeaders)
             {
                 request.Headers.Add(pair.Key, pair.Value);
@@ -53,7 +68,9 @@ namespace Coin.Sdk.Common.Client
             
             var jwt = CreateJwt(_privateKey, _consumerName, _validPeriodInSeconds);
             CookieContainer.Add(request.RequestUri, new Cookie("jwt", jwt));
-            return await base.SendAsync(request, cancellationToken);
+
+            var ctsToken = CancellationTokenSource == null ? cancellationToken : CancellationTokenSource.Token;
+            return await base.SendAsync(request, ctsToken);
         }
     }
 }

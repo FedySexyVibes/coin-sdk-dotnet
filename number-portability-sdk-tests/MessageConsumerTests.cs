@@ -17,7 +17,7 @@ namespace Coin.Sdk.NP.Tests
         {
             const int backOffPeriod = 1;
             _listener = new TestListener();
-            _messageConsumer = new NumberPortabilityMessageConsumer(Consumer, PrivateKeyFile, EncryptedHmacSecretFile, _listener, SseUrl, backOffPeriod, 0);
+            _messageConsumer = new NumberPortabilityMessageConsumer(Consumer, PrivateKeyFile, EncryptedHmacSecretFile, _listener, SseUrl, backOffPeriod, 20);
             _listener.Clear();
         }
 
@@ -25,7 +25,7 @@ namespace Coin.Sdk.NP.Tests
         public void ConsumeAll()
         {
             _messageConsumer.StartConsuming(onFinalDisconnect: e => Assert.Fail("Disconnected"));
-            for (var i = 0; i < 5; i++)
+            for (var i = 0; i < 300; i++)
             {
                 Thread.Sleep(1000);
             }

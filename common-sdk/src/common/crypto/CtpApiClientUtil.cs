@@ -72,9 +72,12 @@ namespace Coin.Sdk.Common.Crypto
         {
             using (var reader = File.OpenText(path))
             {
-                var keyPair = (AsymmetricCipherKeyPair) new PemReader(reader).ReadObject();
-                var parameters = DotNetUtilities.ToRSAParameters((RsaPrivateCrtKeyParameters) keyPair.Private);
-                
+                //var keyPair = (AsymmetricCipherKeyPair) new PemReader(reader).ReadObject();
+                //var parameters = DotNetUtilities.ToRSAParameters((RsaPrivateCrtKeyParameters) keyPair.Private);
+
+                var keyPair = (RsaPrivateCrtKeyParameters)new PemReader(reader).ReadObject();
+                var parameters = DotNetUtilities.ToRSAParameters(keyPair);
+
                 return Create(parameters);
             }
         }
