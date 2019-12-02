@@ -45,7 +45,7 @@ namespace Coin.Sdk.NP.Sample
                         Sender = new Sender
                         {
                             NetworkOperator = Operator,
-                            //ServiceProvider = ""
+                            ServiceProvider = Operator
                         },
                         Receiver = new Receiver
                         {
