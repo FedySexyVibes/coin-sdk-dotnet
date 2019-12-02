@@ -16,10 +16,10 @@ namespace Coin.Sdk.NP.Tests
     
     public static class TestSettings
     {
-        public const string PrivateKeyFile = "c:/users/pauls/source/repos/coin-sdk-dotnet-master-webrequest/number-portability-sdk-tests/keys/loadtest-loada-private-key.pem";
-        public const string EncryptedHmacSecretFile = "c:/users/pauls/source/repos/coin-sdk-dotnet-master-webrequest/number-portability-sdk-tests/keys/loadtest-loada-sharedkey.encrypted";
-
-        public static string ApiUrl = "https://" + (Environment.GetEnvironmentVariable("STUB_HOST_AND_PORT") ?? "dev-api.coin.nl") + "/number-portability/v1";
+        public const string PrivateKeyFile = "../../../keys/private-key.pem";
+        public const string EncryptedHmacSecretFile =  "../../../keys/sharedkey.encrypted";
+        
+        public static string ApiUrl = "http://" + (Environment.GetEnvironmentVariable("STUB_HOST_AND_PORT") ?? "localhost:8000") + "/number-portability/v1";
         public static string SseUrl = ApiUrl + "/dossiers/events";
 
         public const string Consumer = "loadtest-loada";
