@@ -4,8 +4,6 @@ using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using static Coin.Sdk.Common.Crypto.CtpApiClientUtil;
-using System.Collections.Generic;
-using Coin.Sdk.Common.Crypto;
 
 namespace Coin.Sdk.Common.Client
 {
