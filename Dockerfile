@@ -1,4 +1,4 @@
-FROM pomma89/dotnet-mono:dotnet-3-mono-6-sdk
+FROM microsoft/dotnet:2.2-sdk
 WORKDIR /app
 
 COPY coin-sdk-dotnet.sln ./

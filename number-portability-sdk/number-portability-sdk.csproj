@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net47</TargetFramework>
+        <TargetFramework>netstandard2.0</TargetFramework>
         <RootNamespace>Coin.Sdk.NP</RootNamespace>
         <Version>0.0.0</Version>
     </PropertyGroup>
@@ -13,14 +13,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\common-sdk\common-sdk.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Reference Include="System.Net.Http.WebRequest" />
-    </ItemGroup>
-
-    <ItemGroup Condition="$(TargetFramework.StartsWith('net4')) AND '$(OS)' != 'Windows_NT'">
-        <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0-preview.2" PrivateAssets="All" />
     </ItemGroup>
 
 </Project>

@@ -11,7 +11,7 @@ using System.Collections.Generic;
 
 namespace Coin.Sdk.Common.Client
 {
-    public class CoinHttpClientHandler : WebRequestHandler
+    public class CoinHttpClientHandler : HttpClientHandler
     {
         readonly HmacSignatureType _hmacSignatureType;
         readonly HMACSHA256 _signer;
@@ -69,7 +69,7 @@ namespace Coin.Sdk.Common.Client
             var jwt = CreateJwt(_privateKey, _consumerName, _validPeriodInSeconds);
             CookieContainer.Add(request.RequestUri, new Cookie("jwt", jwt));
 
-            var ctsToken = CancellationTokenSource == null ? cancellationToken : CancellationTokenSource.Token;
+            var ctsToken = CancellationTokenSource?.Token ?? cancellationToken;
             return await base.SendAsync(request, ctsToken);
         }
     }
