@@ -7,9 +7,6 @@ using Coin.Sdk.Common.Client;
 using EvtSource;
 using NLog;
 using static Coin.Sdk.Common.Crypto.CtpApiClientUtil;
-using static Coin.Sdk.NP.Messages.V1.Utils;
-using System.Threading.Tasks;
-using System.Diagnostics;
 using System.Timers;
 using Newtonsoft.Json.Linq;
 
@@ -64,8 +61,8 @@ namespace Coin.Sdk.NP.Service.Impl
                 throw new InvalidEnumArgumentException("offsetPersister should be given when confirmationStatus equals All");
             }
 
-            this.coinHttpClientHandler.CancellationTokenSource = new CancellationTokenSource();
-            _timer.SetToken(this.coinHttpClientHandler.CancellationTokenSource);
+            coinHttpClientHandler.CancellationTokenSource = new CancellationTokenSource();
+            _timer.SetToken(coinHttpClientHandler.CancellationTokenSource);
             _eventSourceReader = new EventSourceReader(CreateUri(initialOffset, confirmationStatus, messageTypes), coinHttpClientHandler);
 
             StartReading();
@@ -122,13 +119,13 @@ namespace Coin.Sdk.NP.Service.Impl
 
                 _logger.Debug("Restarting stream");
                 _eventSourceReader = new EventSourceReader(CreateUri(recoveredOffset, confirmationStatus, messageTypes), coinHttpClientHandler);
-                this.coinHttpClientHandler.CancellationTokenSource = new CancellationTokenSource();
-                _timer.SetToken(this.coinHttpClientHandler.CancellationTokenSource);
+                coinHttpClientHandler.CancellationTokenSource = new CancellationTokenSource();
+                _timer.SetToken(coinHttpClientHandler.CancellationTokenSource);
                 StartReading();
             }
         }
 
-        private void HandleMessage(EventSourceMessageEventArgs e)
+        void HandleMessage(EventSourceMessageEventArgs e)
         {
             var message = JObject.Parse(e.Message).First.First;
             switch (e.Event)
@@ -204,12 +201,12 @@ namespace Coin.Sdk.NP.Service.Impl
                     + (messageTypes.Length == 0 ? "" : $"&messageTypes={string.Join(",", messageTypes)}"));
     }
 
-    class ReadTimeOutTimer
+    internal class ReadTimeOutTimer
     {
-        private const int THRESHOLD_TIME_OUT = 300000000;
+        const int THRESHOLD_TIME_OUT = 300000000;
         readonly System.Timers.Timer timer = new System.Timers.Timer();
-        private long timestamp = DateTime.Now.Ticks;
-        private CancellationTokenSource cancellationTokenSource;
+        long timestamp = DateTime.Now.Ticks;
+        CancellationTokenSource cancellationTokenSource;
 
         public ReadTimeOutTimer()
         {
@@ -255,26 +252,26 @@ namespace Coin.Sdk.NP.Service.Impl
             {
                 System.Diagnostics.Debug.WriteLine("Timestamp: " + timestamp);
                 System.Diagnostics.Debug.WriteLine("Time-out above threshold! Quitting: " + e);
-                this.cancellationTokenSource.Cancel();
+                cancellationTokenSource.Cancel();
             }
         }
     }
 
-    class BackoffHandler
+    internal class BackoffHandler
     {
-        private int backOffPeriod;
-        private int numberOfRetries;
-        private int currentBackOffPeriod;
-        private int retriesLeft;
+        int backOffPeriod;
+        int numberOfRetries;
+        int currentBackOffPeriod;
+        int retriesLeft;
 
-        private long timestamp
+        long timestamp
         { get; set; }
 
         public BackoffHandler(int backOffPeriod, int numberOfRetries)
         {
             this.backOffPeriod = backOffPeriod;
             this.numberOfRetries = numberOfRetries;
-            this.Reset();
+            Reset();
         }
 
         public int GetBackOffPeriod()
@@ -289,30 +286,31 @@ namespace Coin.Sdk.NP.Service.Impl
 
         public void Reset()
         {
-            this.currentBackOffPeriod = this.backOffPeriod;
-            this.retriesLeft = this.numberOfRetries;
-            this.timestamp = DateTime.Now.Ticks;
+            currentBackOffPeriod = backOffPeriod;
+            retriesLeft = numberOfRetries;
+            timestamp = DateTime.Now.Ticks;
         }
         public void DecreaseNumberOfRetries()
         {
-            if (this.retriesLeft > 0)
-                this.retriesLeft--;
+            if (retriesLeft > 0)
+                retriesLeft--;
         }
-        private void IncreaseBackOffPeriod()
+
+        void IncreaseBackOffPeriod()
         {
-            this.currentBackOffPeriod = (this.currentBackOffPeriod > 60) ? this.currentBackOffPeriod : this.currentBackOffPeriod * 2;
+            currentBackOffPeriod = (currentBackOffPeriod > 60) ? currentBackOffPeriod : currentBackOffPeriod * 2;
         }
         public bool MaximumNumberOfRetriesUsed()
         {
-            return this.retriesLeft <= 0; 
+            return retriesLeft <= 0; 
         }
 
         public void WaitBackOffPeriod()
         {
             System.Diagnostics.Debug.WriteLine($"Going to sleep for {currentBackOffPeriod} seconds and still {retriesLeft} retries left!");
-            Thread.Sleep(this.currentBackOffPeriod * 1000);
-            this.IncreaseBackOffPeriod();
-            this.DecreaseNumberOfRetries();
+            Thread.Sleep(currentBackOffPeriod * 1000);
+            IncreaseBackOffPeriod();
+            DecreaseNumberOfRetries();
         }
     }
 }
