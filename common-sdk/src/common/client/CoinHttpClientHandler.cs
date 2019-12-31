@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Security.Cryptography;
@@ -37,11 +38,27 @@ namespace Coin.Sdk.Common.Client
             UseCookies = true;
         }
         
+        private async Task<Dictionary<string, string>> getHmacHeaders(HttpRequestMessage request)
+        {
+            // In the .NET 4.7 & 4.8 Runtime the implementation throws an exception when a body is added 
+            // to the request. The following if statement is added for this reason, otherwise the SSE stream
+            // can't be opened. 
+            if (request.Method.Equals(HttpMethod.Get))
+            {
+                return GetHmacHeaders(_hmacSignatureType, new byte[0]);
+            }
+            else
+            {
+                request.Content = request.Content ?? new ByteArrayContent(new byte[0]);
+                var content = await request.Content.ReadAsByteArrayAsync();
+                return GetHmacHeaders(_hmacSignatureType, content);
+            }
+        }
+
+        
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            request.Content = request.Content ?? new ByteArrayContent(new byte[0]);
-            var content = await request.Content.ReadAsByteArrayAsync();
-            var hmacHeaders = GetHmacHeaders(_hmacSignatureType, content);
+            var hmacHeaders = await getHmacHeaders(request);
             foreach (var pair in hmacHeaders)
             {
                 request.Headers.Add(pair.Key, pair.Value);
