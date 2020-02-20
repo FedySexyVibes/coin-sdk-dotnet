@@ -11,6 +11,7 @@ services:
     image: postgres:10-alpine
     environment:
       - POSTGRES_USER=kong
+      - POSTGRES_PASSWORD=kong
       - POSTGRES_DB=kong
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "kong"]
