@@ -10,6 +10,7 @@ using static Coin.Sdk.Common.Crypto.CtpApiClientUtil;
 using System.Timers;
 using Newtonsoft.Json.Linq;
 using System.Globalization;
+using Coin.Sdk.src.common;
 
 namespace Coin.Sdk.NP.Service.Impl
 {
@@ -17,25 +18,38 @@ namespace Coin.Sdk.NP.Service.Impl
     {
         private const long DefaultOffset = -1;
         private readonly INumberPortabilityMessageListener _listener;
-        private readonly string _sseUri;
+        private readonly Uri _sseUri;
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
         private EventSourceReader _eventSourceReader;
         private ReadTimeOutTimer _timer = new ReadTimeOutTimer();
         private BackoffHandler _backoffHandler;
-               
+
         public NumberPortabilityMessageConsumer(string consumerName, string privateKeyFile, string encryptedHmacSecretFile,
             INumberPortabilityMessageListener listener, string sseUri, int backOffPeriod = 1, int numberOfRetries = 3,
             HmacSignatureType hmacSignatureType = HmacSignatureType.XDateAndDigest, int validPeriodInSeconds = DefaultValidPeriodInSecs) :
             this(consumerName, ReadPrivateKeyFile(privateKeyFile), encryptedHmacSecretFile,
-                listener, sseUri, backOffPeriod, numberOfRetries, hmacSignatureType, validPeriodInSeconds) {}
+                listener, new Uri(sseUri), backOffPeriod, numberOfRetries, hmacSignatureType, validPeriodInSeconds) { }
+
+        public NumberPortabilityMessageConsumer(string consumerName, string privateKeyFile, string encryptedHmacSecretFile,
+            INumberPortabilityMessageListener listener, Uri sseUri, int backOffPeriod = 1, int numberOfRetries = 3,
+            HmacSignatureType hmacSignatureType = HmacSignatureType.XDateAndDigest, int validPeriodInSeconds = DefaultValidPeriodInSecs) :
+            this(consumerName, ReadPrivateKeyFile(privateKeyFile), encryptedHmacSecretFile,
+                listener, sseUri, backOffPeriod, numberOfRetries, hmacSignatureType, validPeriodInSeconds)
+        { }
 
         private NumberPortabilityMessageConsumer(string consumerName, RSA privateKey, string encryptedHmacSecretFile, INumberPortabilityMessageListener listener,
-            string sseUri, int backOffPeriod, int numberOfRetries, HmacSignatureType hmacSignatureType, int validPeriodInSeconds) :
+            Uri sseUri, int backOffPeriod, int numberOfRetries, HmacSignatureType hmacSignatureType, int validPeriodInSeconds) :
             this(consumerName, privateKey, HmacFromEncryptedBase64EncodedSecretFile(encryptedHmacSecretFile, privateKey),
-                listener, sseUri, backOffPeriod, numberOfRetries, hmacSignatureType, validPeriodInSeconds) {}
-        
+                listener, sseUri, backOffPeriod, numberOfRetries, hmacSignatureType, validPeriodInSeconds) { }
+
         public NumberPortabilityMessageConsumer(string consumerName, RSA privateKey, HMACSHA256 signer, INumberPortabilityMessageListener listener,
             string sseUri, int backOffPeriod = 1, int numberOfRetries = 3, HmacSignatureType hmacSignatureType = HmacSignatureType.XDateAndDigest,
+            int validPeriodInSeconds = DefaultValidPeriodInSecs) 
+            : this(consumerName, privateKey, signer, listener,
+                  new Uri(sseUri), backOffPeriod, numberOfRetries, hmacSignatureType, validPeriodInSeconds) {}
+
+        public NumberPortabilityMessageConsumer(string consumerName, RSA privateKey, HMACSHA256 signer, INumberPortabilityMessageListener listener,
+            Uri sseUri, int backOffPeriod = 1, int numberOfRetries = 3, HmacSignatureType hmacSignatureType = HmacSignatureType.XDateAndDigest,
             int validPeriodInSeconds = DefaultValidPeriodInSecs) : base(consumerName, privateKey, signer, hmacSignatureType, validPeriodInSeconds)
         {
             _listener = listener;
@@ -197,9 +211,15 @@ namespace Coin.Sdk.NP.Service.Impl
             }
         }
 
-        private Uri CreateUri(long offset, ConfirmationStatus confirmationStatus, string[] messageTypes) =>
-            new Uri($"{_sseUri}?offset={offset}&confirmationStatus={confirmationStatus}"
-                    + (messageTypes.Length == 0 ? "" : $"&messageTypes={string.Join(",", messageTypes)}"));
+        private Uri CreateUri(long offset, ConfirmationStatus confirmationStatus, string[] messageTypes)
+        {
+            var uri = _sseUri
+                .AddQueryArg(nameof(offset), $"{offset}")
+                .AddQueryArg(nameof(confirmationStatus), $"{confirmationStatus}");
+            if (messageTypes.Length > 0)
+                uri.AddQueryArg(nameof(messageTypes), $"{string.Join(",", messageTypes)}");
+            return uri;
+        }
     }
 
     internal class ReadTimeOutTimer : IDisposable
