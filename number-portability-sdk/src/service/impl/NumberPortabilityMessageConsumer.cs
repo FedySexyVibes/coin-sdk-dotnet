@@ -309,9 +309,6 @@ namespace Coin.Sdk.NP.Service.Impl
         private int currentBackOffPeriod;
         private int retriesLeft;
 
-        private long timestamp
-        { get; set; }
-
         public BackoffHandler(int backOffPeriod, int numberOfRetries)
         {
             this.backOffPeriod = backOffPeriod;
@@ -333,7 +330,6 @@ namespace Coin.Sdk.NP.Service.Impl
         {
             currentBackOffPeriod = backOffPeriod;
             retriesLeft = numberOfRetries;
-            timestamp = DateTime.Now.Ticks;
         }
         public void DecreaseNumberOfRetries()
         {
