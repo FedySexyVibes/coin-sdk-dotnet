@@ -45,11 +45,11 @@ namespace Coin.Sdk.Common.Client
             // can't be opened. 
             if (request.Method.Equals(HttpMethod.Get))
             {
-                return GetHmacHeaders(_hmacSignatureType, new byte[0]);
+                return GetHmacHeaders(_hmacSignatureType, System.Array.Empty<byte>());
             }
             else
             {
-                request.Content = request.Content ?? new ByteArrayContent(new byte[0]);
+                request.Content = request.Content ?? new ByteArrayContent(System.Array.Empty<byte>());
                 var content = await request.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
                 return GetHmacHeaders(_hmacSignatureType, content);
             }

@@ -95,7 +95,7 @@ namespace Coin.Sdk.Common.Crypto
         }
 
         public static Dictionary<string, string> GetHmacHeaders(HmacSignatureType hmacSignatureType, string body = null) =>
-            GetHmacHeaders(hmacSignatureType, body == null ? new byte[0] : Encoding.UTF8.GetBytes(body));
+            GetHmacHeaders(hmacSignatureType, body == null ? Array.Empty<byte>() : Encoding.UTF8.GetBytes(body));
 
         public static Dictionary<string, string> GetHmacHeaders(HmacSignatureType hmacSignatureType, byte[] body)
         {
@@ -107,7 +107,7 @@ namespace Coin.Sdk.Common.Crypto
                     break;
                 case HmacSignatureType.XDateAndDigest:
                     hmacHeaders["x-date"] = DateTime.UtcNow.ToString("R");
-                    hmacHeaders["digest"] = "SHA-256=" + Convert.ToBase64String(SHA256.Create().ComputeHash(body ?? new byte[0]));
+                    hmacHeaders["digest"] = "SHA-256=" + Convert.ToBase64String(SHA256.Create().ComputeHash(body ?? Array.Empty<byte>()));
                     break;
             }
             return hmacHeaders;
