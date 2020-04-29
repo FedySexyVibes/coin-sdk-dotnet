@@ -37,8 +37,8 @@ namespace Coin.Sdk.NP.Service.Impl
         public async Task<MessageResponse> SendMessage(IMessageEnvelope<INpMessageContent> envelope)
         {
             var url = $"{_apiUrl}/dossiers/{TypeName(envelope)}";
-            var responseMessage = await SendWithToken(HttpMethod.Post, url, envelope);
-            var responseBody = await responseMessage.Content.ReadAsStringAsync();
+            var responseMessage = await SendWithToken(HttpMethod.Post, url, envelope).ConfigureAwait(false);
+            var responseBody = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
             var json = JObject.Parse(responseBody);
             if (responseMessage.IsSuccessStatusCode)
             {
