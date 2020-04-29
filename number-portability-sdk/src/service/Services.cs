@@ -14,45 +14,45 @@ namespace Coin.Sdk.NP.Service
 
         void OnUnknownMessage(string messageId, string message);
 
-        void OnPortingRequest(String messageId, PortingRequestMessage message);
+        void OnPortingRequest(string messageId, PortingRequestMessage message);
 
-        void OnPortingRequestAnswer(String messageId, PortingRequestAnswerMessage message);
+        void OnPortingRequestAnswer(string messageId, PortingRequestAnswerMessage message);
 
-        void OnPortingRequestAnswerDelayed(String messageId, PortingRequestAnswerDelayedMessage message);
+        void OnPortingRequestAnswerDelayed(string messageId, PortingRequestAnswerDelayedMessage message);
 
-        void OnPortingPerformed(String messageId, PortingPerformedMessage message);
+        void OnPortingPerformed(string messageId, PortingPerformedMessage message);
 
-        void OnDeactivation(String messageId, DeactivationMessage message);
+        void OnDeactivation(string messageId, DeactivationMessage message);
 
-        void OnCancel(String messageId, CancelMessage message);
+        void OnCancel(string messageId, CancelMessage message);
 
-        void OnErrorFound(String messageId, ErrorFoundMessage message);
+        void OnErrorFound(string messageId, ErrorFoundMessage message);
 
-        void OnActivationServiceNumber(String messageId, ActivationServiceNumberMessage message);
+        void OnActivationServiceNumber(string messageId, ActivationServiceNumberMessage message);
 
-        void OnDeactivationServiceNumber(String messageId, DeactivationServiceNumberMessage message);
+        void OnDeactivationServiceNumber(string messageId, DeactivationServiceNumberMessage message);
 
-        void OnTariffChangeServiceNumber(String messageId, TariffChangeServiceNumberMessage message);
+        void OnTariffChangeServiceNumber(string messageId, TariffChangeServiceNumberMessage message);
 
-        void OnRangeActivation(String messageId, RangeActivationMessage message);
+        void OnRangeActivation(string messageId, RangeActivationMessage message);
 
-        void OnRangeDeactivation(String messageId, RangeDeactivationMessage message);
+        void OnRangeDeactivation(string messageId, RangeDeactivationMessage message);
 
-        void OnEnumActivationNumber(String messageId, EnumActivationNumberMessage message);
+        void OnEnumActivationNumber(string messageId, EnumActivationNumberMessage message);
 
-        void OnEnumActivationOperator(String messageId, EnumActivationOperatorMessage message);
+        void OnEnumActivationOperator(string messageId, EnumActivationOperatorMessage message);
 
-        void OnEnumActivationRange(String messageId, EnumActivationRangeMessage message);
+        void OnEnumActivationRange(string messageId, EnumActivationRangeMessage message);
 
-        void OnEnumDeactivationNumber(String messageId, EnumDeactivationNumberMessage message);
+        void OnEnumDeactivationNumber(string messageId, EnumDeactivationNumberMessage message);
 
-        void OnEnumDeactivationOperator(String messageId, EnumDeactivationOperatorMessage message);
+        void OnEnumDeactivationOperator(string messageId, EnumDeactivationOperatorMessage message);
 
-        void OnEnumDeactivationRange(String messageId, EnumDeactivationRangeMessage message);
+        void OnEnumDeactivationRange(string messageId, EnumDeactivationRangeMessage message);
 
-        void OnEnumProfileActivation(String messageId, EnumProfileActivationMessage message);
+        void OnEnumProfileActivation(string messageId, EnumProfileActivationMessage message);
 
-        void OnEnumProfileDeactivation(String messageId, EnumProfileDeactivationMessage message);
+        void OnEnumProfileDeactivation(string messageId, EnumProfileDeactivationMessage message);
     }
 
     public interface INumberPortabilityService {

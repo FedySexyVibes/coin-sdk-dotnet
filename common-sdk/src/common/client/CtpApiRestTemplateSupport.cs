@@ -11,7 +11,7 @@ namespace Coin.Sdk.Common.Client
     public abstract class CtpApiRestTemplateSupport : IDisposable
     {
         protected HttpClient HttpClient { get; private set; }
-        protected CoinHttpClientHandler coinHttpClientHandler { get; private set; }
+        protected CoinHttpClientHandler CoinHttpClientHandler { get; private set; }
 
         protected CtpApiRestTemplateSupport(string consumerName, string privateKeyFile, string encryptedHmacSecretFile)
             : this(consumerName, ReadPrivateKeyFile(privateKeyFile), encryptedHmacSecretFile) { }
@@ -22,8 +22,8 @@ namespace Coin.Sdk.Common.Client
         protected CtpApiRestTemplateSupport(string consumerName, RSA privateKey, HMACSHA256 signer,
             HmacSignatureType hmacSignatureType = HmacSignatureType.XDateAndDigest, int validPeriodInSeconds = DefaultValidPeriodInSecs)
         {
-            coinHttpClientHandler = new CoinHttpClientHandler(consumerName, privateKey, signer, hmacSignatureType, validPeriodInSeconds);
-            HttpClient = new HttpClient(coinHttpClientHandler);
+            CoinHttpClientHandler = new CoinHttpClientHandler(consumerName, privateKey, signer, hmacSignatureType, validPeriodInSeconds);
+            HttpClient = new HttpClient(CoinHttpClientHandler);
         }
 
         protected async Task<HttpResponseMessage> SendWithToken<T>(HttpMethod method, Uri url, T content)
@@ -37,18 +37,18 @@ namespace Coin.Sdk.Common.Client
         }
 
         #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
+        private bool _disposed = false; // To detect redundant calls
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (!_disposed)
             {
                 if (disposing)
                 {
                     HttpClient?.Dispose();
-                    coinHttpClientHandler?.Dispose();
+                    CoinHttpClientHandler?.Dispose();
                 }
-                disposedValue = true;
+                _disposed = true;
             }
         }
 

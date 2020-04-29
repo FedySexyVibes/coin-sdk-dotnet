@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 using NLog;
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Threading;
@@ -16,7 +17,7 @@ namespace Coin.Sdk.NP.Service.Impl
 {
     public class NumberPortabilityMessageConsumer : CtpApiRestTemplateSupport
     {
-        private const long DefaultOffset = -1;
+        private const long _defaultoffset = -1;
         private readonly INumberPortabilityMessageListener _listener;
         private readonly Uri _sseUri;
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
@@ -62,14 +63,14 @@ namespace Coin.Sdk.NP.Service.Impl
 
         public void StopConsuming()
         {
-            System.Diagnostics.Debug.WriteLine("Quitting because testcase ended!");
+            Debug.WriteLine("Quitting because testcase ended!");
             _timer.Stop();
             if (_eventSourceReader?.IsDisposed == false) _eventSourceReader.Dispose();
         }
 
         public void StartConsuming(
             ConfirmationStatus confirmationStatus = ConfirmationStatus.Unconfirmed,
-            long initialOffset = DefaultOffset,
+            long initialOffset = _defaultoffset,
             IOffsetPersister offsetPersister = null,
             Func<long, long> recoverOffset = null,
             Action<Exception> onFinalDisconnect = null,
@@ -78,9 +79,9 @@ namespace Coin.Sdk.NP.Service.Impl
             if (confirmationStatus == ConfirmationStatus.All && offsetPersister == null)
                 throw new InvalidEnumArgumentException("offsetPersister should be given when confirmationStatus equals All");
 
-            coinHttpClientHandler.CancellationTokenSource = new CancellationTokenSource();
-            _timer.SetToken(coinHttpClientHandler.CancellationTokenSource);
-            _eventSourceReader = new EventSourceReader(CreateUri(initialOffset, confirmationStatus, messageTypes), coinHttpClientHandler);
+            CoinHttpClientHandler.CancellationTokenSource = new CancellationTokenSource();
+            _timer.SetToken(CoinHttpClientHandler.CancellationTokenSource);
+            _eventSourceReader = new EventSourceReader(CreateUri(initialOffset, confirmationStatus, messageTypes), CoinHttpClientHandler);
 
             StartReading();
 
@@ -138,9 +139,9 @@ namespace Coin.Sdk.NP.Service.Impl
                 _backoffHandler.WaitBackOffPeriod();
 
                 _logger.Debug("Restarting stream");
-                _eventSourceReader = new EventSourceReader(CreateUri(recoveredOffset, confirmationStatus, messageTypes), coinHttpClientHandler);
-                coinHttpClientHandler.CancellationTokenSource = new CancellationTokenSource();
-                _timer.SetToken(coinHttpClientHandler.CancellationTokenSource);
+                _eventSourceReader = new EventSourceReader(CreateUri(recoveredOffset, confirmationStatus, messageTypes), CoinHttpClientHandler);
+                CoinHttpClientHandler.CancellationTokenSource = new CancellationTokenSource();
+                _timer.SetToken(CoinHttpClientHandler.CancellationTokenSource);
                 StartReading();
             }
         }
@@ -229,59 +230,59 @@ namespace Coin.Sdk.NP.Service.Impl
 
     internal class ReadTimeOutTimer : IDisposable
     {
-        private const int THRESHOLD_TIME_OUT = 300000000;
-        private readonly System.Timers.Timer timer = new System.Timers.Timer();
-        private long timestamp = DateTime.Now.Ticks;
-        private CancellationTokenSource cancellationTokenSource;
+        private const int THRESHOLD_TIMEOUT = 300000000;
+        private readonly System.Timers.Timer _timer = new System.Timers.Timer();
+        private long _timestamp = DateTime.Now.Ticks;
+        private CancellationTokenSource _cancellationtokensource;
 
         public ReadTimeOutTimer()
         {
-            timer.Interval = 30000;
-            timer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
+            _timer.Interval = 30000;
+            _timer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
         }
 
-        public void UpdateTimestamp() => timestamp = DateTime.Now.Ticks;
+        public void UpdateTimestamp() => _timestamp = DateTime.Now.Ticks;
 
-        public void Start() => timer.Start();
+        public void Start() => _timer.Start();
 
-        public void Stop() => timer.Stop();
+        public void Stop() => _timer.Stop();
 
         public void Reset()
         {
-            timer.Stop();
-            timestamp = DateTime.Now.Ticks;
-            timer.Start();
+            _timer.Stop();
+            _timestamp = DateTime.Now.Ticks;
+            _timer.Start();
         }
 
-        public void SetToken(CancellationTokenSource cts) => cancellationTokenSource = cts;
+        public void SetToken(CancellationTokenSource cts) => _cancellationtokensource = cts;
 
         private void OnTimedEvent(object source, ElapsedEventArgs e)
         {
             var now = DateTime.Now.Ticks;
-            var elapsedTime = now - timestamp;
-            System.Diagnostics.Debug.WriteLine("Timestamp: " + timestamp);
-            System.Diagnostics.Debug.WriteLine("Elapsed Time: " + elapsedTime);
+            var elapsedTime = now - _timestamp;
+            Debug.WriteLine("Timestamp: " + _timestamp);
+            Debug.WriteLine("Elapsed Time: " + elapsedTime);
 
-            if (elapsedTime > THRESHOLD_TIME_OUT)
+            if (elapsedTime > THRESHOLD_TIMEOUT)
             {
-                System.Diagnostics.Debug.WriteLine("Timestamp: " + timestamp);
-                System.Diagnostics.Debug.WriteLine("Time-out above threshold! Quitting: " + e);
-                cancellationTokenSource.Cancel();
+                Debug.WriteLine("Timestamp: " + _timestamp);
+                Debug.WriteLine("Time-out above threshold! Quitting: " + e);
+                _cancellationtokensource.Cancel();
             }
         }
 
         #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
+        private bool _disposed = false; // To detect redundant calls
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (!_disposed)
             {
                 if (disposing)
                 {
-                    timer?.Dispose();
+                    _timer?.Dispose();
                 }
-                disposedValue = true;
+                _disposed = true;
             }
         }
 
@@ -295,40 +296,40 @@ namespace Coin.Sdk.NP.Service.Impl
 
     internal class BackoffHandler
     {
-        private readonly int backOffPeriod;
-        private readonly int numberOfRetries;
-        private int currentBackOffPeriod;
-        private int retriesLeft;
+        private readonly int _backoffperiod;
+        private readonly int _numberofretries;
+        private int _currentbackoffperiod;
+        private int _retriesleft;
 
         public BackoffHandler(int backOffPeriod, int numberOfRetries)
         {
-            this.backOffPeriod = backOffPeriod;
-            this.numberOfRetries = numberOfRetries;
+            _backoffperiod = backOffPeriod;
+            _numberofretries = numberOfRetries;
             Reset();
         }
 
-        public int GetBackOffPeriod() => backOffPeriod;
+        public int GetBackOffPeriod() => _backoffperiod;
 
-        public int GetRetriesLeft() => numberOfRetries;
+        public int GetRetriesLeft() => _numberofretries;
 
         public void Reset()
         {
-            currentBackOffPeriod = backOffPeriod;
-            retriesLeft = numberOfRetries;
+            _currentbackoffperiod = _backoffperiod;
+            _retriesleft = _numberofretries;
         }
         public void DecreaseNumberOfRetries()
         {
-            if (retriesLeft > 0)
-                retriesLeft--;
+            if (_retriesleft > 0)
+                _retriesleft--;
         }
 
-        private void IncreaseBackOffPeriod() => currentBackOffPeriod = (currentBackOffPeriod > 60) ? currentBackOffPeriod : currentBackOffPeriod * 2;
-        public bool MaximumNumberOfRetriesUsed() => retriesLeft <= 0;
+        private void IncreaseBackOffPeriod() => _currentbackoffperiod = (_currentbackoffperiod > 60) ? _currentbackoffperiod : _currentbackoffperiod * 2;
+        public bool MaximumNumberOfRetriesUsed() => _retriesleft <= 0;
 
         public void WaitBackOffPeriod()
         {
-            System.Diagnostics.Debug.WriteLine($"Going to sleep for {currentBackOffPeriod} seconds and still {retriesLeft} retries left!");
-            Thread.Sleep(currentBackOffPeriod * 1000);
+            Debug.WriteLine($"Going to sleep for {_currentbackoffperiod} seconds and still {_retriesleft} retries left!");
+            Thread.Sleep(_currentbackoffperiod * 1000);
             IncreaseBackOffPeriod();
             DecreaseNumberOfRetries();
         }

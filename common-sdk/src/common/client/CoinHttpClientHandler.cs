@@ -1,3 +1,4 @@
+using Coin.Sdk.Common.Crypto;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
@@ -42,20 +43,20 @@ namespace Coin.Sdk.Common.Client
             UseCookies = true;
         }
 
-        private async Task<Dictionary<string, string>> getHmacHeaders(HttpRequestMessage request)
+        private async Task<Dictionary<string, string>> GetHmacHeaders(HttpRequestMessage request)
         {
             // In the .NET 4.7 & 4.8 Runtime the implementation throws an exception when a body is added 
             // to the request. The following if statement is added for this reason, otherwise the SSE stream
             // can't be opened. 
             if (request.Method.Equals(HttpMethod.Get))
             {
-                return GetHmacHeaders(_hmacSignatureType, System.Array.Empty<byte>());
+                return CtpApiClientUtil.GetHmacHeaders(_hmacSignatureType, System.Array.Empty<byte>());
             }
             else
             {
                 request.Content = request.Content ?? _emptycontent;
                 var content = await request.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
-                return GetHmacHeaders(_hmacSignatureType, content);
+                return CtpApiClientUtil.GetHmacHeaders(_hmacSignatureType, content);
             }
         }
 
@@ -64,11 +65,10 @@ namespace Coin.Sdk.Common.Client
         {
             if (request is null)
                 throw new System.ArgumentNullException(nameof(request));
-            var hmacHeaders = await getHmacHeaders(request).ConfigureAwait(false);
+            var hmacHeaders = await GetHmacHeaders(request).ConfigureAwait(false);
             foreach (var pair in hmacHeaders)
-            {
                 request.Headers.Add(pair.Key, pair.Value);
-            }
+
             var requestLine = $"{request.Method} {request.RequestUri.LocalPath} HTTP/1.1";
             request.Headers.Add("authorization", CalculateHttpRequestHmac(_signer, _consumerName, hmacHeaders, requestLine));
             request.Headers.Add("User-Agent", $"coin-sdk-dotnet-{SdkInfo.UserAgent}");

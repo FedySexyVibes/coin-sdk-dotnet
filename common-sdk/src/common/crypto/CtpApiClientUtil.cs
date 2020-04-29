@@ -27,9 +27,7 @@ namespace Coin.Sdk.Common.Crypto
         public static HMACSHA256 HmacFromEncryptedBase64EncodedSecretFile(string filename, RSA privateKey)
         {
             using (var reader = File.OpenText(filename))
-            {
                 return HmacFromEncryptedBase64EncodedSecret(reader.ReadToEnd(), privateKey);
-            }
         }
 
         public static HMACSHA256 HmacFromEncryptedBase64EncodedSecret(string encryptedSecret, RSA privateKey)
@@ -66,12 +64,12 @@ namespace Coin.Sdk.Common.Crypto
         {
             if (signer is null)
                 throw new ArgumentNullException(nameof(signer));
-            var message = generateHmacMessage(headers, requestLine);
+            var message = GenerateHmacMessage(headers, requestLine);
             var signature = Convert.ToBase64String(signer.ComputeHash(Encoding.UTF8.GetBytes(message)));
             return string.Format(CultureInfo.InvariantCulture, HmacHeaderFormat, consumerName, string.Join(" ", headers.Select(p => p.Key)), signature);
         }
 
-        private static string generateHmacMessage(Dictionary<string, string> headers, string requestLine) =>
+        private static string GenerateHmacMessage(Dictionary<string, string> headers, string requestLine) =>
             string.Join("\n", headers.Select(p => $"{p.Key}: {p.Value}")) + "\n" + requestLine;
 
         public static RSA ReadPrivateKeyFile(string path)
