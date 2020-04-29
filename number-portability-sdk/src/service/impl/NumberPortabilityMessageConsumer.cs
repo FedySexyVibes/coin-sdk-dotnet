@@ -9,20 +9,19 @@ using NLog;
 using static Coin.Sdk.Common.Crypto.CtpApiClientUtil;
 using System.Timers;
 using Newtonsoft.Json.Linq;
-using Org.BouncyCastle.Asn1.Cms;
 using System.Globalization;
 
 namespace Coin.Sdk.NP.Service.Impl
 {
     public class NumberPortabilityMessageConsumer : CtpApiRestTemplateSupport
     {
-        const long DefaultOffset = -1;
-        readonly INumberPortabilityMessageListener _listener;
-        readonly string _sseUri;
-        readonly Logger _logger = LogManager.GetCurrentClassLogger();
-        EventSourceReader _eventSourceReader;
-        ReadTimeOutTimer _timer = new ReadTimeOutTimer();
-        BackoffHandler _backoffHandler;
+        private const long DefaultOffset = -1;
+        private readonly INumberPortabilityMessageListener _listener;
+        private readonly string _sseUri;
+        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        private EventSourceReader _eventSourceReader;
+        private ReadTimeOutTimer _timer = new ReadTimeOutTimer();
+        private BackoffHandler _backoffHandler;
                
         public NumberPortabilityMessageConsumer(string consumerName, string privateKeyFile, string encryptedHmacSecretFile,
             INumberPortabilityMessageListener listener, string sseUri, int backOffPeriod = 1, int numberOfRetries = 3,
@@ -30,7 +29,7 @@ namespace Coin.Sdk.NP.Service.Impl
             this(consumerName, ReadPrivateKeyFile(privateKeyFile), encryptedHmacSecretFile,
                 listener, sseUri, backOffPeriod, numberOfRetries, hmacSignatureType, validPeriodInSeconds) {}
 
-        NumberPortabilityMessageConsumer(string consumerName, RSA privateKey, string encryptedHmacSecretFile, INumberPortabilityMessageListener listener,
+        private NumberPortabilityMessageConsumer(string consumerName, RSA privateKey, string encryptedHmacSecretFile, INumberPortabilityMessageListener listener,
             string sseUri, int backOffPeriod, int numberOfRetries, HmacSignatureType hmacSignatureType, int validPeriodInSeconds) :
             this(consumerName, privateKey, HmacFromEncryptedBase64EncodedSecretFile(encryptedHmacSecretFile, privateKey),
                 listener, sseUri, backOffPeriod, numberOfRetries, hmacSignatureType, validPeriodInSeconds) {}
@@ -127,7 +126,7 @@ namespace Coin.Sdk.NP.Service.Impl
             }
         }
 
-        void HandleMessage(EventSourceMessageEventArgs e)
+        private void HandleMessage(EventSourceMessageEventArgs e)
         {
             var message = JObject.Parse(e.Message).First.First;
             switch (e.Event)
@@ -198,17 +197,17 @@ namespace Coin.Sdk.NP.Service.Impl
             }
         }
 
-        Uri CreateUri(long offset, ConfirmationStatus confirmationStatus, string[] messageTypes) =>
+        private Uri CreateUri(long offset, ConfirmationStatus confirmationStatus, string[] messageTypes) =>
             new Uri($"{_sseUri}?offset={offset}&confirmationStatus={confirmationStatus}"
                     + (messageTypes.Length == 0 ? "" : $"&messageTypes={string.Join(",", messageTypes)}"));
     }
 
     internal class ReadTimeOutTimer : IDisposable
     {
-        const int THRESHOLD_TIME_OUT = 300000000;
-        readonly System.Timers.Timer timer = new System.Timers.Timer();
-        long timestamp = DateTime.Now.Ticks;
-        CancellationTokenSource cancellationTokenSource;
+        private const int THRESHOLD_TIME_OUT = 300000000;
+        private readonly System.Timers.Timer timer = new System.Timers.Timer();
+        private long timestamp = DateTime.Now.Ticks;
+        private CancellationTokenSource cancellationTokenSource;
 
         public ReadTimeOutTimer()
         {
@@ -243,7 +242,7 @@ namespace Coin.Sdk.NP.Service.Impl
             cancellationTokenSource = cts;
         }
 
-        void OnTimedEvent(object source, ElapsedEventArgs e)
+        private void OnTimedEvent(object source, ElapsedEventArgs e)
         {
             var now = DateTime.Now.Ticks;
             var elapsedTime = now - timestamp;
@@ -283,12 +282,12 @@ namespace Coin.Sdk.NP.Service.Impl
 
     internal class BackoffHandler
     {
-        int backOffPeriod;
-        int numberOfRetries;
-        int currentBackOffPeriod;
-        int retriesLeft;
+        private int backOffPeriod;
+        private int numberOfRetries;
+        private int currentBackOffPeriod;
+        private int retriesLeft;
 
-        long timestamp
+        private long timestamp
         { get; set; }
 
         public BackoffHandler(int backOffPeriod, int numberOfRetries)
@@ -320,7 +319,7 @@ namespace Coin.Sdk.NP.Service.Impl
                 retriesLeft--;
         }
 
-        void IncreaseBackOffPeriod()
+        private void IncreaseBackOffPeriod()
         {
             currentBackOffPeriod = (currentBackOffPeriod > 60) ? currentBackOffPeriod : currentBackOffPeriod * 2;
         }

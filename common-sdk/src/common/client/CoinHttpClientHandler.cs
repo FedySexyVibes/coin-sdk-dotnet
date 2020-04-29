@@ -10,11 +10,11 @@ namespace Coin.Sdk.Common.Client
 {
     public class CoinHttpClientHandler : HttpClientHandler
     {
-        readonly HmacSignatureType _hmacSignatureType;
-        readonly HMACSHA256 _signer;
-        readonly RSA _privateKey;
-        readonly string _consumerName;
-        readonly int _validPeriodInSeconds;
+        private readonly HmacSignatureType _hmacSignatureType;
+        private readonly HMACSHA256 _signer;
+        private readonly RSA _privateKey;
+        private readonly string _consumerName;
+        private readonly int _validPeriodInSeconds;
         public CancellationTokenSource CancellationTokenSource
         { get; set; }
 
@@ -22,7 +22,7 @@ namespace Coin.Sdk.Common.Client
             HmacSignatureType hmacSignatureHmacSignatureType = HmacSignatureType.XDateAndDigest, int validPeriodInSeconds = DefaultValidPeriodInSecs) :
             this(consumerName, ReadPrivateKeyFile(privateKeyFile), encryptedHmacSecretFile, hmacSignatureHmacSignatureType, validPeriodInSeconds) {}
 
-        CoinHttpClientHandler(string consumerName, RSA privateKey, string encryptedHmacSecretFile,
+        private CoinHttpClientHandler(string consumerName, RSA privateKey, string encryptedHmacSecretFile,
             HmacSignatureType hmacSignatureHmacSignatureType, int validPeriodInSeconds) :
             this(consumerName, privateKey, HmacFromEncryptedBase64EncodedSecretFile(encryptedHmacSecretFile, privateKey),
                 hmacSignatureHmacSignatureType, validPeriodInSeconds) {}

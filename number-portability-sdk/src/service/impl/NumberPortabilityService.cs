@@ -13,8 +13,7 @@ namespace Coin.Sdk.NP.Service.Impl
 
     public class NumberPortabilityService : CtpApiRestTemplateSupport, INumberPortabilityService
     {
-
-        readonly string _apiUrl;
+        private readonly string _apiUrl;
 
         public NumberPortabilityService(string apiUrl, string consumerName, string privateKeyFile, string encryptedHmacSecretFile) : this(
             apiUrl, consumerName, ReadPrivateKeyFile(privateKeyFile), encryptedHmacSecretFile) {}
