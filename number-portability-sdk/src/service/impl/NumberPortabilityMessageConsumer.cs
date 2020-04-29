@@ -10,6 +10,7 @@ using static Coin.Sdk.Common.Crypto.CtpApiClientUtil;
 using System.Timers;
 using Newtonsoft.Json.Linq;
 using Org.BouncyCastle.Asn1.Cms;
+using System.Globalization;
 
 namespace Coin.Sdk.NP.Service.Impl
 {
@@ -91,7 +92,7 @@ namespace Coin.Sdk.NP.Service.Impl
                     {
                         // Handle correct message
                         HandleMessage(messageEvent);
-                        if (offsetPersister != null) offsetPersister.Offset = long.Parse(messageEvent.Id);
+                        if (offsetPersister != null) offsetPersister.Offset = long.Parse(messageEvent.Id, CultureInfo.InvariantCulture);
                     }
                 }
                 catch (Exception ex)

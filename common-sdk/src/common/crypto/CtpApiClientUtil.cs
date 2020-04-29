@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
@@ -66,7 +67,7 @@ namespace Coin.Sdk.Common.Crypto
                 throw new ArgumentNullException(nameof(signer));
             var message = generateHmacMessage(headers, requestLine);
             var signature = Convert.ToBase64String(signer.ComputeHash(Encoding.UTF8.GetBytes(message)));
-            return string.Format(HmacHeaderFormat, consumerName, string.Join(" ", headers.Select(p => p.Key)), signature);
+            return string.Format(CultureInfo.InvariantCulture, HmacHeaderFormat, consumerName, string.Join(" ", headers.Select(p => p.Key)), signature);
         }
         
         static string generateHmacMessage(Dictionary<string, string> headers, string requestLine) =>
@@ -107,12 +108,12 @@ namespace Coin.Sdk.Common.Crypto
             switch (hmacSignatureType)
             {
                 case HmacSignatureType.Date:
-                    hmacHeaders["date"] = DateTime.UtcNow.ToString("R");
+                    hmacHeaders["date"] = DateTime.UtcNow.ToString("R", CultureInfo.InvariantCulture);
                     break;
                 case HmacSignatureType.XDateAndDigest:
                     using (var sha = SHA256.Create())
                     {
-                        hmacHeaders["x-date"] = DateTime.UtcNow.ToString("R");
+                        hmacHeaders["x-date"] = DateTime.UtcNow.ToString("R", CultureInfo.InvariantCulture);
                         hmacHeaders["digest"] = "SHA-256=" + Convert.ToBase64String(sha.ComputeHash(body ?? Array.Empty<byte>()));
                     }
                     break;
