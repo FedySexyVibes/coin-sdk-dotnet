@@ -40,7 +40,9 @@ namespace Coin.Sdk.NP.Messages.V1
                 case ActivationServiceNumber _: return "activationsn";
                 case DeactivationServiceNumber _: return "deactivationsn";
                 case TariffChangeServiceNumber _: return "tariffchangesn";
-                default: return content.GetType().Name.Split('.').Last().ToLower().Replace("message", "");
+#pragma warning disable CA1308 // Normalize strings to uppercase
+                default: return content.GetType().Name.Split('.').Last().ToLowerInvariant().Replace("message", string.Empty);
+#pragma warning restore CA1308 // Normalize strings to uppercase
             }
         }
 
