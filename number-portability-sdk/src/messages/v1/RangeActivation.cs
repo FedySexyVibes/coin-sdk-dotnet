@@ -39,7 +39,7 @@ namespace Coin.Sdk.NP.Messages.V1 {
 
         [DataMember(Name="planneddatetime", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "planneddatetime")]
-        public string plannedDatetime { get; set; }
+        public string PlannedDatetime { get; set; }
 
         [DataMember(Name="repeats", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "repeats")]
