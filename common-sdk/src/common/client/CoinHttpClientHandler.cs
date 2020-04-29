@@ -58,6 +58,8 @@ namespace Coin.Sdk.Common.Client
         
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
+            if (request is null)
+                throw new System.ArgumentNullException(nameof(request));
             var hmacHeaders = await getHmacHeaders(request).ConfigureAwait(false);
             foreach (var pair in hmacHeaders)
             {

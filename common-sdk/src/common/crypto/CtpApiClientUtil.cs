@@ -33,6 +33,8 @@ namespace Coin.Sdk.Common.Crypto
 
         public static HMACSHA256 HmacFromEncryptedBase64EncodedSecret(string encryptedSecret, RSA privateKey)
         {
+            if (privateKey is null)
+                throw new ArgumentNullException(nameof(privateKey));
             var sharedKey = privateKey.Decrypt(Convert.FromBase64String(encryptedSecret), RSAEncryptionPadding.Pkcs1);
             return new HMACSHA256(sharedKey);
         }
@@ -60,6 +62,8 @@ namespace Coin.Sdk.Common.Crypto
         public static string CalculateHttpRequestHmac(HMACSHA256 signer, string consumerName, Dictionary<string, string>
             headers, string requestLine)
         {
+            if (signer is null)
+                throw new ArgumentNullException(nameof(signer));
             var message = generateHmacMessage(headers, requestLine);
             var signature = Convert.ToBase64String(signer.ComputeHash(Encoding.UTF8.GetBytes(message)));
             return string.Format(HmacHeaderFormat, consumerName, string.Join(" ", headers.Select(p => p.Key)), signature);
