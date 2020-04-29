@@ -108,7 +108,9 @@ namespace Coin.Sdk.NP.Service.Impl
                         if (offsetPersister != null) offsetPersister.Offset = long.Parse(messageEvent.Id, CultureInfo.InvariantCulture);
                     }
                 }
+#pragma warning disable CA1031 // Do not catch general exception types
                 catch (Exception ex)
+#pragma warning restore CA1031 // Do not catch general exception types
                 {
                     _logger.Error(ex);
                     _listener.OnException(ex);
