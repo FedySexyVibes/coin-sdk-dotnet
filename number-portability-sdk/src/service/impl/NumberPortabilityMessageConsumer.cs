@@ -21,8 +21,8 @@ namespace Coin.Sdk.NP.Service.Impl
         private readonly Uri _sseUri;
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
         private EventSourceReader _eventSourceReader;
-        private ReadTimeOutTimer _timer = new ReadTimeOutTimer();
-        private BackoffHandler _backoffHandler;
+        private readonly ReadTimeOutTimer _timer = new ReadTimeOutTimer();
+        private readonly BackoffHandler _backoffHandler;
 
         public NumberPortabilityMessageConsumer(string consumerName, string privateKeyFile, string encryptedHmacSecretFile,
             INumberPortabilityMessageListener listener, string sseUri, int backOffPeriod = 1, int numberOfRetries = 3,
@@ -304,8 +304,8 @@ namespace Coin.Sdk.NP.Service.Impl
 
     internal class BackoffHandler
     {
-        private int backOffPeriod;
-        private int numberOfRetries;
+        private readonly int backOffPeriod;
+        private readonly int numberOfRetries;
         private int currentBackOffPeriod;
         private int retriesLeft;
 
