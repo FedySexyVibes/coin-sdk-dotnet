@@ -106,8 +106,11 @@ namespace Coin.Sdk.Common.Crypto
                     hmacHeaders["date"] = DateTime.UtcNow.ToString("R");
                     break;
                 case HmacSignatureType.XDateAndDigest:
-                    hmacHeaders["x-date"] = DateTime.UtcNow.ToString("R");
-                    hmacHeaders["digest"] = "SHA-256=" + Convert.ToBase64String(SHA256.Create().ComputeHash(body ?? Array.Empty<byte>()));
+                    using (var sha = SHA256.Create())
+                    {
+                        hmacHeaders["x-date"] = DateTime.UtcNow.ToString("R");
+                        hmacHeaders["digest"] = "SHA-256=" + Convert.ToBase64String(sha.ComputeHash(body ?? Array.Empty<byte>()));
+                    }
                     break;
             }
             return hmacHeaders;

@@ -25,11 +25,13 @@ namespace Coin.Sdk.Common.Client
             HttpClient = new HttpClient(coinHttpClientHandler);
         }
 
-        protected Task<HttpResponseMessage> SendWithToken<T>(HttpMethod method, string url, T content) {
-            var request = new HttpRequestMessage(method, url);
-            var bodyAsString = JsonConvert.SerializeObject(content);
-            request.Content = new StringContent(bodyAsString, Encoding.Default, "application/json");
-            return HttpClient.SendAsync(request);
+        protected async Task<HttpResponseMessage> SendWithToken<T>(HttpMethod method, string url, T content) {
+            using (var request = new HttpRequestMessage(method, url))
+            {
+                var bodyAsString = JsonConvert.SerializeObject(content);
+                request.Content = new StringContent(bodyAsString, Encoding.Default, "application/json");
+                return await HttpClient.SendAsync(request).ConfigureAwait(false);
+            }
         }
     }
 }
