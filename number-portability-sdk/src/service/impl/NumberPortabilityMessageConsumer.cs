@@ -9,6 +9,7 @@ using NLog;
 using static Coin.Sdk.Common.Crypto.CtpApiClientUtil;
 using System.Timers;
 using Newtonsoft.Json.Linq;
+using Org.BouncyCastle.Asn1.Cms;
 
 namespace Coin.Sdk.NP.Service.Impl
 {
@@ -201,7 +202,7 @@ namespace Coin.Sdk.NP.Service.Impl
                     + (messageTypes.Length == 0 ? "" : $"&messageTypes={string.Join(",", messageTypes)}"));
     }
 
-    internal class ReadTimeOutTimer
+    internal class ReadTimeOutTimer : IDisposable
     {
         const int THRESHOLD_TIME_OUT = 300000000;
         readonly System.Timers.Timer timer = new System.Timers.Timer();
@@ -255,6 +256,28 @@ namespace Coin.Sdk.NP.Service.Impl
                 cancellationTokenSource.Cancel();
             }
         }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    timer?.Dispose();
+                }
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 
     internal class BackoffHandler

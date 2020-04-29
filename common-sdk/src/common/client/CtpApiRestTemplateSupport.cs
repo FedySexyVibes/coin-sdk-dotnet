@@ -4,10 +4,11 @@ using System.Text;
 using System.Threading.Tasks;
 using static Coin.Sdk.Common.Crypto.CtpApiClientUtil;
 using Newtonsoft.Json;
+using System;
 
 namespace Coin.Sdk.Common.Client
 {
-    public abstract class CtpApiRestTemplateSupport
+    public abstract class CtpApiRestTemplateSupport : IDisposable
     {
         protected readonly HttpClient HttpClient;
         protected readonly CoinHttpClientHandler coinHttpClientHandler;
@@ -33,5 +34,27 @@ namespace Coin.Sdk.Common.Client
                 return await HttpClient.SendAsync(request).ConfigureAwait(false);
             }
         }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    HttpClient?.Dispose();
+                }
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }
