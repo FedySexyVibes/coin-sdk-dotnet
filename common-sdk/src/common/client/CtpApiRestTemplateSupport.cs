@@ -45,6 +45,7 @@ namespace Coin.Sdk.Common.Client
                 if (disposing)
                 {
                     HttpClient?.Dispose();
+                    coinHttpClientHandler?.Dispose();
                 }
                 disposedValue = true;
             }
