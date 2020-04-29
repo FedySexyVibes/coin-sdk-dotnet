@@ -1,16 +1,16 @@
+using Coin.Sdk.Common.Client;
+using Coin.Sdk.NP.Messages.V1;
+using Coin.Sdk.src.common;
+using EvtSource;
+using Newtonsoft.Json.Linq;
+using NLog;
 using System;
 using System.ComponentModel;
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Threading;
-using Coin.Sdk.NP.Messages.V1;
-using Coin.Sdk.Common.Client;
-using EvtSource;
-using NLog;
-using static Coin.Sdk.Common.Crypto.CtpApiClientUtil;
 using System.Timers;
-using Newtonsoft.Json.Linq;
-using System.Globalization;
-using Coin.Sdk.src.common;
+using static Coin.Sdk.Common.Crypto.CtpApiClientUtil;
 
 namespace Coin.Sdk.NP.Service.Impl
 {
@@ -28,7 +28,8 @@ namespace Coin.Sdk.NP.Service.Impl
             INumberPortabilityMessageListener listener, string sseUri, int backOffPeriod = 1, int numberOfRetries = 3,
             HmacSignatureType hmacSignatureType = HmacSignatureType.XDateAndDigest, int validPeriodInSeconds = DefaultValidPeriodInSecs) :
             this(consumerName, ReadPrivateKeyFile(privateKeyFile), encryptedHmacSecretFile,
-                listener, new Uri(sseUri), backOffPeriod, numberOfRetries, hmacSignatureType, validPeriodInSeconds) { }
+                listener, new Uri(sseUri), backOffPeriod, numberOfRetries, hmacSignatureType, validPeriodInSeconds)
+        { }
 
         public NumberPortabilityMessageConsumer(string consumerName, string privateKeyFile, string encryptedHmacSecretFile,
             INumberPortabilityMessageListener listener, Uri sseUri, int backOffPeriod = 1, int numberOfRetries = 3,
@@ -40,13 +41,15 @@ namespace Coin.Sdk.NP.Service.Impl
         private NumberPortabilityMessageConsumer(string consumerName, RSA privateKey, string encryptedHmacSecretFile, INumberPortabilityMessageListener listener,
             Uri sseUri, int backOffPeriod, int numberOfRetries, HmacSignatureType hmacSignatureType, int validPeriodInSeconds) :
             this(consumerName, privateKey, HmacFromEncryptedBase64EncodedSecretFile(encryptedHmacSecretFile, privateKey),
-                listener, sseUri, backOffPeriod, numberOfRetries, hmacSignatureType, validPeriodInSeconds) { }
+                listener, sseUri, backOffPeriod, numberOfRetries, hmacSignatureType, validPeriodInSeconds)
+        { }
 
         public NumberPortabilityMessageConsumer(string consumerName, RSA privateKey, HMACSHA256 signer, INumberPortabilityMessageListener listener,
             string sseUri, int backOffPeriod = 1, int numberOfRetries = 3, HmacSignatureType hmacSignatureType = HmacSignatureType.XDateAndDigest,
-            int validPeriodInSeconds = DefaultValidPeriodInSecs) 
+            int validPeriodInSeconds = DefaultValidPeriodInSecs)
             : this(consumerName, privateKey, signer, listener,
-                  new Uri(sseUri), backOffPeriod, numberOfRetries, hmacSignatureType, validPeriodInSeconds) {}
+                  new Uri(sseUri), backOffPeriod, numberOfRetries, hmacSignatureType, validPeriodInSeconds)
+        { }
 
         public NumberPortabilityMessageConsumer(string consumerName, RSA privateKey, HMACSHA256 signer, INumberPortabilityMessageListener listener,
             Uri sseUri, int backOffPeriod = 1, int numberOfRetries = 3, HmacSignatureType hmacSignatureType = HmacSignatureType.XDateAndDigest,
@@ -72,9 +75,8 @@ namespace Coin.Sdk.NP.Service.Impl
             Action<Exception> onFinalDisconnect = null,
             params string[] messageTypes)
         {
-            if (confirmationStatus == ConfirmationStatus.All && offsetPersister == null) {
+            if (confirmationStatus == ConfirmationStatus.All && offsetPersister == null)
                 throw new InvalidEnumArgumentException("offsetPersister should be given when confirmationStatus equals All");
-            }
 
             coinHttpClientHandler.CancellationTokenSource = new CancellationTokenSource();
             _timer.SetToken(coinHttpClientHandler.CancellationTokenSource);
@@ -95,7 +97,8 @@ namespace Coin.Sdk.NP.Service.Impl
             void HandleEvent(EventSourceMessageEventArgs messageEvent)
             {
                 _timer.UpdateTimestamp();
-                try { 
+                try
+                {
                     if (messageEvent.Event == "message")
                     {
                         // Just message as event means a heartbeat/keepalive
@@ -237,20 +240,11 @@ namespace Coin.Sdk.NP.Service.Impl
             timer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
         }
 
-        public void UpdateTimestamp()
-        {
-            timestamp = DateTime.Now.Ticks;
-        }
+        public void UpdateTimestamp() => timestamp = DateTime.Now.Ticks;
 
-        public void Start()
-        {
-            timer.Start();
-        }
+        public void Start() => timer.Start();
 
-        public void Stop()
-        {
-            timer.Stop();
-        }
+        public void Stop() => timer.Stop();
 
         public void Reset()
         {
@@ -259,10 +253,7 @@ namespace Coin.Sdk.NP.Service.Impl
             timer.Start();
         }
 
-        public void SetToken(CancellationTokenSource cts)
-        {
-            cancellationTokenSource = cts;
-        }
+        public void SetToken(CancellationTokenSource cts) => cancellationTokenSource = cts;
 
         private void OnTimedEvent(object source, ElapsedEventArgs e)
         {
@@ -316,15 +307,9 @@ namespace Coin.Sdk.NP.Service.Impl
             Reset();
         }
 
-        public int GetBackOffPeriod()
-        {
-            return backOffPeriod;
-        }
+        public int GetBackOffPeriod() => backOffPeriod;
 
-        public int GetRetriesLeft()
-        {
-            return numberOfRetries;
-        }
+        public int GetRetriesLeft() => numberOfRetries;
 
         public void Reset()
         {
@@ -337,14 +322,8 @@ namespace Coin.Sdk.NP.Service.Impl
                 retriesLeft--;
         }
 
-        private void IncreaseBackOffPeriod()
-        {
-            currentBackOffPeriod = (currentBackOffPeriod > 60) ? currentBackOffPeriod : currentBackOffPeriod * 2;
-        }
-        public bool MaximumNumberOfRetriesUsed()
-        {
-            return retriesLeft <= 0; 
-        }
+        private void IncreaseBackOffPeriod() => currentBackOffPeriod = (currentBackOffPeriod > 60) ? currentBackOffPeriod : currentBackOffPeriod * 2;
+        public bool MaximumNumberOfRetriesUsed() => retriesLeft <= 0;
 
         public void WaitBackOffPeriod()
         {

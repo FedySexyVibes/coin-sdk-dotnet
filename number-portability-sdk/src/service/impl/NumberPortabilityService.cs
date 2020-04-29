@@ -46,13 +46,9 @@ namespace Coin.Sdk.NP.Service.Impl
             var responseBody = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
             var json = JObject.Parse(responseBody);
             if (responseMessage.IsSuccessStatusCode)
-            {
                 return json.ToObject<MessageResponse>();
-            }
             if (json.TryGetValue("transactionId", out _))
-            {
                 return json.ToObject<ErrorResponse>();
-            }
             throw new HttpListenerException((int)responseMessage.StatusCode, responseBody);
         }
     }

@@ -1,3 +1,8 @@
+using Microsoft.IdentityModel.Tokens;
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.OpenSsl;
+using Org.BouncyCastle.Security;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -6,11 +11,6 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using Microsoft.IdentityModel.Tokens;
-using Org.BouncyCastle.Crypto;
-using Org.BouncyCastle.Crypto.Parameters;
-using Org.BouncyCastle.OpenSsl;
-using Org.BouncyCastle.Security;
 
 namespace Coin.Sdk.Common.Crypto
 {
@@ -23,7 +23,7 @@ namespace Coin.Sdk.Common.Crypto
             Date,
             XDateAndDigest
         }
-        
+
         public static HMACSHA256 HmacFromEncryptedBase64EncodedSecretFile(string filename, RSA privateKey)
         {
             using (var reader = File.OpenText(filename))
@@ -54,12 +54,13 @@ namespace Coin.Sdk.Common.Crypto
                 consumerName,
                 notBefore: nbf,
                 expires: exp,
-                signingCredentials: credentials);
+                signingCredentials: credentials
+            );
 
             var tokenHandler = new JwtSecurityTokenHandler();
             return tokenHandler.WriteToken(jwtToken);
         }
-        
+
         public static string CalculateHttpRequestHmac(HMACSHA256 signer, string consumerName, Dictionary<string, string>
             headers, string requestLine)
         {
@@ -77,9 +78,9 @@ namespace Coin.Sdk.Common.Crypto
         {
             using (var reader = File.OpenText(path))
             {
-                var keyPair = (AsymmetricCipherKeyPair) new PemReader(reader).ReadObject();
-                var parameters = DotNetUtilities.ToRSAParameters((RsaPrivateCrtKeyParameters) keyPair.Private);
-                
+                var keyPair = (AsymmetricCipherKeyPair)new PemReader(reader).ReadObject();
+                var parameters = DotNetUtilities.ToRSAParameters((RsaPrivateCrtKeyParameters)keyPair.Private);
+
                 return Create(parameters);
             }
         }
