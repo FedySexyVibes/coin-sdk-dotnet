@@ -30,18 +30,18 @@ namespace Coin.Sdk.NP.Messages.V1 {
 
         [DataMember(Name="donornetworkoperator", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "donornetworkoperator")]
-        public string DonorNetworkOperator;
+        public string DonorNetworkOperator { get; set; }
 
         [DataMember(Name="donorserviceprovider", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "donorserviceprovider")]
-        public string DonorServiceProvider;
+        public string DonorServiceProvider { get; set; }
 
         [DataMember(Name="answerduedatetime", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "answerduedatetime")]
-        public string AnswerDueDatetime;
+        public string AnswerDueDatetime { get; set; }
 
         [DataMember(Name="reasoncode", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "reasoncode")]
-        public string ReasonCode;
+        public string ReasonCode { get; set; }
     }
 }

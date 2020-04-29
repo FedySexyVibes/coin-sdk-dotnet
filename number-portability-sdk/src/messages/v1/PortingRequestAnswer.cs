@@ -31,44 +31,44 @@ namespace Coin.Sdk.NP.Messages.V1 {
 
         [DataMember(Name="blocking", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "blocking")]
-        public string Blocking;
+        public string Blocking { get; set; }
 
         [DataMember(Name="repeats", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "repeats")]
-        public List<PortingRequestAnswerRepeats> Repeats;
+        public List<PortingRequestAnswerRepeats> Repeats { get; set; }
     }
 
     public class PortingRequestAnswerRepeats {
 
         [DataMember(Name="seq", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "seq")]
-        public PortingRequestAnswerSeq Seq;
+        public PortingRequestAnswerSeq Seq { get; set; }
     }
 
     public class PortingRequestAnswerSeq {
 
         [DataMember(Name="numberseries", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "numberseries")]
-        public NumberSeries NumberSeries;
+        public NumberSeries NumberSeries { get; set; }
 
         [DataMember(Name="blockingcode", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "blockingcode")]
-        public string BlockingCode;
+        public string BlockingCode { get; set; }
 
         [DataMember(Name="firstpossibledate", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "firstpossibledate")]
-        public string FirstPossibleDate;
+        public string FirstPossibleDate { get; set; }
 
         [DataMember(Name="note", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "note")]
-        public string Note;
+        public string Note { get; set; }
 
         [DataMember(Name="donornetworkoperator", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "donornetworkoperator")]
-        public string DonorNetworkOperator;
+        public string DonorNetworkOperator { get; set; }
 
         [DataMember(Name="donorserviceprovider", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "donorserviceprovider")]
-        public string DonorServiceProvider;
+        public string DonorServiceProvider { get; set; }
     }
 }

@@ -31,55 +31,55 @@ namespace Coin.Sdk.NP.Messages.V1 {
 
         [DataMember(Name="platformprovider", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "platformprovider")]
-        public string PlatformProvider;
+        public string PlatformProvider { get; set; }
 
         [DataMember(Name="planneddatetime", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "planneddatetime")]
-        public string PlannedDatetime;
+        public string PlannedDatetime { get; set; }
 
         [DataMember(Name="repeats", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "repeats")]
-        public List<TariffChangeServiceNumberRepeats> Repeats;
+        public List<TariffChangeServiceNumberRepeats> Repeats { get; set; }
     }
 
     public class TariffChangeServiceNumberRepeats {
 
         [DataMember(Name="seq", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "seq")]
-        public TariffChangeServiceNumberSeq Seq;
+        public TariffChangeServiceNumberSeq Seq { get; set; }
     }
 
     public class TariffChangeServiceNumberSeq {
 
         [DataMember(Name="numberseries", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "numberseries")]
-        public NumberSeries NumberSeries;
+        public NumberSeries NumberSeries { get; set; }
 
         [DataMember(Name="tariffinfonew", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "tariffinfonew")]
-        public TariffInfo TariffInfoNew;
+        public TariffInfo TariffInfoNew { get; set; }
     }
 
     public class TariffInfo {
 
         [DataMember(Name="peak", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "peak")]
-        public string Peak;
+        public string Peak { get; set; }
 
         [DataMember(Name="offpeak", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "offpeak")]
-        public string OffPeak;
+        public string OffPeak { get; set; }
 
         [DataMember(Name="currency", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "currency")]
-        public string Currency;
+        public string Currency { get; set; }
 
         [DataMember(Name="type", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "type")]
-        public string Type;
+        public string Type { get; set; }
 
         [DataMember(Name="vat", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "vat")]
-        public string Vat;
+        public string Vat { get; set; }
     }
 }

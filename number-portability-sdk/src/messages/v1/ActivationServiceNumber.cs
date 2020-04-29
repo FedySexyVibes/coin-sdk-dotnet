@@ -29,42 +29,42 @@ namespace Coin.Sdk.NP.Messages.V1 {
         [JsonProperty(PropertyName = "dossierid")]
         public string DossierId { get; set; }
 
-        [DataMember(Name="platformprovider", EmitDefaultValue=false)]
+        [DataMember(Name = "platformprovider", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "platformprovider")]
-        public string PlatformProvider;
+        public string PlatformProvider { get; set; }
 
         [DataMember(Name="planneddatetime", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "planneddatetime")]
-        public string PlannedDatetime;
+        public string PlannedDatetime { get; set; }
 
         [DataMember(Name="note", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "note")]
-        public string Note;
+        public string Note { get; set; }
 
         [DataMember(Name="repeats", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "repeats")]
-        public List<ActivationServiceNumberRepeats> Repeats;
+        public List<ActivationServiceNumberRepeats> Repeats { get; set; }
     }
 
     public class ActivationServiceNumberRepeats {
 
         [DataMember(Name="seq", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "seq")]
-        public ActivationServiceNumberSeq Seq;
+        public ActivationServiceNumberSeq Seq { get; set; }
     }
 
     public class ActivationServiceNumberSeq {
 
         [DataMember(Name="numberseries", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "numberseries")]
-        public NumberSeries NumberSeries;
+        public NumberSeries NumberSeries { get; set; }
 
         [DataMember(Name="tariffinfo", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "tariffinfo")]
-        public TariffInfo TariffInfo;
+        public TariffInfo TariffInfo { get; set; }
 
         [DataMember(Name="pop", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "pop")]
-        public string Pop;
+        public string Pop { get; set; }
     }
 }

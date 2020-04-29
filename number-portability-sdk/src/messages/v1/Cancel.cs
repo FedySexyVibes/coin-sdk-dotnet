@@ -30,6 +30,6 @@ namespace Coin.Sdk.NP.Messages.V1 {
 
         [DataMember(Name="note", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "note")]
-        public string Note;
+        public string Note { get; set; }
     }
 }

@@ -7,7 +7,7 @@ namespace Coin.Sdk.NP.Messages.V1 {
 
         [DataMember(Name="transactionId", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "transactionId")]
-        public string TransactionId;
+        public string TransactionId { get; set; }
     }
 
     public enum ConfirmationStatus {
