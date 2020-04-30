@@ -57,9 +57,9 @@ namespace Coin.Sdk.NP.Service
 
     public interface INumberPortabilityService {
 
-        Task<HttpResponseMessage> SendConfirmation(string id);
+        Task<HttpResponseMessage> SendConfirmationAsync(string id);
 
-        Task<MessageResponse> SendMessage(IMessageEnvelope<INpMessageContent> message);
+        Task<MessageResponse> SendMessageAsync(IMessageEnvelope<INpMessageContent> message);
     }
 
     public interface IOffsetPersister {
