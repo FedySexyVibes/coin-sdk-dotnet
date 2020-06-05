@@ -31,32 +31,32 @@ namespace Coin.Sdk.NP.Messages.V1 {
 
         [DataMember(Name="platformprovider", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "platformprovider")]
-        public string PlatformProvider;
+        public string PlatformProvider { get; set; }
 
         [DataMember(Name="planneddatetime", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "planneddatetime")]
-        public string PlannedDatetime;
+        public string PlannedDatetime { get; set; }
 
         [DataMember(Name="repeats", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "repeats")]
-        public List<DeactivationServiceNumberRepeats> Repeats;
+        public List<DeactivationServiceNumberRepeats> Repeats { get; set; }
     }
 
     public class DeactivationServiceNumberRepeats {
 
         [DataMember(Name="seq", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "seq")]
-        public DeactivationServiceNumberSeq Seq;
+        public DeactivationServiceNumberSeq Seq { get; set; }
     }
 
     public class DeactivationServiceNumberSeq {
 
         [DataMember(Name="numberseries", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "numberseries")]
-        public NumberSeries NumberSeries;
+        public NumberSeries NumberSeries { get; set; }
 
         [DataMember(Name="pop", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "pop")]
-        public string Pop;
+        public string Pop { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
@@ -22,17 +23,17 @@ namespace Coin.Sdk.Common.Crypto
             Date,
             XDateAndDigest
         }
-        
+
         public static HMACSHA256 HmacFromEncryptedBase64EncodedSecretFile(string filename, RSA privateKey)
         {
             using (var reader = File.OpenText(filename))
-            {
                 return HmacFromEncryptedBase64EncodedSecret(reader.ReadToEnd(), privateKey);
-            }
         }
 
         public static HMACSHA256 HmacFromEncryptedBase64EncodedSecret(string encryptedSecret, RSA privateKey)
         {
+            if (privateKey is null)
+                throw new ArgumentNullException(nameof(privateKey));
             var sharedKey = privateKey.Decrypt(Convert.FromBase64String(encryptedSecret), RSAEncryptionPadding.Pkcs1);
             return new HMACSHA256(sharedKey);
         }
@@ -51,21 +52,24 @@ namespace Coin.Sdk.Common.Crypto
                 consumerName,
                 notBefore: nbf,
                 expires: exp,
-                signingCredentials: credentials);
+                signingCredentials: credentials
+            );
 
             var tokenHandler = new JwtSecurityTokenHandler();
             return tokenHandler.WriteToken(jwtToken);
         }
-        
+
         public static string CalculateHttpRequestHmac(HMACSHA256 signer, string consumerName, Dictionary<string, string>
             headers, string requestLine)
         {
-            var message = generateHmacMessage(headers, requestLine);
+            if (signer is null)
+                throw new ArgumentNullException(nameof(signer));
+            var message = GenerateHmacMessage(headers, requestLine);
             var signature = Convert.ToBase64String(signer.ComputeHash(Encoding.UTF8.GetBytes(message)));
-            return string.Format(HmacHeaderFormat, consumerName, string.Join(" ", headers.Select(p => p.Key)), signature);
+            return string.Format(CultureInfo.InvariantCulture, HmacHeaderFormat, consumerName, string.Join(" ", headers.Select(p => p.Key)), signature);
         }
-        
-        static string generateHmacMessage(Dictionary<string, string> headers, string requestLine) =>
+
+        static string GenerateHmacMessage(Dictionary<string, string> headers, string requestLine) =>
             string.Join("\n", headers.Select(p => $"{p.Key}: {p.Value}")) + "\n" + requestLine;
 
         public static RSA ReadPrivateKeyFile(string path)
@@ -73,12 +77,12 @@ namespace Coin.Sdk.Common.Crypto
             using (var reader = File.OpenText(path))
             {
                 var keyPair = (AsymmetricCipherKeyPair) new PemReader(reader).ReadObject();
-                var parameters = DotNetUtilities.ToRSAParameters((RsaPrivateCrtKeyParameters) keyPair.Private);
-                
+                var parameters = DotNetUtilities.ToRSAParameters((RsaPrivateCrtKeyParameters)keyPair.Private);
+
                 return Create(parameters);
             }
         }
-        
+
         static RSA Create(RSAParameters parameters)
         {
             var rsa = RSA.Create();
@@ -95,7 +99,7 @@ namespace Coin.Sdk.Common.Crypto
         }
 
         public static Dictionary<string, string> GetHmacHeaders(HmacSignatureType hmacSignatureType, string body = null) =>
-            GetHmacHeaders(hmacSignatureType, body == null ? new byte[0] : Encoding.UTF8.GetBytes(body));
+            GetHmacHeaders(hmacSignatureType, body == null ? Array.Empty<byte>() : Encoding.UTF8.GetBytes(body));
 
         public static Dictionary<string, string> GetHmacHeaders(HmacSignatureType hmacSignatureType, byte[] body)
         {
@@ -103,11 +107,14 @@ namespace Coin.Sdk.Common.Crypto
             switch (hmacSignatureType)
             {
                 case HmacSignatureType.Date:
-                    hmacHeaders["date"] = DateTime.UtcNow.ToString("R");
+                    hmacHeaders["date"] = DateTime.UtcNow.ToString("R", CultureInfo.InvariantCulture);
                     break;
                 case HmacSignatureType.XDateAndDigest:
-                    hmacHeaders["x-date"] = DateTime.UtcNow.ToString("R");
-                    hmacHeaders["digest"] = "SHA-256=" + Convert.ToBase64String(SHA256.Create().ComputeHash(body ?? new byte[0]));
+                    using (var sha = SHA256.Create())
+                    {
+                        hmacHeaders["x-date"] = DateTime.UtcNow.ToString("R", CultureInfo.InvariantCulture);
+                        hmacHeaders["digest"] = "SHA-256=" + Convert.ToBase64String(sha.ComputeHash(body ?? Array.Empty<byte>()));
+                    }
                     break;
             }
             return hmacHeaders;

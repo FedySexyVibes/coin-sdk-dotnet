@@ -31,14 +31,14 @@ namespace Coin.Sdk.NP.Messages.V1 {
 
         [DataMember(Name="currentnetworkoperator", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "currentnetworkoperator")]
-        public string CurrentNetworkOperator;
+        public string CurrentNetworkOperator { get; set; }
 
         [DataMember(Name="typeofnumber", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "typeofnumber")]
-        public string TypeOfNumber;
+        public string TypeOfNumber { get; set; }
 
         [DataMember(Name="repeats", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "repeats")]
-        public List<EnumNumberRepeats> Repeats;
+        public List<EnumNumberRepeats> Repeats { get; set; }
     }
 }

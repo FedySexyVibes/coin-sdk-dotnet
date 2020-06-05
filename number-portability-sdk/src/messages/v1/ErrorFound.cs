@@ -31,28 +31,28 @@ namespace Coin.Sdk.NP.Messages.V1 {
 
         [DataMember(Name="repeats", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "repeats")]
-        public List<ErrorFoundRepeats> Repeats;
+        public List<ErrorFoundRepeats> Repeats { get; set; }
     }
 
     public class ErrorFoundRepeats {
 
         [DataMember(Name="seq", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "seq")]
-        public ErrorFoundSeq Seq;
+        public ErrorFoundSeq Seq { get; set; }
     }
 
     public class ErrorFoundSeq {
 
         [DataMember(Name="phonenumber", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "phonenumber")]
-        public string PhoneNumber;
+        public string PhoneNumber { get; set; }
 
         [DataMember(Name="errorcode", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "errorcode")]
-        public string ErrorCode;
+        public string ErrorCode { get; set; }
 
         [DataMember(Name="description", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "description")]
-        public string Description;
+        public string Description { get; set; }
     }
 }

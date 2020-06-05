@@ -30,14 +30,14 @@ namespace Coin.Sdk.NP.Messages.V1 {
 
         [DataMember(Name="currentnetworkoperator", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "currentnetworkoperator")]
-        public string CurrentNetworkOperator;
+        public string CurrentNetworkOperator { get; set; }
 
         [DataMember(Name="typeofnumber", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "typeofnumber")]
-        public string TypeOfNumber;
+        public string TypeOfNumber { get; set; }
 
         [DataMember(Name="profileid", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "profileid")]
-        public string ProfileId;
+        public string ProfileId { get; set; }
     }
 }

@@ -31,18 +31,18 @@ namespace Coin.Sdk.NP.Messages.V1 {
 
         [DataMember(Name="currentnetworkoperator", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "currentnetworkoperator")]
-        public string CurrentNetworkOperator;
+        public string CurrentNetworkOperator { get; set; }
 
         [DataMember(Name="optanr", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "optanr")]
-        public string OptaNr;
+        public string OptaNr { get; set; }
 
         [DataMember(Name="planneddatetime", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "planneddatetime")]
-        public string plannedDatetime;
+        public string PlannedDatetime { get; set; }
 
         [DataMember(Name="repeats", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "repeats")]
-        public List<RangeRepeats> Repeats;
+        public List<RangeRepeats> Repeats { get; set; }
     }
 }

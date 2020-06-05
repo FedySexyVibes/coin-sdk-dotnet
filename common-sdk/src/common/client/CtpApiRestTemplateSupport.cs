@@ -1,35 +1,63 @@
+using System;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using static Coin.Sdk.Common.Crypto.CtpApiClientUtil;
 using Newtonsoft.Json;
+using static Coin.Sdk.Common.Crypto.CtpApiClientUtil;
 
 namespace Coin.Sdk.Common.Client
 {
-    public abstract class CtpApiRestTemplateSupport
+    public abstract class CtpApiRestTemplateSupport : IDisposable
     {
-        protected readonly HttpClient HttpClient;
-        protected readonly CoinHttpClientHandler coinHttpClientHandler;
+        protected HttpClient HttpClient { get; private set; }
+        protected CoinHttpClientHandler CoinHttpClientHandler { get; private set; }
 
-        protected CtpApiRestTemplateSupport(string consumerName, string privateKeyFile, string encryptedHmacSecretFile) :
-            this(consumerName, ReadPrivateKeyFile(privateKeyFile), encryptedHmacSecretFile) {}
+        protected CtpApiRestTemplateSupport(string consumerName, string privateKeyFile, string encryptedHmacSecretFile)
+            : this(consumerName, ReadPrivateKeyFile(privateKeyFile), encryptedHmacSecretFile) { }
 
-        CtpApiRestTemplateSupport(string consumerName, RSA privateKey, string encryptedHmacSecretFile) :
-            this(consumerName, privateKey, HmacFromEncryptedBase64EncodedSecretFile(encryptedHmacSecretFile, privateKey)) {}
-        
-        protected CtpApiRestTemplateSupport(string consumerName, RSA privateKey, HMACSHA256 signer, 
+        CtpApiRestTemplateSupport(string consumerName, RSA privateKey, string encryptedHmacSecretFile)
+            : this(consumerName, privateKey, HmacFromEncryptedBase64EncodedSecretFile(encryptedHmacSecretFile, privateKey)) { }
+
+        protected CtpApiRestTemplateSupport(string consumerName, RSA privateKey, HMACSHA256 signer,
             HmacSignatureType hmacSignatureType = HmacSignatureType.XDateAndDigest, int validPeriodInSeconds = DefaultValidPeriodInSecs)
         {
-            coinHttpClientHandler = new CoinHttpClientHandler(consumerName, privateKey, signer, hmacSignatureType, validPeriodInSeconds);
-            HttpClient = new HttpClient(coinHttpClientHandler);
+            CoinHttpClientHandler = new CoinHttpClientHandler(consumerName, privateKey, signer, hmacSignatureType, validPeriodInSeconds);
+            HttpClient = new HttpClient(CoinHttpClientHandler);
         }
 
-        protected Task<HttpResponseMessage> SendWithToken<T>(HttpMethod method, string url, T content) {
-            var request = new HttpRequestMessage(method, url);
-            var bodyAsString = JsonConvert.SerializeObject(content);
-            request.Content = new StringContent(bodyAsString, Encoding.Default, "application/json");
-            return HttpClient.SendAsync(request);
+        protected async Task<HttpResponseMessage> SendWithToken<T>(HttpMethod method, Uri url, T content)
+        {
+            using (var request = new HttpRequestMessage(method, url))
+            {
+                var bodyAsString = JsonConvert.SerializeObject(content);
+                request.Content = new StringContent(bodyAsString, Encoding.Default, "application/json");
+                return await HttpClient.SendAsync(request).ConfigureAwait(false);
+            }
         }
+
+        #region IDisposable Support
+
+        bool _disposed; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    HttpClient?.Dispose();
+                    CoinHttpClientHandler?.Dispose();
+                }
+                _disposed = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }

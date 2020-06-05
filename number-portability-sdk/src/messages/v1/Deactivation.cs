@@ -29,28 +29,28 @@ namespace Coin.Sdk.NP.Messages.V1 {
 
         [DataMember(Name="currentnetworkoperator", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "currentnetworkoperator")]
-        public string CurrentNetworkOperator;
+        public string CurrentNetworkOperator { get; set; }
 
         [DataMember(Name="originalnetworkoperator", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "originalnetworkoperator")]
-        public string OriginalNetworkOperator;
+        public string OriginalNetworkOperator { get; set; }
 
         [DataMember(Name="repeats", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "repeats")]
-        public List<DeactivationRepeats> Repeats;
+        public List<DeactivationRepeats> Repeats { get; set; }
     }
 
     public class DeactivationRepeats {
 
         [DataMember(Name="seq", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "seq")]
-        public DeactivationSeq Seq;
+        public DeactivationSeq Seq { get; set; }
     }
 
     public class DeactivationSeq {
 
         [DataMember(Name="numberseries", EmitDefaultValue=false)]
         [JsonProperty(PropertyName = "numberseries")]
-        public NumberSeries NumberSeries;
+        public NumberSeries NumberSeries { get; set; }
     }
 }

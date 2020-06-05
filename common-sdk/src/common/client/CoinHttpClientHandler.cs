@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
+using Coin.Sdk.Common.Crypto;
 using static Coin.Sdk.Common.Crypto.CtpApiClientUtil;
 
 namespace Coin.Sdk.Common.Client
@@ -15,19 +17,23 @@ namespace Coin.Sdk.Common.Client
         readonly RSA _privateKey;
         readonly string _consumerName;
         readonly int _validPeriodInSeconds;
-        public CancellationTokenSource CancellationTokenSource
-        { get; set; }
+
+        static readonly ByteArrayContent EmptyContent = new ByteArrayContent(Array.Empty<byte>());
+
+        public CancellationTokenSource CancellationTokenSource { get; set; }
 
         public CoinHttpClientHandler(string consumerName, string privateKeyFile, string encryptedHmacSecretFile,
             HmacSignatureType hmacSignatureHmacSignatureType = HmacSignatureType.XDateAndDigest, int validPeriodInSeconds = DefaultValidPeriodInSecs) :
-            this(consumerName, ReadPrivateKeyFile(privateKeyFile), encryptedHmacSecretFile, hmacSignatureHmacSignatureType, validPeriodInSeconds) {}
+            this(consumerName, ReadPrivateKeyFile(privateKeyFile), encryptedHmacSecretFile, hmacSignatureHmacSignatureType, validPeriodInSeconds)
+        { }
 
         CoinHttpClientHandler(string consumerName, RSA privateKey, string encryptedHmacSecretFile,
             HmacSignatureType hmacSignatureHmacSignatureType, int validPeriodInSeconds) :
             this(consumerName, privateKey, HmacFromEncryptedBase64EncodedSecretFile(encryptedHmacSecretFile, privateKey),
-                hmacSignatureHmacSignatureType, validPeriodInSeconds) {}
+                hmacSignatureHmacSignatureType, validPeriodInSeconds)
+        { }
 
-        public CoinHttpClientHandler(string consumerName, RSA privateKey, HMACSHA256 signer, 
+        public CoinHttpClientHandler(string consumerName, RSA privateKey, HMACSHA256 signer,
             HmacSignatureType hmacSignatureHmacSignatureType = HmacSignatureType.XDateAndDigest, int validPeriodInSeconds = DefaultValidPeriodInSecs)
         {
             _hmacSignatureType = hmacSignatureHmacSignatureType;
@@ -37,32 +43,31 @@ namespace Coin.Sdk.Common.Client
             _validPeriodInSeconds = validPeriodInSeconds;
             UseCookies = true;
         }
-        
-        private async Task<Dictionary<string, string>> getHmacHeaders(HttpRequestMessage request)
+
+        async Task<Dictionary<string, string>> GetHmacHeaders(HttpRequestMessage request)
         {
             // In the .NET 4.7 & 4.8 Runtime the implementation throws an exception when a body is added 
             // to the request. The following if statement is added for this reason, otherwise the SSE stream
             // can't be opened. 
             if (request.Method.Equals(HttpMethod.Get))
             {
-                return GetHmacHeaders(_hmacSignatureType, new byte[0]);
+                return CtpApiClientUtil.GetHmacHeaders(_hmacSignatureType, Array.Empty<byte>());
             }
-            else
-            {
-                request.Content = request.Content ?? new ByteArrayContent(new byte[0]);
-                var content = await request.Content.ReadAsByteArrayAsync();
-                return GetHmacHeaders(_hmacSignatureType, content);
-            }
+
+            request.Content = request.Content ?? EmptyContent;
+            var content = await request.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
+            return CtpApiClientUtil.GetHmacHeaders(_hmacSignatureType, content);
         }
 
-        
+
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var hmacHeaders = await getHmacHeaders(request);
+            if (request is null)
+                throw new ArgumentNullException(nameof(request));
+            var hmacHeaders = await GetHmacHeaders(request).ConfigureAwait(false);
             foreach (var pair in hmacHeaders)
-            {
                 request.Headers.Add(pair.Key, pair.Value);
-            }
+
             var requestLine = $"{request.Method} {request.RequestUri.LocalPath} HTTP/1.1";
             request.Headers.Add("authorization", CalculateHttpRequestHmac(_signer, _consumerName, hmacHeaders, requestLine));
             request.Headers.Add("User-Agent", $"coin-sdk-dotnet-{SdkInfo.UserAgent}");
@@ -71,7 +76,7 @@ namespace Coin.Sdk.Common.Client
             CookieContainer.Add(request.RequestUri, new Cookie("jwt", jwt));
 
             var ctsToken = CancellationTokenSource?.Token ?? cancellationToken;
-            return await base.SendAsync(request, ctsToken);
+            return await base.SendAsync(request, ctsToken).ConfigureAwait(false);
         }
     }
 }

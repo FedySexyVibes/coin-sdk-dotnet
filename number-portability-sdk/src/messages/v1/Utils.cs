@@ -9,18 +9,40 @@ namespace Coin.Sdk.NP.Messages.V1
     {
         public static string TypeName<T>() where T : INpMessageContent, new() => TypeName(new T());
 
-        public static string TypeName(IMessageEnvelope<INpMessageContent> envelope) => TypeName(envelope.Message.Body.Content);
-        public static string TypeName(INpMessage<INpMessageContent> message) => TypeName(message.Body.Content);
-        public static string TypeName(INpMessageBody<INpMessageContent> body) => TypeName(body.Content);
+        public static string TypeName(IMessageEnvelope<INpMessageContent> envelope)
+        {
+            if (envelope is null)
+                throw new ArgumentNullException(nameof(envelope));
+            return TypeName(envelope.Message.Body.Content);
+        }
+
+        public static string TypeName(INpMessage<INpMessageContent> message)
+        {
+            if (message is null)
+                throw new ArgumentNullException(nameof(message));
+            return TypeName(message.Body.Content);
+        }
+
+        public static string TypeName(INpMessageBody<INpMessageContent> body)
+        {
+            if (body is null)
+                throw new ArgumentNullException(nameof(body));
+            return TypeName(body.Content);
+        }
+
         public static string TypeName(INpMessageContent content)
         {
+            if (content is null)
+                throw new ArgumentNullException(nameof(content));
             switch (content)
             {
                 case PortingRequestAnswerDelayed _: return "pradelayed";
                 case ActivationServiceNumber _: return "activationsn";
                 case DeactivationServiceNumber _: return "deactivationsn";
                 case TariffChangeServiceNumber _: return "tariffchangesn";
-                default: return content.GetType().Name.Split('.').Last().ToLower().Replace("message", "");
+#pragma warning disable CA1308 // Normalize strings to uppercase
+                default: return content.GetType().Name.Split('.').Last().ToLowerInvariant().Replace("message", string.Empty);
+#pragma warning restore CA1308 // Normalize strings to uppercase
             }
         }
 
@@ -60,13 +82,17 @@ namespace Coin.Sdk.NP.Messages.V1
      
         public override object ReadJson(JsonReader reader,    
             Type objectType, object existingValue, JsonSerializer serializer)    
-        {    
+        {
+            if (serializer is null)
+                throw new ArgumentNullException(nameof(serializer));
             return serializer.Deserialize<T>(reader);    
         }    
      
         public override void WriteJson(JsonWriter writer,    
             object value, JsonSerializer serializer)    
-        {    
+        {
+            if (serializer is null)
+                throw new ArgumentNullException(nameof(serializer));
             serializer.Serialize(writer, value);    
         }    
     }

@@ -1,14 +1,18 @@
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Threading;
-using Coin.Sdk.NP.Messages.V1;
+using System.Timers;
+using Coin.Sdk.Common;
 using Coin.Sdk.Common.Client;
+using Coin.Sdk.NP.Messages.V1;
 using EvtSource;
+using Newtonsoft.Json.Linq;
 using NLog;
 using static Coin.Sdk.Common.Crypto.CtpApiClientUtil;
-using System.Timers;
-using Newtonsoft.Json.Linq;
+using Timer = System.Timers.Timer;
 
 namespace Coin.Sdk.NP.Service.Impl
 {
@@ -16,25 +20,41 @@ namespace Coin.Sdk.NP.Service.Impl
     {
         const long DefaultOffset = -1;
         readonly INumberPortabilityMessageListener _listener;
-        readonly string _sseUri;
+        readonly Uri _sseUri;
         readonly Logger _logger = LogManager.GetCurrentClassLogger();
         EventSourceReader _eventSourceReader;
-        ReadTimeOutTimer _timer = new ReadTimeOutTimer();
-        BackoffHandler _backoffHandler;
-               
+        readonly ReadTimeOutTimer _timer = new ReadTimeOutTimer();
+        readonly BackoffHandler _backoffHandler;
+
         public NumberPortabilityMessageConsumer(string consumerName, string privateKeyFile, string encryptedHmacSecretFile,
             INumberPortabilityMessageListener listener, string sseUri, int backOffPeriod = 1, int numberOfRetries = 3,
             HmacSignatureType hmacSignatureType = HmacSignatureType.XDateAndDigest, int validPeriodInSeconds = DefaultValidPeriodInSecs) :
             this(consumerName, ReadPrivateKeyFile(privateKeyFile), encryptedHmacSecretFile,
-                listener, sseUri, backOffPeriod, numberOfRetries, hmacSignatureType, validPeriodInSeconds) {}
+                listener, new Uri(sseUri), backOffPeriod, numberOfRetries, hmacSignatureType, validPeriodInSeconds)
+        { }
+
+        public NumberPortabilityMessageConsumer(string consumerName, string privateKeyFile, string encryptedHmacSecretFile,
+            INumberPortabilityMessageListener listener, Uri sseUri, int backOffPeriod = 1, int numberOfRetries = 3,
+            HmacSignatureType hmacSignatureType = HmacSignatureType.XDateAndDigest, int validPeriodInSeconds = DefaultValidPeriodInSecs) :
+            this(consumerName, ReadPrivateKeyFile(privateKeyFile), encryptedHmacSecretFile,
+                listener, sseUri, backOffPeriod, numberOfRetries, hmacSignatureType, validPeriodInSeconds)
+        { }
 
         NumberPortabilityMessageConsumer(string consumerName, RSA privateKey, string encryptedHmacSecretFile, INumberPortabilityMessageListener listener,
-            string sseUri, int backOffPeriod, int numberOfRetries, HmacSignatureType hmacSignatureType, int validPeriodInSeconds) :
+            Uri sseUri, int backOffPeriod, int numberOfRetries, HmacSignatureType hmacSignatureType, int validPeriodInSeconds) :
             this(consumerName, privateKey, HmacFromEncryptedBase64EncodedSecretFile(encryptedHmacSecretFile, privateKey),
-                listener, sseUri, backOffPeriod, numberOfRetries, hmacSignatureType, validPeriodInSeconds) {}
-        
+                listener, sseUri, backOffPeriod, numberOfRetries, hmacSignatureType, validPeriodInSeconds)
+        { }
+
         public NumberPortabilityMessageConsumer(string consumerName, RSA privateKey, HMACSHA256 signer, INumberPortabilityMessageListener listener,
             string sseUri, int backOffPeriod = 1, int numberOfRetries = 3, HmacSignatureType hmacSignatureType = HmacSignatureType.XDateAndDigest,
+            int validPeriodInSeconds = DefaultValidPeriodInSecs)
+            : this(consumerName, privateKey, signer, listener,
+                  new Uri(sseUri), backOffPeriod, numberOfRetries, hmacSignatureType, validPeriodInSeconds)
+        { }
+
+        public NumberPortabilityMessageConsumer(string consumerName, RSA privateKey, HMACSHA256 signer, INumberPortabilityMessageListener listener,
+            Uri sseUri, int backOffPeriod = 1, int numberOfRetries = 3, HmacSignatureType hmacSignatureType = HmacSignatureType.XDateAndDigest,
             int validPeriodInSeconds = DefaultValidPeriodInSecs) : base(consumerName, privateKey, signer, hmacSignatureType, validPeriodInSeconds)
         {
             _listener = listener;
@@ -44,7 +64,7 @@ namespace Coin.Sdk.NP.Service.Impl
 
         public void StopConsuming()
         {
-            System.Diagnostics.Debug.WriteLine("Quitting because testcase ended!");
+            Debug.WriteLine("Quitting because testcase ended!");
             _timer.Stop();
             if (_eventSourceReader?.IsDisposed == false) _eventSourceReader.Dispose();
         }
@@ -57,13 +77,12 @@ namespace Coin.Sdk.NP.Service.Impl
             Action<Exception> onFinalDisconnect = null,
             params string[] messageTypes)
         {
-            if (confirmationStatus == ConfirmationStatus.All && offsetPersister == null) {
+            if (confirmationStatus == ConfirmationStatus.All && offsetPersister == null)
                 throw new InvalidEnumArgumentException("offsetPersister should be given when confirmationStatus equals All");
-            }
 
-            coinHttpClientHandler.CancellationTokenSource = new CancellationTokenSource();
-            _timer.SetToken(coinHttpClientHandler.CancellationTokenSource);
-            _eventSourceReader = new EventSourceReader(CreateUri(initialOffset, confirmationStatus, messageTypes), coinHttpClientHandler);
+            CoinHttpClientHandler.CancellationTokenSource = new CancellationTokenSource();
+            _timer.SetToken(CoinHttpClientHandler.CancellationTokenSource);
+            _eventSourceReader = new EventSourceReader(CreateUri(initialOffset, confirmationStatus, messageTypes), CoinHttpClientHandler);
 
             StartReading();
 
@@ -80,7 +99,8 @@ namespace Coin.Sdk.NP.Service.Impl
             void HandleEvent(EventSourceMessageEventArgs messageEvent)
             {
                 _timer.UpdateTimestamp();
-                try { 
+                try
+                {
                     if (messageEvent.Event == "message")
                     {
                         // Just message as event means a heartbeat/keepalive
@@ -90,10 +110,12 @@ namespace Coin.Sdk.NP.Service.Impl
                     {
                         // Handle correct message
                         HandleMessage(messageEvent);
-                        if (offsetPersister != null) offsetPersister.Offset = long.Parse(messageEvent.Id);
+                        if (offsetPersister != null) offsetPersister.Offset = long.Parse(messageEvent.Id, CultureInfo.InvariantCulture);
                     }
                 }
+#pragma warning disable CA1031 // Do not catch general exception types
                 catch (Exception ex)
+#pragma warning restore CA1031 // Do not catch general exception types
                 {
                     _logger.Error(ex);
                     _listener.OnException(ex);
@@ -118,9 +140,9 @@ namespace Coin.Sdk.NP.Service.Impl
                 _backoffHandler.WaitBackOffPeriod();
 
                 _logger.Debug("Restarting stream");
-                _eventSourceReader = new EventSourceReader(CreateUri(recoveredOffset, confirmationStatus, messageTypes), coinHttpClientHandler);
-                coinHttpClientHandler.CancellationTokenSource = new CancellationTokenSource();
-                _timer.SetToken(coinHttpClientHandler.CancellationTokenSource);
+                _eventSourceReader = new EventSourceReader(CreateUri(recoveredOffset, confirmationStatus, messageTypes), CoinHttpClientHandler);
+                CoinHttpClientHandler.CancellationTokenSource = new CancellationTokenSource();
+                _timer.SetToken(CoinHttpClientHandler.CancellationTokenSource);
                 StartReading();
             }
         }
@@ -196,119 +218,120 @@ namespace Coin.Sdk.NP.Service.Impl
             }
         }
 
-        Uri CreateUri(long offset, ConfirmationStatus confirmationStatus, string[] messageTypes) =>
-            new Uri($"{_sseUri}?offset={offset}&confirmationStatus={confirmationStatus}"
-                    + (messageTypes.Length == 0 ? "" : $"&messageTypes={string.Join(",", messageTypes)}"));
+        Uri CreateUri(long offset, ConfirmationStatus confirmationStatus, string[] messageTypes)
+        {
+            var uri = _sseUri
+                .AddQueryArg(nameof(offset), $"{offset}")
+                .AddQueryArg(nameof(confirmationStatus), $"{confirmationStatus}");
+            if (messageTypes.Length > 0)
+                uri.AddQueryArg(nameof(messageTypes), $"{string.Join(",", messageTypes)}");
+            return uri;
+        }
     }
 
-    internal class ReadTimeOutTimer
+    internal class ReadTimeOutTimer : IDisposable
     {
-        const int THRESHOLD_TIME_OUT = 300000000;
-        readonly System.Timers.Timer timer = new System.Timers.Timer();
-        long timestamp = DateTime.Now.Ticks;
-        CancellationTokenSource cancellationTokenSource;
+        const int ThresholdTimeout = 300000000;
+        readonly Timer _timer = new Timer();
+        long _timestamp = DateTime.Now.Ticks;
+        CancellationTokenSource _cancellationtokensource;
 
         public ReadTimeOutTimer()
         {
-            timer.Interval = 30000;
-            timer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
+            _timer.Interval = 30000;
+            _timer.Elapsed += OnTimedEvent;
         }
 
-        public void UpdateTimestamp()
-        {
-            timestamp = DateTime.Now.Ticks;
-        }
+        public void UpdateTimestamp() => _timestamp = DateTime.Now.Ticks;
 
-        public void Start()
-        {
-            timer.Start();
-        }
+        public void Start() => _timer.Start();
 
-        public void Stop()
-        {
-            timer.Stop();
-        }
+        public void Stop() => _timer.Stop();
 
         public void Reset()
         {
-            timer.Stop();
-            timestamp = DateTime.Now.Ticks;
-            timer.Start();
+            _timer.Stop();
+            _timestamp = DateTime.Now.Ticks;
+            _timer.Start();
         }
 
-        public void SetToken(CancellationTokenSource cts)
-        {
-            cancellationTokenSource = cts;
-        }
+        public void SetToken(CancellationTokenSource cts) => _cancellationtokensource = cts;
 
         void OnTimedEvent(object source, ElapsedEventArgs e)
         {
             var now = DateTime.Now.Ticks;
-            var elapsedTime = now - timestamp;
-            System.Diagnostics.Debug.WriteLine("Timestamp: " + timestamp);
-            System.Diagnostics.Debug.WriteLine("Elapsed Time: " + elapsedTime);
+            var elapsedTime = now - _timestamp;
+            Debug.WriteLine("Timestamp: " + _timestamp);
+            Debug.WriteLine("Elapsed Time: " + elapsedTime);
 
-            if (elapsedTime > THRESHOLD_TIME_OUT)
+            if (elapsedTime > ThresholdTimeout)
             {
-                System.Diagnostics.Debug.WriteLine("Timestamp: " + timestamp);
-                System.Diagnostics.Debug.WriteLine("Time-out above threshold! Quitting: " + e);
-                cancellationTokenSource.Cancel();
+                Debug.WriteLine("Timestamp: " + _timestamp);
+                Debug.WriteLine("Time-out above threshold! Quitting: " + e);
+                _cancellationtokensource.Cancel();
             }
         }
+
+        #region IDisposable Support
+
+        bool _disposed; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    _timer?.Dispose();
+                }
+                _disposed = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 
     internal class BackoffHandler
     {
-        int backOffPeriod;
-        int numberOfRetries;
-        int currentBackOffPeriod;
-        int retriesLeft;
-
-        long timestamp
-        { get; set; }
+        readonly int _backoffperiod;
+        readonly int _numberofretries;
+        int _currentbackoffperiod;
+        int _retriesleft;
 
         public BackoffHandler(int backOffPeriod, int numberOfRetries)
         {
-            this.backOffPeriod = backOffPeriod;
-            this.numberOfRetries = numberOfRetries;
+            _backoffperiod = backOffPeriod;
+            _numberofretries = numberOfRetries;
             Reset();
         }
 
-        public int GetBackOffPeriod()
-        {
-            return backOffPeriod;
-        }
+        public int GetBackOffPeriod() => _backoffperiod;
 
-        public int GetRetriesLeft()
-        {
-            return numberOfRetries;
-        }
+        public int GetRetriesLeft() => _numberofretries;
 
         public void Reset()
         {
-            currentBackOffPeriod = backOffPeriod;
-            retriesLeft = numberOfRetries;
-            timestamp = DateTime.Now.Ticks;
+            _currentbackoffperiod = _backoffperiod;
+            _retriesleft = _numberofretries;
         }
         public void DecreaseNumberOfRetries()
         {
-            if (retriesLeft > 0)
-                retriesLeft--;
+            if (_retriesleft > 0)
+                _retriesleft--;
         }
 
-        void IncreaseBackOffPeriod()
-        {
-            currentBackOffPeriod = (currentBackOffPeriod > 60) ? currentBackOffPeriod : currentBackOffPeriod * 2;
-        }
-        public bool MaximumNumberOfRetriesUsed()
-        {
-            return retriesLeft <= 0; 
-        }
+        void IncreaseBackOffPeriod() => _currentbackoffperiod = (_currentbackoffperiod > 60) ? _currentbackoffperiod : _currentbackoffperiod * 2;
+        public bool MaximumNumberOfRetriesUsed() => _retriesleft <= 0;
 
         public void WaitBackOffPeriod()
         {
-            System.Diagnostics.Debug.WriteLine($"Going to sleep for {currentBackOffPeriod} seconds and still {retriesLeft} retries left!");
-            Thread.Sleep(currentBackOffPeriod * 1000);
+            Debug.WriteLine($"Going to sleep for {_currentbackoffperiod} seconds and still {_retriesleft} retries left!");
+            Thread.Sleep(_currentbackoffperiod * 1000);
             IncreaseBackOffPeriod();
             DecreaseNumberOfRetries();
         }
