@@ -80,7 +80,7 @@ namespace Coin.Sdk.NP.Sample
 
         public void OnKeepAlive()
         {
-            System.Diagnostics.Debug.WriteLine($"Keepalive");
+            System.Diagnostics.Debug.WriteLine("Keepalive");
         }
 
         public void OnPortingPerformed(string messageId, PortingPerformedMessage message)
