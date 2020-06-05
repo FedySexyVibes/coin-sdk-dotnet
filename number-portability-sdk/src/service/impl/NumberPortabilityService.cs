@@ -34,15 +34,15 @@ namespace Coin.Sdk.NP.Service.Impl
 
         public NumberPortabilityService(Uri apiUrl, string consumerName, HMACSHA256 signer, RSA privateKey) : base(consumerName, privateKey, signer) => _apiUrl = apiUrl;
 
-        public Task<HttpResponseMessage> SendConfirmation(string id)
+        public Task<HttpResponseMessage> SendConfirmationAsync(string id)
         {
             var confirmationMessage = new ConfirmationMessage { TransactionId = id };
-            return SendWithToken(HttpMethod.Put, _apiUrl.AddPathArg($"dossiers/confirmations/{id}"), confirmationMessage);
+            return SendWithTokenAsync(HttpMethod.Put, _apiUrl.AddPathArg($"dossiers/confirmations/{id}"), confirmationMessage);
         }
 
-        public async Task<MessageResponse> SendMessage(IMessageEnvelope<INpMessageContent> envelope)
+        public async Task<MessageResponse> SendMessageAsync(IMessageEnvelope<INpMessageContent> envelope)
         {
-            var responseMessage = await SendWithToken(HttpMethod.Post, _apiUrl.AddPathArg($"dossiers/{TypeName(envelope)}"), envelope).ConfigureAwait(false);
+            var responseMessage = await SendWithTokenAsync(HttpMethod.Post, _apiUrl.AddPathArg($"dossiers/{TypeName(envelope)}"), envelope).ConfigureAwait(false);
             var responseBody = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
             var json = JObject.Parse(responseBody);
             if (responseMessage.IsSuccessStatusCode)

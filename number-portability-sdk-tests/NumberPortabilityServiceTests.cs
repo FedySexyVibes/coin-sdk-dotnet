@@ -59,7 +59,7 @@ namespace Coin.Sdk.NP.Tests
                     }
                 }
             };
-            return _numberPortabilityService.SendMessage(message).Result;
+            return _numberPortabilityService.SendMessageAsync(message).Result;
         }
 
         [Test]

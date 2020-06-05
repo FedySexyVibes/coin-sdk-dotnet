@@ -44,7 +44,7 @@ namespace Coin.Sdk.Common.Client
             UseCookies = true;
         }
 
-        async Task<Dictionary<string, string>> GetHmacHeaders(HttpRequestMessage request)
+        async Task<Dictionary<string, string>> GetHmacHeadersAsync(HttpRequestMessage request)
         {
             // In the .NET 4.7 & 4.8 Runtime the implementation throws an exception when a body is added 
             // to the request. The following if statement is added for this reason, otherwise the SSE stream
@@ -64,7 +64,7 @@ namespace Coin.Sdk.Common.Client
         {
             if (request is null)
                 throw new ArgumentNullException(nameof(request));
-            var hmacHeaders = await GetHmacHeaders(request).ConfigureAwait(false);
+            var hmacHeaders = await GetHmacHeadersAsync(request).ConfigureAwait(false);
             foreach (var pair in hmacHeaders)
                 request.Headers.Add(pair.Key, pair.Value);
 
