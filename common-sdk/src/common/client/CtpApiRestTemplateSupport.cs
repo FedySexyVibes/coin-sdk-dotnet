@@ -30,8 +30,11 @@ namespace Coin.Sdk.Common.Client
         {
             using (var request = new HttpRequestMessage(method, url))
             {
-                var bodyAsString = JsonConvert.SerializeObject(content);
-                request.Content = new StringContent(bodyAsString, Encoding.Default, "application/json");
+                if (content != null)
+                {
+                    var bodyAsString = JsonConvert.SerializeObject(content);
+                    request.Content = new StringContent(bodyAsString, Encoding.Default, "application/json");
+                }
                 return await HttpClient.SendAsync(request).ConfigureAwait(false);
             }
         }
