@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Web;
 
-namespace Coin.Sdk.src.common
+namespace Coin.Sdk.Common
 {
     public static class UriHelper
     {
-        private static readonly char[] _pathsep = new[] { '/' };
+        static readonly char[] Pathsep = { '/' };
 
         public static Uri AddQueryArg(this Uri url, string paramName, string paramValue, bool replace = false)
         {
@@ -25,7 +25,7 @@ namespace Coin.Sdk.src.common
                 throw new ArgumentNullException(nameof(path));
 
             var builder = new UriBuilder(url);
-            builder.Path = $"{builder.Path.TrimEnd(_pathsep)}/{path.TrimStart(_pathsep)}";
+            builder.Path = $"{builder.Path.TrimEnd(Pathsep)}/{path.TrimStart(Pathsep)}";
             return new Uri(builder.Uri.ToString());
         }
     }

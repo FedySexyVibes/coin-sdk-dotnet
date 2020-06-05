@@ -1,9 +1,9 @@
-using Newtonsoft.Json;
 using System;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using static Coin.Sdk.Common.Crypto.CtpApiClientUtil;
 
 namespace Coin.Sdk.Common.Client
@@ -16,7 +16,7 @@ namespace Coin.Sdk.Common.Client
         protected CtpApiRestTemplateSupport(string consumerName, string privateKeyFile, string encryptedHmacSecretFile)
             : this(consumerName, ReadPrivateKeyFile(privateKeyFile), encryptedHmacSecretFile) { }
 
-        private CtpApiRestTemplateSupport(string consumerName, RSA privateKey, string encryptedHmacSecretFile)
+        CtpApiRestTemplateSupport(string consumerName, RSA privateKey, string encryptedHmacSecretFile)
             : this(consumerName, privateKey, HmacFromEncryptedBase64EncodedSecretFile(encryptedHmacSecretFile, privateKey)) { }
 
         protected CtpApiRestTemplateSupport(string consumerName, RSA privateKey, HMACSHA256 signer,
@@ -37,7 +37,8 @@ namespace Coin.Sdk.Common.Client
         }
 
         #region IDisposable Support
-        private bool _disposed = false; // To detect redundant calls
+
+        bool _disposed; // To detect redundant calls
 
         protected virtual void Dispose(bool disposing)
         {

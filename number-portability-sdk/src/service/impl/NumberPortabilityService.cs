@@ -1,12 +1,12 @@
-using Coin.Sdk.Common.Client;
-using Coin.Sdk.NP.Messages.V1;
-using Coin.Sdk.src.common;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Net;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using Coin.Sdk.Common;
+using Coin.Sdk.Common.Client;
+using Coin.Sdk.NP.Messages.V1;
+using Newtonsoft.Json.Linq;
 using static Coin.Sdk.Common.Crypto.CtpApiClientUtil;
 using static Coin.Sdk.NP.Messages.V1.Utils;
 
@@ -15,7 +15,7 @@ namespace Coin.Sdk.NP.Service.Impl
 
     public class NumberPortabilityService : CtpApiRestTemplateSupport, INumberPortabilityService
     {
-        private readonly Uri _apiUrl;
+        readonly Uri _apiUrl;
 
         public NumberPortabilityService(string apiUrl, string consumerName, string privateKeyFile, string encryptedHmacSecretFile)
             : this(new Uri(apiUrl), consumerName, privateKeyFile, encryptedHmacSecretFile) { }

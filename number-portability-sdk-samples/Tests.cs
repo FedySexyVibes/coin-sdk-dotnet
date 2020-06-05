@@ -49,7 +49,7 @@ namespace Coin.Sdk.NP.Sample
                         },
                         Receiver = new Receiver
                         {
-                            NetworkOperator = CrdbReceiver,
+                            NetworkOperator = CrdbReceiver
                             //ServiceProvider = ""
                         },
                         Timestamp = _timestamp
@@ -73,7 +73,7 @@ namespace Coin.Sdk.NP.Sample
                                         {
                                             Start = PhoneNumber,
                                             End = PhoneNumber
-                                        },
+                                        }
                                         /*Repeats = new List<EnumRepeats>
                                         {
                                             new EnumRepeats
@@ -86,7 +86,7 @@ namespace Coin.Sdk.NP.Sample
                                         }*/
                                     }
                                 }
-                            },
+                            }
                             /*CustomerInfo = new CustomerInfo
                             {
                                 //CustomerId = "",
