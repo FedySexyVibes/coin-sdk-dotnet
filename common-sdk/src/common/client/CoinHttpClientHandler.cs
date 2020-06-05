@@ -1,23 +1,24 @@
-using Coin.Sdk.Common.Crypto;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
+using Coin.Sdk.Common.Crypto;
 using static Coin.Sdk.Common.Crypto.CtpApiClientUtil;
 
 namespace Coin.Sdk.Common.Client
 {
     public class CoinHttpClientHandler : HttpClientHandler
     {
-        private readonly HmacSignatureType _hmacSignatureType;
-        private readonly HMACSHA256 _signer;
-        private readonly RSA _privateKey;
-        private readonly string _consumerName;
-        private readonly int _validPeriodInSeconds;
+        readonly HmacSignatureType _hmacSignatureType;
+        readonly HMACSHA256 _signer;
+        readonly RSA _privateKey;
+        readonly string _consumerName;
+        readonly int _validPeriodInSeconds;
 
-        private static readonly ByteArrayContent _emptycontent = new ByteArrayContent(System.Array.Empty<byte>());
+        static readonly ByteArrayContent EmptyContent = new ByteArrayContent(Array.Empty<byte>());
 
         public CancellationTokenSource CancellationTokenSource { get; set; }
 
@@ -26,7 +27,7 @@ namespace Coin.Sdk.Common.Client
             this(consumerName, ReadPrivateKeyFile(privateKeyFile), encryptedHmacSecretFile, hmacSignatureHmacSignatureType, validPeriodInSeconds)
         { }
 
-        private CoinHttpClientHandler(string consumerName, RSA privateKey, string encryptedHmacSecretFile,
+        CoinHttpClientHandler(string consumerName, RSA privateKey, string encryptedHmacSecretFile,
             HmacSignatureType hmacSignatureHmacSignatureType, int validPeriodInSeconds) :
             this(consumerName, privateKey, HmacFromEncryptedBase64EncodedSecretFile(encryptedHmacSecretFile, privateKey),
                 hmacSignatureHmacSignatureType, validPeriodInSeconds)
@@ -43,28 +44,26 @@ namespace Coin.Sdk.Common.Client
             UseCookies = true;
         }
 
-        private async Task<Dictionary<string, string>> GetHmacHeadersAsync(HttpRequestMessage request)
+        async Task<Dictionary<string, string>> GetHmacHeadersAsync(HttpRequestMessage request)
         {
             // In the .NET 4.7 & 4.8 Runtime the implementation throws an exception when a body is added 
             // to the request. The following if statement is added for this reason, otherwise the SSE stream
             // can't be opened. 
             if (request.Method.Equals(HttpMethod.Get))
             {
-                return CtpApiClientUtil.GetHmacHeaders(_hmacSignatureType, System.Array.Empty<byte>());
+                return CtpApiClientUtil.GetHmacHeaders(_hmacSignatureType, Array.Empty<byte>());
             }
-            else
-            {
-                request.Content = request.Content ?? _emptycontent;
-                var content = await request.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
-                return CtpApiClientUtil.GetHmacHeaders(_hmacSignatureType, content);
-            }
+
+            request.Content = request.Content ?? EmptyContent;
+            var content = await request.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
+            return CtpApiClientUtil.GetHmacHeaders(_hmacSignatureType, content);
         }
 
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             if (request is null)
-                throw new System.ArgumentNullException(nameof(request));
+                throw new ArgumentNullException(nameof(request));
             var hmacHeaders = await GetHmacHeadersAsync(request).ConfigureAwait(false);
             foreach (var pair in hmacHeaders)
                 request.Headers.Add(pair.Key, pair.Value);

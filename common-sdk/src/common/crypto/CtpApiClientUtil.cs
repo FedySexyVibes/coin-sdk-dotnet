@@ -1,8 +1,3 @@
-using Microsoft.IdentityModel.Tokens;
-using Org.BouncyCastle.Crypto;
-using Org.BouncyCastle.Crypto.Parameters;
-using Org.BouncyCastle.OpenSsl;
-using Org.BouncyCastle.Security;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -11,6 +6,11 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.IdentityModel.Tokens;
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.OpenSsl;
+using Org.BouncyCastle.Security;
 
 namespace Coin.Sdk.Common.Crypto
 {
@@ -38,7 +38,7 @@ namespace Coin.Sdk.Common.Crypto
             return new HMACSHA256(sharedKey);
         }
 
-        private const string HmacHeaderFormat = "hmac username=\"{0}\", algorithm=\"hmac-sha256\", headers=\"{1} request-line\", signature=\"{2}\"";
+        const string HmacHeaderFormat = "hmac username=\"{0}\", algorithm=\"hmac-sha256\", headers=\"{1} request-line\", signature=\"{2}\"";
 
         public static string CreateJwt(RSA privateKey, string consumerName, int validPeriodInSeconds)
         {
@@ -69,21 +69,21 @@ namespace Coin.Sdk.Common.Crypto
             return string.Format(CultureInfo.InvariantCulture, HmacHeaderFormat, consumerName, string.Join(" ", headers.Select(p => p.Key)), signature);
         }
 
-        private static string GenerateHmacMessage(Dictionary<string, string> headers, string requestLine) =>
+        static string GenerateHmacMessage(Dictionary<string, string> headers, string requestLine) =>
             string.Join("\n", headers.Select(p => $"{p.Key}: {p.Value}")) + "\n" + requestLine;
 
         public static RSA ReadPrivateKeyFile(string path)
         {
             using (var reader = File.OpenText(path))
             {
-                var keyPair = (AsymmetricCipherKeyPair)new PemReader(reader).ReadObject();
+                var keyPair = (AsymmetricCipherKeyPair) new PemReader(reader).ReadObject();
                 var parameters = DotNetUtilities.ToRSAParameters((RsaPrivateCrtKeyParameters)keyPair.Private);
 
                 return Create(parameters);
             }
         }
 
-        private static RSA Create(RSAParameters parameters)
+        static RSA Create(RSAParameters parameters)
         {
             var rsa = RSA.Create();
             try
