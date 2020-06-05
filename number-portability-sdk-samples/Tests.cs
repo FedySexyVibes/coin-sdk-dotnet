@@ -101,7 +101,7 @@ namespace Coin.Sdk.NP.Sample
                     }
                 }
             };
-            var response = _numberPortabilityService.SendMessage(message).Result;
+            var response = _numberPortabilityService.SendMessageAsync(message).Result;
             Console.WriteLine($"Transaction id: {response.TransactionId}");
             if (!(response is ErrorResponse error)) return;
             foreach (var content in error.Errors)
@@ -122,7 +122,7 @@ namespace Coin.Sdk.NP.Sample
         public void SendConfirmation()
         {
             const string messageId = "<ENTER MESSAGE ID>";
-            var response = _numberPortabilityService.SendConfirmation(messageId).Result;
+            var response = _numberPortabilityService.SendConfirmationAsync(messageId).Result;
             Console.WriteLine(response.IsSuccessStatusCode
                 ? $"Successfully sent confirmation of message {messageId}"
                 : $"Confirmation failed with status {response.StatusCode}. Response: {response.Content.ReadAsStringAsync().Result}.");
