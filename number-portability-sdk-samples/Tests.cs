@@ -11,12 +11,12 @@ namespace Coin.Sdk.NP.Sample
 {
     public class Tests
     {
-        NumberPortabilityService _numberPortabilityService;
-        NumberPortabilityMessageConsumer _messageConsumer;
-        
-        const string Operator = "<YOUR OPERATOR>";
-        readonly string _timestamp = DateTime.Now.ToString("yyyyMMddhhmmss");
-        const string PhoneNumber = "0612345678";
+        private NumberPortabilityService _numberPortabilityService;
+        private NumberPortabilityMessageConsumer _messageConsumer;
+
+        private const string Operator = "<YOUR OPERATOR>";
+        private readonly string _timestamp = DateTime.Now.ToString("yyyyMMddhhmmss");
+        private const string PhoneNumber = "0612345678";
 
         [SetUp]
         public void Setup()

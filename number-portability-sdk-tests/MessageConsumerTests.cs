@@ -9,8 +9,8 @@ namespace Coin.Sdk.NP.Tests
 {
     public class MessageConsumerTests
     {
-        NumberPortabilityMessageConsumer _messageConsumer;
-        TestListener _listener;
+        private NumberPortabilityMessageConsumer _messageConsumer;
+        private TestListener _listener;
 
         [SetUp]
         public void Setup()

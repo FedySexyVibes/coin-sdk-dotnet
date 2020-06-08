@@ -9,7 +9,7 @@ namespace Coin.Sdk.NP.Tests
 {
     public class NumberPortabilityServiceTests
     {
-        NumberPortabilityService _numberPortabilityService;
+        private NumberPortabilityService _numberPortabilityService;
 
         [SetUp]
         public void Setup()
@@ -17,7 +17,7 @@ namespace Coin.Sdk.NP.Tests
             _numberPortabilityService = new NumberPortabilityService(ApiUrl, Consumer, PrivateKeyFile, EncryptedHmacSecretFile);
         }
 
-        MessageResponse SendPortingRequest(string dossierId)
+        private MessageResponse SendPortingRequest(string dossierId)
         {
             var message = new MessageEnvelope<PortingRequest>
             {

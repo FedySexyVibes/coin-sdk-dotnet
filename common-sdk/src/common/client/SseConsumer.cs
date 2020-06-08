@@ -16,15 +16,15 @@ namespace Coin.Sdk.Common.Client
 {
     public class SseConsumer : CtpApiRestTemplateSupport
     {
-        const long DefaultOffset = -1;
-        const int DefaultNumberOfRetries = 15;
-        readonly Logger _logger = LogManager.GetCurrentClassLogger();
-        readonly Uri _sseUri;
-        EventSourceReader _eventSourceReader;
-        readonly ReadTimeoutTimer _timer = new ReadTimeoutTimer();
-        readonly BackoffHandler _backoffHandler;
+        private const long DefaultOffset = -1;
+        private const int DefaultNumberOfRetries = 15;
+        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        private readonly Uri _sseUri;
+        private EventSourceReader _eventSourceReader;
+        private readonly ReadTimeoutTimer _timer = new ReadTimeoutTimer();
+        private readonly BackoffHandler _backoffHandler;
 
-        enum ConfirmationStatus
+        private enum ConfirmationStatus
         {
             Unconfirmed,
             All
@@ -44,7 +44,7 @@ namespace Coin.Sdk.Common.Client
         {
         }
 
-        SseConsumer(string consumerName, Uri sseUri, RSA privateKey, string encryptedHmacSecretFile, int backOffPeriod,
+        private SseConsumer(string consumerName, Uri sseUri, RSA privateKey, string encryptedHmacSecretFile, int backOffPeriod,
             int numberOfRetries) :
             this(consumerName, sseUri, privateKey,
                 HmacFromEncryptedBase64EncodedSecretFile(encryptedHmacSecretFile, privateKey), backOffPeriod,
@@ -99,7 +99,7 @@ namespace Coin.Sdk.Common.Client
             StartConsuming(handleSse, ConfirmationStatus.All, messageTypes, otherParams, onFinalDisconnect,
                 offsetPersister, offset);
 
-        void StartConsuming(SseHandler handleSse,
+        private void StartConsuming(SseHandler handleSse,
             ConfirmationStatus confirmationStatus = ConfirmationStatus.Unconfirmed,
             IEnumerable<string> messageTypes = null,
             Dictionary<string, IEnumerable<string>> otherParams = null,
@@ -157,7 +157,7 @@ namespace Coin.Sdk.Common.Client
             }
         }
 
-        Uri CreateUri(long offset, ConfirmationStatus confirmationStatus, IEnumerable<string> messageTypes = null,
+        private Uri CreateUri(long offset, ConfirmationStatus confirmationStatus, IEnumerable<string> messageTypes = null,
             Dictionary<string, IEnumerable<string>> otherParams = null) => _sseUri
             .AddQueryArg(nameof(offset), $"{offset}")
             .AddQueryArg(nameof(confirmationStatus), $"{confirmationStatus}")
@@ -174,10 +174,10 @@ namespace Coin.Sdk.Common.Client
 
     internal sealed class ReadTimeoutTimer : IDisposable
     {
-        const int ThresholdTimeout = 300_000_000;
-        readonly Timer _timer = new Timer();
-        long _timestamp = DateTime.Now.Ticks;
-        CancellationTokenSource _cancellationTokenSource;
+        private const int ThresholdTimeout = 300_000_000;
+        private readonly Timer _timer = new Timer();
+        private long _timestamp = DateTime.Now.Ticks;
+        private CancellationTokenSource _cancellationTokenSource;
 
         public ReadTimeoutTimer()
         {
@@ -200,7 +200,7 @@ namespace Coin.Sdk.Common.Client
 
         public void SetToken(CancellationTokenSource cts) => _cancellationTokenSource = cts;
 
-        void OnTimedEvent(object source, ElapsedEventArgs e)
+        private void OnTimedEvent(object source, ElapsedEventArgs e)
         {
             var now = DateTime.Now.Ticks;
             var elapsedTime = now - _timestamp;
@@ -217,9 +217,9 @@ namespace Coin.Sdk.Common.Client
 
         #region IDisposable Support
 
-        bool _disposed; // To detect redundant calls
+        private bool _disposed; // To detect redundant calls
 
-        void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!_disposed)
             {
@@ -243,10 +243,10 @@ namespace Coin.Sdk.Common.Client
 
     internal class BackoffHandler
     {
-        readonly int _backoffPeriod;
-        readonly int _numberOfRetries;
-        int _currentBackoffPeriod;
-        int _retriesLeft;
+        private readonly int _backoffPeriod;
+        private readonly int _numberOfRetries;
+        private int _currentBackoffPeriod;
+        private int _retriesLeft;
 
         public BackoffHandler(int backOffPeriod, int numberOfRetries)
         {
@@ -265,13 +265,13 @@ namespace Coin.Sdk.Common.Client
             _retriesLeft = _numberOfRetries;
         }
 
-        void DecreaseNumberOfRetries()
+        private void DecreaseNumberOfRetries()
         {
             if (_retriesLeft > 0)
                 _retriesLeft--;
         }
 
-        void IncreaseBackOffPeriod() => _currentBackoffPeriod =
+        private void IncreaseBackOffPeriod() => _currentBackoffPeriod =
             _currentBackoffPeriod > 60 ? _currentBackoffPeriod : _currentBackoffPeriod * 2;
 
         public bool MaximumNumberOfRetriesUsed() => _retriesLeft <= 0;

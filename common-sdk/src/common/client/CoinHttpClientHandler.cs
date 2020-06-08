@@ -11,12 +11,12 @@ namespace Coin.Sdk.Common.Client
 {
     public class CoinHttpClientHandler : HttpClientHandler
     {
-        readonly HMACSHA256 _signer;
-        readonly RSA _privateKey;
-        readonly string _consumerName;
-        readonly int _validPeriodInSeconds;
+        private readonly HMACSHA256 _signer;
+        private readonly RSA _privateKey;
+        private readonly string _consumerName;
+        private readonly int _validPeriodInSeconds;
 
-        static readonly ByteArrayContent EmptyContent = new ByteArrayContent(Array.Empty<byte>());
+        private static readonly ByteArrayContent EmptyContent = new ByteArrayContent(Array.Empty<byte>());
 
         public CancellationTokenSource CancellationTokenSource { get; set; }
 
@@ -25,7 +25,7 @@ namespace Coin.Sdk.Common.Client
             this(consumerName, ReadPrivateKeyFile(privateKeyFile), encryptedHmacSecretFile, validPeriodInSeconds)
         { }
 
-        CoinHttpClientHandler(string consumerName, RSA privateKey, string encryptedHmacSecretFile, int validPeriodInSeconds) :
+        private CoinHttpClientHandler(string consumerName, RSA privateKey, string encryptedHmacSecretFile, int validPeriodInSeconds) :
             this(consumerName, privateKey,
                 HmacFromEncryptedBase64EncodedSecretFile(encryptedHmacSecretFile, privateKey), validPeriodInSeconds)
         { }
@@ -39,7 +39,7 @@ namespace Coin.Sdk.Common.Client
             UseCookies = true;
         }
 
-        static async Task<Dictionary<string, string>> GetHmacHeadersAsync(HttpRequestMessage request)
+        private static async Task<Dictionary<string, string>> GetHmacHeadersAsync(HttpRequestMessage request)
         {
             // In the .NET 4.7 & 4.8 Runtime the implementation throws an exception when a body is added 
             // to the request. The following if statement is added for this reason, otherwise the SSE stream

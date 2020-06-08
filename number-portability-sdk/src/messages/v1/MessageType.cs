@@ -29,7 +29,7 @@ namespace Coin.Sdk.NP.Messages.V1
 
     internal static class MessageTypeExtensions
     {
-        static readonly Dictionary<MessageType, string> MessageTypeNames = new Dictionary<MessageType, string>
+        private static readonly Dictionary<MessageType, string> MessageTypeNames = new Dictionary<MessageType, string>
         {
             [MessageType.ActivationServiceNumberV1] = "activationsn",
             [MessageType.CancelV1] = "cancel",

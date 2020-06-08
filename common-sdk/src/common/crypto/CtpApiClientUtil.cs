@@ -32,7 +32,7 @@ namespace Coin.Sdk.Common.Crypto
             return new HMACSHA256(sharedKey);
         }
 
-        const string HmacHeaderFormat = "hmac username=\"{0}\", algorithm=\"hmac-sha256\", headers=\"{1} request-line\", signature=\"{2}\"";
+        private const string HmacHeaderFormat = "hmac username=\"{0}\", algorithm=\"hmac-sha256\", headers=\"{1} request-line\", signature=\"{2}\"";
 
         public static string CreateJwt(RSA privateKey, string consumerName, int validPeriodInSeconds)
         {
@@ -63,7 +63,7 @@ namespace Coin.Sdk.Common.Crypto
             return string.Format(CultureInfo.InvariantCulture, HmacHeaderFormat, consumerName, string.Join(" ", headers.Select(p => p.Key)), signature);
         }
 
-        static string GenerateHmacMessage(Dictionary<string, string> headers, string requestLine) =>
+        private static string GenerateHmacMessage(Dictionary<string, string> headers, string requestLine) =>
             string.Join("\n", headers.Select(p => $"{p.Key}: {p.Value}")) + "\n" + requestLine;
 
         public static RSA ReadPrivateKeyFile(string path)
@@ -77,7 +77,7 @@ namespace Coin.Sdk.Common.Crypto
             }
         }
 
-        static RSA Create(RSAParameters parameters)
+        private static RSA Create(RSAParameters parameters)
         {
             var rsa = RSA.Create();
             try

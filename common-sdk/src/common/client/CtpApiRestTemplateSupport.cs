@@ -17,7 +17,7 @@ namespace Coin.Sdk.Common.Client
         protected CtpApiRestTemplateSupport(string consumerName, string privateKeyFile, string encryptedHmacSecretFile)
             : this(consumerName, ReadPrivateKeyFile(privateKeyFile), encryptedHmacSecretFile) { }
 
-        CtpApiRestTemplateSupport(string consumerName, RSA privateKey, string encryptedHmacSecretFile)
+        private CtpApiRestTemplateSupport(string consumerName, RSA privateKey, string encryptedHmacSecretFile)
             : this(consumerName, privateKey, HmacFromEncryptedBase64EncodedSecretFile(encryptedHmacSecretFile, privateKey)) { }
 
         protected CtpApiRestTemplateSupport(string consumerName, RSA privateKey, HMACSHA256 signer,
@@ -42,11 +42,11 @@ namespace Coin.Sdk.Common.Client
 
         #region IDisposable Support
 
-        bool _disposed; // To detect redundant calls
+        private bool _disposed; // To detect redundant calls
 
         protected virtual IEnumerable<IDisposable> DisposableFields => new IDisposable[] { HttpClient, CoinHttpClientHandler };
 
-        void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!_disposed)
             {

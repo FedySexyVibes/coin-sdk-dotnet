@@ -10,9 +10,9 @@ namespace Coin.Sdk.NP.Service.Impl
 {
     public class NumberPortabilityMessageConsumer
     {
-        const long DefaultOffset = -1;
-        readonly SseConsumer _sseConsumer;
-        readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        private const long DefaultOffset = -1;
+        private readonly SseConsumer _sseConsumer;
+        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         public NumberPortabilityMessageConsumer(SseConsumer sseConsumer)
         {
@@ -81,7 +81,7 @@ namespace Coin.Sdk.NP.Service.Impl
                 onFinalDisconnect: onFinalDisconnect);
         }
 
-        bool HandleSse(INumberPortabilityMessageListener listener, EventSourceMessageEventArgs eventArgs)
+        private bool HandleSse(INumberPortabilityMessageListener listener, EventSourceMessageEventArgs eventArgs)
         {
             try
             {
