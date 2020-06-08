@@ -1,339 +1,176 @@
 using System;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Globalization;
-using System.Security.Cryptography;
-using System.Threading;
-using System.Timers;
-using Coin.Sdk.Common;
+using System.Linq;
 using Coin.Sdk.Common.Client;
 using Coin.Sdk.NP.Messages.V1;
 using EvtSource;
 using Newtonsoft.Json.Linq;
 using NLog;
-using static Coin.Sdk.Common.Crypto.CtpApiClientUtil;
-using Timer = System.Timers.Timer;
 
 namespace Coin.Sdk.NP.Service.Impl
 {
-    public class NumberPortabilityMessageConsumer : CtpApiRestTemplateSupport
+    public class NumberPortabilityMessageConsumer
     {
         const long DefaultOffset = -1;
-        readonly INumberPortabilityMessageListener _listener;
-        readonly Uri _sseUri;
+        readonly SseConsumer _sseConsumer;
         readonly Logger _logger = LogManager.GetCurrentClassLogger();
-        EventSourceReader _eventSourceReader;
-        readonly ReadTimeOutTimer _timer = new ReadTimeOutTimer();
-        readonly BackoffHandler _backoffHandler;
 
-        public NumberPortabilityMessageConsumer(string consumerName, string privateKeyFile, string encryptedHmacSecretFile,
-            INumberPortabilityMessageListener listener, string sseUri, int backOffPeriod = 1, int numberOfRetries = 3,
-            HmacSignatureType hmacSignatureType = HmacSignatureType.XDateAndDigest, int validPeriodInSeconds = DefaultValidPeriodInSecs) :
-            this(consumerName, ReadPrivateKeyFile(privateKeyFile), encryptedHmacSecretFile,
-                listener, new Uri(sseUri), backOffPeriod, numberOfRetries, hmacSignatureType, validPeriodInSeconds)
-        { }
-
-        public NumberPortabilityMessageConsumer(string consumerName, string privateKeyFile, string encryptedHmacSecretFile,
-            INumberPortabilityMessageListener listener, Uri sseUri, int backOffPeriod = 1, int numberOfRetries = 3,
-            HmacSignatureType hmacSignatureType = HmacSignatureType.XDateAndDigest, int validPeriodInSeconds = DefaultValidPeriodInSecs) :
-            this(consumerName, ReadPrivateKeyFile(privateKeyFile), encryptedHmacSecretFile,
-                listener, sseUri, backOffPeriod, numberOfRetries, hmacSignatureType, validPeriodInSeconds)
-        { }
-
-        NumberPortabilityMessageConsumer(string consumerName, RSA privateKey, string encryptedHmacSecretFile, INumberPortabilityMessageListener listener,
-            Uri sseUri, int backOffPeriod, int numberOfRetries, HmacSignatureType hmacSignatureType, int validPeriodInSeconds) :
-            this(consumerName, privateKey, HmacFromEncryptedBase64EncodedSecretFile(encryptedHmacSecretFile, privateKey),
-                listener, sseUri, backOffPeriod, numberOfRetries, hmacSignatureType, validPeriodInSeconds)
-        { }
-
-        public NumberPortabilityMessageConsumer(string consumerName, RSA privateKey, HMACSHA256 signer, INumberPortabilityMessageListener listener,
-            string sseUri, int backOffPeriod = 1, int numberOfRetries = 3, HmacSignatureType hmacSignatureType = HmacSignatureType.XDateAndDigest,
-            int validPeriodInSeconds = DefaultValidPeriodInSecs)
-            : this(consumerName, privateKey, signer, listener,
-                  new Uri(sseUri), backOffPeriod, numberOfRetries, hmacSignatureType, validPeriodInSeconds)
-        { }
-
-        public NumberPortabilityMessageConsumer(string consumerName, RSA privateKey, HMACSHA256 signer, INumberPortabilityMessageListener listener,
-            Uri sseUri, int backOffPeriod = 1, int numberOfRetries = 3, HmacSignatureType hmacSignatureType = HmacSignatureType.XDateAndDigest,
-            int validPeriodInSeconds = DefaultValidPeriodInSecs) : base(consumerName, privateKey, signer, hmacSignatureType, validPeriodInSeconds)
+        public NumberPortabilityMessageConsumer(SseConsumer sseConsumer)
         {
-            _listener = listener;
-            _sseUri = sseUri;
-            _backoffHandler = new BackoffHandler(backOffPeriod, numberOfRetries);
+            _sseConsumer = sseConsumer;
         }
 
         public void StopConsuming()
         {
-            Debug.WriteLine("Quitting because testcase ended!");
-            _timer.Stop();
-            if (_eventSourceReader?.IsDisposed == false) _eventSourceReader.Dispose();
+            _sseConsumer.StopConsuming();
         }
 
-        public void StartConsuming(
-            ConfirmationStatus confirmationStatus = ConfirmationStatus.Unconfirmed,
-            long initialOffset = DefaultOffset,
-            IOffsetPersister offsetPersister = null,
-            Func<long, long> recoverOffset = null,
+        /// <summary>
+        /// Recommended method for consuming messages. On connect or reconnect it will consume all unconfirmed messages.
+        /// </summary>
+        public void StartConsumingUnconfirmed(
+            INumberPortabilityMessageListener listener,
             Action<Exception> onFinalDisconnect = null,
-            params string[] messageTypes)
+            params MessageType[] messageTypes
+        )
         {
-            if (confirmationStatus == ConfirmationStatus.All && offsetPersister == null)
-                throw new InvalidEnumArgumentException("offsetPersister should be given when confirmationStatus equals All");
+            _sseConsumer.StartConsumingUnconfirmed(
+                sse => HandleSse(listener, sse),
+                messageTypes.Select(m => m.Name()),
+                onFinalDisconnect: onFinalDisconnect);
+        }
 
-            CoinHttpClientHandler.CancellationTokenSource = new CancellationTokenSource();
-            _timer.SetToken(CoinHttpClientHandler.CancellationTokenSource);
-            _eventSourceReader = new EventSourceReader(CreateUri(initialOffset, confirmationStatus, messageTypes), CoinHttpClientHandler);
+        /// <summary>
+        /// Consume all messages, both confirmed and unconfirmed, from a certain offset.
+        /// Only use for special cases if <see cref="StartConsumingUnconfirmed"/> does not meet needs.
+        /// </summary>
+        public void StartConsumingAll(
+            INumberPortabilityMessageListener listener,
+            IOffsetPersister offsetPersister,
+            long offset = DefaultOffset,
+            Action<Exception> onFinalDisconnect = null,
+            params MessageType[] messageTypes
+        )
+        {
+            _sseConsumer.StartConsumingAll(
+                sse => HandleSse(listener, sse),
+                offsetPersister,
+                offset,
+                messageTypes.Select(m => m.Name()),
+                onFinalDisconnect: onFinalDisconnect);
+        }
 
-            StartReading();
+        /// <summary>
+        /// Only use this method for receiving unconfirmed messages if you make sure that all messages that are received
+        /// through this method will be confirmed otherwise, ideally in the stream opened by
+        /// <see cref="StartConsumingUnconfirmed"/>. So this method should only be used for a secondary
+        /// stream (e.g. backoffice process) that needs to consume unconfirmed messages for administrative purposes.
+        /// </summary>
+        public void StartConsumingUnconfirmedWithOffsetPersistence(
+            INumberPortabilityMessageListener listener,
+            IOffsetPersister offsetPersister,
+            long offset = DefaultOffset,
+            Action<Exception> onFinalDisconnect = null,
+            params MessageType[] messageTypes
+        )
+        {
+            _sseConsumer.StartConsumingUnconfirmedWithOffsetPersistence(
+                sse => HandleSse(listener, sse),
+                offsetPersister,
+                offset,
+                messageTypes.Select(m => m.Name()),
+                onFinalDisconnect: onFinalDisconnect);
+        }
 
-            void StartReading()
+        bool HandleSse(INumberPortabilityMessageListener listener, EventSourceMessageEventArgs eventArgs)
+        {
+            try
             {
-                _eventSourceReader.MessageReceived += (sender, e) => HandleEvent(e);
-                _eventSourceReader.Start();
-                _eventSourceReader.Disconnected += (sender, e) => HandleDisconnect(e);
-                _logger.Info("Stream started");
-                _timer.Start();
-
-            }
-
-            void HandleEvent(EventSourceMessageEventArgs messageEvent)
-            {
-                _timer.UpdateTimestamp();
-                try
+                var message = JObject.Parse(eventArgs.Message).First.First;
+                switch (eventArgs.Event)
                 {
-                    if (messageEvent.Event == "message")
-                    {
-                        // Just message as event means a heartbeat/keepalive
-                        _listener.OnKeepAlive();
-                    }
-                    else
-                    {
-                        // Handle correct message
-                        HandleMessage(messageEvent);
-                        if (offsetPersister != null) offsetPersister.Offset = long.Parse(messageEvent.Id, CultureInfo.InvariantCulture);
-                    }
+                    case "activationsn-v1":
+                        listener.OnActivationServiceNumber(eventArgs.Id,
+                            message.ToObject<ActivationServiceNumberMessage>());
+                        return true;
+                    case "cancel-v1":
+                        listener.OnCancel(eventArgs.Id, message.ToObject<CancelMessage>());
+                        return true;
+                    case "deactivation-v1":
+                        listener.OnDeactivation(eventArgs.Id, message.ToObject<DeactivationMessage>());
+                        return true;
+                    case "deactivationsn-v1":
+                        listener.OnDeactivationServiceNumber(eventArgs.Id,
+                            message.ToObject<DeactivationServiceNumberMessage>());
+                        return true;
+                    case "enumactivationnumber-v1":
+                        listener.OnEnumActivationNumber(eventArgs.Id, message.ToObject<EnumActivationNumberMessage>());
+                        return true;
+                    case "enumactivationoperator-v1":
+                        listener.OnEnumActivationOperator(eventArgs.Id,
+                            message.ToObject<EnumActivationOperatorMessage>());
+                        return true;
+                    case "enumactivationrange-v1":
+                        listener.OnEnumActivationRange(eventArgs.Id, message.ToObject<EnumActivationRangeMessage>());
+                        return true;
+                    case "enumdeactivationnumber-v1":
+                        listener.OnEnumDeactivationNumber(eventArgs.Id,
+                            message.ToObject<EnumDeactivationNumberMessage>());
+                        return true;
+                    case "enumdeactivationoperator-v1":
+                        listener.OnEnumDeactivationOperator(eventArgs.Id,
+                            message.ToObject<EnumDeactivationOperatorMessage>());
+                        return true;
+                    case "enumdeactivationrange-v1":
+                        listener.OnEnumDeactivationRange(eventArgs.Id,
+                            message.ToObject<EnumDeactivationRangeMessage>());
+                        return true;
+                    case "enumprofileactivation-v1":
+                        listener.OnEnumProfileActivation(eventArgs.Id,
+                            message.ToObject<EnumProfileActivationMessage>());
+                        return true;
+                    case "enumprofiledeactivation-v1":
+                        listener.OnEnumProfileDeactivation(eventArgs.Id,
+                            message.ToObject<EnumProfileDeactivationMessage>());
+                        return true;
+                    case "errorfound-v1":
+                        listener.OnErrorFound(eventArgs.Id, message.ToObject<ErrorFoundMessage>());
+                        return true;
+                    case "portingperformed-v1":
+                        listener.OnPortingPerformed(eventArgs.Id, message.ToObject<PortingPerformedMessage>());
+                        return true;
+                    case "portingrequest-v1":
+                        listener.OnPortingRequest(eventArgs.Id, message.ToObject<PortingRequestMessage>());
+                        return true;
+                    case "portingrequestanswer-v1":
+                        listener.OnPortingRequestAnswer(eventArgs.Id, message.ToObject<PortingRequestAnswerMessage>());
+                        return true;
+                    case "pradelayed-v1":
+                        listener.OnPortingRequestAnswerDelayed(eventArgs.Id,
+                            message.ToObject<PortingRequestAnswerDelayedMessage>());
+                        return true;
+                    case "rangeactivation-v1":
+                        listener.OnRangeActivation(eventArgs.Id, message.ToObject<RangeActivationMessage>());
+                        return true;
+                    case "rangedeactivation-v1":
+                        listener.OnRangeDeactivation(eventArgs.Id, message.ToObject<RangeDeactivationMessage>());
+                        return true;
+                    case "tariffchangesn-v1":
+                        listener.OnTariffChangeServiceNumber(eventArgs.Id,
+                            message.ToObject<TariffChangeServiceNumberMessage>());
+                        return true;
+                    default:
+                        listener.OnUnknownMessage(eventArgs.Id, eventArgs.Message);
+                        return true;
                 }
+            }
 #pragma warning disable CA1031 // Do not catch general exception types
-                catch (Exception ex)
-#pragma warning restore CA1031 // Do not catch general exception types
-                {
-                    _logger.Error(ex);
-                    _listener.OnException(ex);
-                }
-                _backoffHandler.Reset();
-                _timer.Reset();
-            }
-
-            void HandleDisconnect(DisconnectEventArgs e)
+            catch (Exception ex)
+#pragma warning disable CA1031 // Do not catch general exception types
             {
-                _timer.Stop();
-                _logger.Debug($"Error: {e.Exception.Message}");
-                var persistedOffset = offsetPersister?.Offset ?? initialOffset;
-                var recoveredOffset = recoverOffset?.Invoke(persistedOffset) ?? persistedOffset;
-                if (_backoffHandler.MaximumNumberOfRetriesUsed())
-                {
-                    _logger.Error("Reached maximum number of connection retries, stopped consuming event stream.");
-                    onFinalDisconnect?.Invoke(e.Exception);
-                    return;
-
-                }
-                _backoffHandler.WaitBackOffPeriod();
-
-                _logger.Debug("Restarting stream");
-                _eventSourceReader = new EventSourceReader(CreateUri(recoveredOffset, confirmationStatus, messageTypes), CoinHttpClientHandler);
-                CoinHttpClientHandler.CancellationTokenSource = new CancellationTokenSource();
-                _timer.SetToken(CoinHttpClientHandler.CancellationTokenSource);
-                StartReading();
+                _logger.Error(ex);
+                listener.OnException(ex);
+                return false;
             }
-        }
-
-        void HandleMessage(EventSourceMessageEventArgs e)
-        {
-            var message = JObject.Parse(e.Message).First.First;
-            switch (e.Event)
-            {
-                case "activationsn-v1":
-                    _listener.OnActivationServiceNumber(e.Id, message.ToObject<ActivationServiceNumberMessage>());
-                    break;
-                case "cancel-v1":
-                    _listener.OnCancel(e.Id, message.ToObject<CancelMessage>());
-                    break;
-                case "deactivation-v1":
-                    _listener.OnDeactivation(e.Id, message.ToObject<DeactivationMessage>());
-                    break;
-                case "deactivationsn-v1":
-                    _listener.OnDeactivationServiceNumber(e.Id, message.ToObject<DeactivationServiceNumberMessage>());
-                    break;
-                case "enumactivationnumber-v1":
-                    _listener.OnEnumActivationNumber(e.Id, message.ToObject<EnumActivationNumberMessage>());
-                    break;
-                case "enumactivationoperator-v1":
-                    _listener.OnEnumActivationOperator(e.Id, message.ToObject<EnumActivationOperatorMessage>());
-                    break;
-                case "enumactivationrange-v1":
-                    _listener.OnEnumActivationRange(e.Id, message.ToObject<EnumActivationRangeMessage>());
-                    break;
-                case "enumdeactivationnumber-v1":
-                    _listener.OnEnumDeactivationNumber(e.Id, message.ToObject<EnumDeactivationNumberMessage>());
-                    break;
-                case "enumdeactivationoperator-v1":
-                    _listener.OnEnumDeactivationOperator(e.Id, message.ToObject<EnumDeactivationOperatorMessage>());
-                    break;
-                case "enumdeactivationrange-v1":
-                    _listener.OnEnumDeactivationRange(e.Id, message.ToObject<EnumDeactivationRangeMessage>());
-                    break;
-                case "enumprofileactivation-v1":
-                    _listener.OnEnumProfileActivation(e.Id, message.ToObject<EnumProfileActivationMessage>());
-                    break;
-                case "enumprofiledeactivation-v1":
-                    _listener.OnEnumProfileDeactivation(e.Id, message.ToObject<EnumProfileDeactivationMessage>());
-                    break;
-                case "errorfound-v1":
-                    _listener.OnErrorFound(e.Id, message.ToObject<ErrorFoundMessage>());
-                    break;
-                case "portingperformed-v1":
-                    _listener.OnPortingPerformed(e.Id, message.ToObject<PortingPerformedMessage>());
-                    break;
-                case "portingrequest-v1":
-                    _listener.OnPortingRequest(e.Id, message.ToObject<PortingRequestMessage>());
-                    break;
-                case "portingrequestanswer-v1":
-                    _listener.OnPortingRequestAnswer(e.Id, message.ToObject<PortingRequestAnswerMessage>());
-                    break;
-                case "pradelayed-v1":
-                    _listener.OnPortingRequestAnswerDelayed(e.Id, message.ToObject<PortingRequestAnswerDelayedMessage>());
-                    break;
-                case "rangeactivation-v1":
-                    _listener.OnRangeActivation(e.Id, message.ToObject<RangeActivationMessage>());
-                    break;
-                case "rangedeactivation-v1":
-                    _listener.OnRangeDeactivation(e.Id, message.ToObject<RangeDeactivationMessage>());
-                    break;
-                case "tariffchangesn-v1":
-                    _listener.OnTariffChangeServiceNumber(e.Id, message.ToObject<TariffChangeServiceNumberMessage>());
-                    break;
-                default:
-                    _listener.OnUnknownMessage(e.Id, e.Message);
-                    break;
-            }
-        }
-
-        Uri CreateUri(long offset, ConfirmationStatus confirmationStatus, string[] messageTypes)
-        {
-            var uri = _sseUri
-                .AddQueryArg(nameof(offset), $"{offset}")
-                .AddQueryArg(nameof(confirmationStatus), $"{confirmationStatus}");
-            if (messageTypes.Length > 0)
-                uri.AddQueryArg(nameof(messageTypes), $"{string.Join(",", messageTypes)}");
-            return uri;
-        }
-    }
-
-    internal class ReadTimeOutTimer : IDisposable
-    {
-        const int ThresholdTimeout = 300000000;
-        readonly Timer _timer = new Timer();
-        long _timestamp = DateTime.Now.Ticks;
-        CancellationTokenSource _cancellationtokensource;
-
-        public ReadTimeOutTimer()
-        {
-            _timer.Interval = 30000;
-            _timer.Elapsed += OnTimedEvent;
-        }
-
-        public void UpdateTimestamp() => _timestamp = DateTime.Now.Ticks;
-
-        public void Start() => _timer.Start();
-
-        public void Stop() => _timer.Stop();
-
-        public void Reset()
-        {
-            _timer.Stop();
-            _timestamp = DateTime.Now.Ticks;
-            _timer.Start();
-        }
-
-        public void SetToken(CancellationTokenSource cts) => _cancellationtokensource = cts;
-
-        void OnTimedEvent(object source, ElapsedEventArgs e)
-        {
-            var now = DateTime.Now.Ticks;
-            var elapsedTime = now - _timestamp;
-            Debug.WriteLine("Timestamp: " + _timestamp);
-            Debug.WriteLine("Elapsed Time: " + elapsedTime);
-
-            if (elapsedTime > ThresholdTimeout)
-            {
-                Debug.WriteLine("Timestamp: " + _timestamp);
-                Debug.WriteLine("Time-out above threshold! Quitting: " + e);
-                _cancellationtokensource.Cancel();
-            }
-        }
-
-        #region IDisposable Support
-
-        bool _disposed; // To detect redundant calls
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_disposed)
-            {
-                if (disposing)
-                {
-                    _timer?.Dispose();
-                }
-                _disposed = true;
-            }
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-        #endregion
-    }
-
-    internal class BackoffHandler
-    {
-        readonly int _backoffperiod;
-        readonly int _numberofretries;
-        int _currentbackoffperiod;
-        int _retriesleft;
-
-        public BackoffHandler(int backOffPeriod, int numberOfRetries)
-        {
-            _backoffperiod = backOffPeriod;
-            _numberofretries = numberOfRetries;
-            Reset();
-        }
-
-        public int GetBackOffPeriod() => _backoffperiod;
-
-        public int GetRetriesLeft() => _numberofretries;
-
-        public void Reset()
-        {
-            _currentbackoffperiod = _backoffperiod;
-            _retriesleft = _numberofretries;
-        }
-        public void DecreaseNumberOfRetries()
-        {
-            if (_retriesleft > 0)
-                _retriesleft--;
-        }
-
-        void IncreaseBackOffPeriod() => _currentbackoffperiod = (_currentbackoffperiod > 60) ? _currentbackoffperiod : _currentbackoffperiod * 2;
-        public bool MaximumNumberOfRetriesUsed() => _retriesleft <= 0;
-
-        public void WaitBackOffPeriod()
-        {
-            Debug.WriteLine($"Going to sleep for {_currentbackoffperiod} seconds and still {_retriesleft} retries left!");
-            Thread.Sleep(_currentbackoffperiod * 1000);
-            IncreaseBackOffPeriod();
-            DecreaseNumberOfRetries();
         }
     }
 }

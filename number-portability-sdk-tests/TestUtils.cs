@@ -1,26 +1,29 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
+using Coin.Sdk.Common.Client;
 using Coin.Sdk.NP.Messages.V1;
 using Coin.Sdk.NP.Service;
 
 namespace Coin.Sdk.NP.Tests
 {
-    public static class TestUtils {
-
+    public static class TestUtils
+    {
         public static string GenerateDossierId(string operatorCode)
         {
             var randomNumber5Digits = (Math.Round(new Random().Next() * 10000.0) + 9999).ToString();
             return operatorCode + "-" + randomNumber5Digits;
         }
     }
-    
+
     public static class TestSettings
     {
         public const string PrivateKeyFile = "../../../keys/private-key.pem";
-        public const string EncryptedHmacSecretFile =  "../../../keys/sharedkey.encrypted";
-        
-        public static string ApiUrl = "http://" + (Environment.GetEnvironmentVariable("STUB_HOST_AND_PORT") ?? "localhost:8000") + "/number-portability/v1";
+        public const string EncryptedHmacSecretFile = "../../../keys/sharedkey.encrypted";
+
+        public static string ApiUrl =
+            "http://" + (Environment.GetEnvironmentVariable("STUB_HOST_AND_PORT") ?? "localhost:8000") +
+            "/number-portability/v1";
+
         public static string SseUrl = ApiUrl + "/dossiers/events";
 
         public const string Consumer = "loadtest-loada";
@@ -33,9 +36,6 @@ namespace Coin.Sdk.NP.Tests
 
     public class TestListener : INumberPortabilityMessageListener
     {
-        public List<(string messageId, INpMessage<INpMessageContent> message)> Messages;
-        public void Clear() => Messages = new List<(string messageId, INpMessage<INpMessageContent> message)>();
-
         public void OnActivationServiceNumber(string messageId, ActivationServiceNumberMessage message)
         {
             Debug.WriteLine($"Received message with id {messageId} of type {message.GetType()}");

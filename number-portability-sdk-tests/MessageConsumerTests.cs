@@ -1,9 +1,9 @@
 using System.Threading;
+using Coin.Sdk.Common.Client;
 using Coin.Sdk.NP.Messages.V1;
 using Coin.Sdk.NP.Service.Impl;
 using NUnit.Framework;
 using static Coin.Sdk.NP.Tests.TestSettings;
-using static Coin.Sdk.NP.Messages.V1.Utils;
 
 namespace Coin.Sdk.NP.Tests
 {
@@ -15,31 +15,33 @@ namespace Coin.Sdk.NP.Tests
         [SetUp]
         public void Setup()
         {
-            const int backOffPeriod = 1;
+            var sseConsumer = new SseConsumer(Consumer, SseUrl, PrivateKeyFile, EncryptedHmacSecretFile);
+            _messageConsumer = new NumberPortabilityMessageConsumer(sseConsumer);
             _listener = new TestListener();
-            _messageConsumer = new NumberPortabilityMessageConsumer(Consumer, PrivateKeyFile, EncryptedHmacSecretFile, _listener, SseUrl, backOffPeriod, 20);
-            _listener.Clear();
         }
 
         [Test]
-        public void ConsumeAll()
+        public void ConsumeUnconfirmed()
         {
-            _messageConsumer.StartConsuming(onFinalDisconnect: e => Assert.Fail("Disconnected"));
-            for (var i = 0; i < 300; i++)
+            _messageConsumer.StartConsumingUnconfirmed(_listener, e => Assert.Fail("Disconnected"));
+            for (var i = 0; i < 30; i++)
             {
                 Thread.Sleep(1000);
             }
+
             _messageConsumer.StopConsuming();
         }
 
         [Test]
-        public void ConsumeFiltered()
+        public void ConsumeAllFiltered()
         {
-            _messageConsumer.StartConsuming(ConfirmationStatus.All, 3, new TestOffsetPersister(), v => v - 2, e => Assert.Fail("Disconnected"), TypeName<PortingRequest>(), TypeName<PortingPerformed>());
+            _messageConsumer.StartConsumingAll(_listener, new TestOffsetPersister(), 3,
+                e => Assert.Fail("Disconnected"), MessageType.PortingRequestV1, MessageType.PortingPerformedV1);
             for (var i = 0; i < 5; i++)
             {
                 Thread.Sleep(1000);
             }
+
             _messageConsumer.StopConsuming();
         }
     }

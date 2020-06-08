@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using Coin.Sdk.Common.Client;
 using Coin.Sdk.NP.Messages.V1;
 using Coin.Sdk.NP.Service.Impl;
 using NUnit.Framework;
@@ -25,9 +26,9 @@ namespace Coin.Sdk.NP.Sample
             const string consumer = "<YOUR CONSUMER>";
             var privateKeyFile = GetPath("private-key.pem");
             var encryptedHmacSecretFile =  GetPath("sharedkey.encrypted");
-            var listener = new Listener();
             _numberPortabilityService = new NumberPortabilityService(apiUrl, consumer, privateKeyFile, encryptedHmacSecretFile);
-            _messageConsumer = new NumberPortabilityMessageConsumer(consumer, privateKeyFile, encryptedHmacSecretFile, listener, sseUrl, 1, 0);
+            var sseConsumer = new SseConsumer(consumer, sseUrl, privateKeyFile, encryptedHmacSecretFile, 1, 0);
+            _messageConsumer = new NumberPortabilityMessageConsumer(sseConsumer);
         }
 
         [Test]
@@ -114,7 +115,7 @@ namespace Coin.Sdk.NP.Sample
         [Test]
         public void ConsumeMessages()
         {
-            _messageConsumer.StartConsuming(onFinalDisconnect: e => Assert.Fail("Disconnected"));
+            _messageConsumer.StartConsumingUnconfirmed(new Listener(), e => Assert.Fail("Disconnected"));
             Thread.Sleep(1000);
         }
         

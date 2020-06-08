@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
@@ -20,9 +21,9 @@ namespace Coin.Sdk.Common.Client
             : this(consumerName, privateKey, HmacFromEncryptedBase64EncodedSecretFile(encryptedHmacSecretFile, privateKey)) { }
 
         protected CtpApiRestTemplateSupport(string consumerName, RSA privateKey, HMACSHA256 signer,
-            HmacSignatureType hmacSignatureType = HmacSignatureType.XDateAndDigest, int validPeriodInSeconds = DefaultValidPeriodInSecs)
+            int validPeriodInSeconds = DefaultValidPeriodInSecs)
         {
-            CoinHttpClientHandler = new CoinHttpClientHandler(consumerName, privateKey, signer, hmacSignatureType, validPeriodInSeconds);
+            CoinHttpClientHandler = new CoinHttpClientHandler(consumerName, privateKey, signer, validPeriodInSeconds);
             HttpClient = new HttpClient(CoinHttpClientHandler);
         }
 
@@ -43,14 +44,18 @@ namespace Coin.Sdk.Common.Client
 
         bool _disposed; // To detect redundant calls
 
-        protected virtual void Dispose(bool disposing)
+        protected virtual IEnumerable<IDisposable> DisposableFields => new IDisposable[] { HttpClient, CoinHttpClientHandler };
+
+        void Dispose(bool disposing)
         {
             if (!_disposed)
             {
                 if (disposing)
                 {
-                    HttpClient?.Dispose();
-                    CoinHttpClientHandler?.Dispose();
+                    foreach (var disposableField in DisposableFields)
+                    {
+                        disposableField?.Dispose();
+                    }
                 }
                 _disposed = true;
             }

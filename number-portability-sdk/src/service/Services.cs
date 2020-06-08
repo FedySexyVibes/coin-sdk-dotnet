@@ -61,8 +61,4 @@ namespace Coin.Sdk.NP.Service
 
         Task<MessageResponse> SendMessageAsync(IMessageEnvelope<INpMessageContent> message);
     }
-
-    public interface IOffsetPersister {
-        long Offset { get; set; }
-    }
 }

@@ -18,12 +18,6 @@ namespace Coin.Sdk.Common.Crypto
     {
         public const int DefaultValidPeriodInSecs = 30;
 
-        public enum HmacSignatureType
-        {
-            Date,
-            XDateAndDigest
-        }
-
         public static HMACSHA256 HmacFromEncryptedBase64EncodedSecretFile(string filename, RSA privateKey)
         {
             using (var reader = File.OpenText(filename))
@@ -98,24 +92,16 @@ namespace Coin.Sdk.Common.Crypto
             }
         }
 
-        public static Dictionary<string, string> GetHmacHeaders(HmacSignatureType hmacSignatureType, string body = null) =>
-            GetHmacHeaders(hmacSignatureType, body == null ? Array.Empty<byte>() : Encoding.UTF8.GetBytes(body));
+        public static Dictionary<string, string> GetHmacHeaders(string body = null) =>
+            GetHmacHeaders(body == null ? Array.Empty<byte>() : Encoding.UTF8.GetBytes(body));
 
-        public static Dictionary<string, string> GetHmacHeaders(HmacSignatureType hmacSignatureType, byte[] body)
+        public static Dictionary<string, string> GetHmacHeaders(byte[] body)
         {
             var hmacHeaders = new Dictionary<string, string>();
-            switch (hmacSignatureType)
+            using (var sha = SHA256.Create())
             {
-                case HmacSignatureType.Date:
-                    hmacHeaders["date"] = DateTime.UtcNow.ToString("R", CultureInfo.InvariantCulture);
-                    break;
-                case HmacSignatureType.XDateAndDigest:
-                    using (var sha = SHA256.Create())
-                    {
-                        hmacHeaders["x-date"] = DateTime.UtcNow.ToString("R", CultureInfo.InvariantCulture);
-                        hmacHeaders["digest"] = "SHA-256=" + Convert.ToBase64String(sha.ComputeHash(body ?? Array.Empty<byte>()));
-                    }
-                    break;
+                hmacHeaders["x-date"] = DateTime.UtcNow.ToString("R", CultureInfo.InvariantCulture);
+                hmacHeaders["digest"] = "SHA-256=" + Convert.ToBase64String(sha.ComputeHash(body ?? Array.Empty<byte>()));
             }
             return hmacHeaders;
         }
