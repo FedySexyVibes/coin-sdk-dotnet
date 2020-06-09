@@ -18,6 +18,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bundle-switching-sdk", "bundle-switching-sdk\bundle-switching-sdk.csproj", "{642CD231-E337-42C5-B820-42CFFD160434}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bundle-switching-sdk-tests", "bundle-switching-sdk-tests\bundle-switching-sdk-tests.csproj", "{59012232-F6EE-41DE-A3C4-97A0BE0234D7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,6 +46,10 @@ Global
 		{642CD231-E337-42C5-B820-42CFFD160434}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{642CD231-E337-42C5-B820-42CFFD160434}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{642CD231-E337-42C5-B820-42CFFD160434}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59012232-F6EE-41DE-A3C4-97A0BE0234D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59012232-F6EE-41DE-A3C4-97A0BE0234D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59012232-F6EE-41DE-A3C4-97A0BE0234D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59012232-F6EE-41DE-A3C4-97A0BE0234D7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -7,4 +7,5 @@ docker-compose --project-name coin-sdk-dotnet-${CI_JOB_ID} --file /tmp/docker-co
 	kong-database \
 	kong-migration \
 	kong \
-	api-stub
+	np-api-stub \
+    bs-api-stub

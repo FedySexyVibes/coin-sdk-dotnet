@@ -17,8 +17,8 @@ namespace Coin.Sdk.NP.Tests
 
     public static class TestSettings
     {
-        public const string PrivateKeyFile = "../../../keys/private-key.pem";
-        public const string EncryptedHmacSecretFile = "../../../keys/sharedkey.encrypted";
+        public const string PrivateKeyFile = "../../../../keys/private-key.pem";
+        public const string EncryptedHmacSecretFile = "../../../../keys/sharedkey.encrypted";
 
         public static string ApiUrl =
             "http://" + (Environment.GetEnvironmentVariable("STUB_HOST_AND_PORT") ?? "localhost:8000") +

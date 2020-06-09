@@ -63,15 +63,20 @@ services:
     networks:
       - kong-network
 
-  api-stub:
+  np-api-stub:
     image: 280925583500.dkr.ecr.eu-central-1.amazonaws.com/crdb/rest-api-stub:latest
+    networks:
+      - kong-network
+
+  bs-api-stub:
+    image: 280925583500.dkr.ecr.eu-central-1.amazonaws.com/comp/rest-api-stub:latest
     networks:
       - kong-network
 
   setup:
     build: ./setup
     volumes:
-      - $PWD/number-portability-sdk-tests/keys/:/keys
+      - $PWD/keys/:/keys
     environment:
       - KONG_APP_URL=kong:8000
       - KONG_ADMIN_URL=kong:8001

@@ -22,27 +22,39 @@ while [[ $tries -lt 5 ]]; do
 done
 
 if [[ $tries -eq 5 ]]; then
-	echo "Quiting, Kong still not available"
+	echo "Quitting, Kong still not available"
 	exit 1
 fi
 echo "Kong up and running"
 
-echo -n "Creating service..."
-service_id=$(curl -s -X POST ${KONG_ADMIN_URL}/services/ \
-	--data 'name=test' \
-	--data 'host=api-stub' \
+echo -n "Creating services..."
+service_id_np=$(curl -s -X POST ${KONG_ADMIN_URL}/services/ \
+	--data 'name=np' \
+	--data 'host=np-api-stub' \
+	--data 'port=8443' \
+	--data 'protocol=https' | jq -r '.id')
+service_id_bs=$(curl -s -X POST ${KONG_ADMIN_URL}/services/ \
+	--data 'name=bs' \
+	--data 'host=bs-api-stub' \
 	--data 'port=8443' \
 	--data 'protocol=https' | jq -r '.id')
 echo " done"
 
-echo -n "Creating route..."
-route_id=$(curl -s -X POST ${KONG_ADMIN_URL}/routes/ \
+echo -n "Creating routes..."
+route_id_np=$(curl -s -X POST ${KONG_ADMIN_URL}/routes/ \
 	--data 'methods[]=GET' \
 	--data 'methods[]=PUT' \
 	--data 'methods[]=POST' \
 	--data 'paths[]=/number-portability/v1' \
 	--data 'strip_path=false' \
-	--data "service.id=$service_id" | jq -r '.id')
+	--data "service.id=$service_id_np" | jq -r '.id')
+route_id_bs=$(curl -s -X POST ${KONG_ADMIN_URL}/routes/ \
+	--data 'methods[]=GET' \
+	--data 'methods[]=PUT' \
+	--data 'methods[]=POST' \
+	--data 'paths[]=/bundle-switching/v4' \
+	--data 'strip_path=false' \
+	--data "service.id=$service_id_bs" | jq -r '.id')
 echo " done"
 
 jwt_plugin='{
@@ -64,8 +76,10 @@ jwt_plugin='{
     }'
 
 echo -n "Setting jwt and hmac plugin..."
-curl -o /dev/null -sS -X POST ${KONG_ADMIN_URL}/services/${service_id}/plugins -H 'Content-Type: application/json' -d "${jwt_plugin}"
-curl -o /dev/null -sS -X POST ${KONG_ADMIN_URL}/services/${service_id}/plugins/ --data "name=hmac-auth"
+curl -o /dev/null -sS -X POST ${KONG_ADMIN_URL}/services/${service_id_np}/plugins -H 'Content-Type: application/json' -d "${jwt_plugin}"
+curl -o /dev/null -sS -X POST ${KONG_ADMIN_URL}/services/${service_id_np}/plugins/ --data "name=hmac-auth"
+curl -o /dev/null -sS -X POST ${KONG_ADMIN_URL}/services/${service_id_bs}/plugins -H 'Content-Type: application/json' -d "${jwt_plugin}"
+curl -o /dev/null -sS -X POST ${KONG_ADMIN_URL}/services/${service_id_bs}/plugins/ --data "name=hmac-auth"
 echo " done"
 
 echo -n "Creating user..."

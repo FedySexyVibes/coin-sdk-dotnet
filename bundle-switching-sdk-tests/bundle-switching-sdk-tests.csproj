@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp2.2</TargetFramework>
-        <RootNamespace>Coin.Sdk.NP.Tests</RootNamespace>
+        <RootNamespace>Coin.Sdk.BS.Tests</RootNamespace>
         <IsPackable>false</IsPackable>
     </PropertyGroup>
 
@@ -14,7 +14,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\common-sdk\common-sdk.csproj" />
-        <ProjectReference Include="..\number-portability-sdk\number-portability-sdk.csproj" />
+        <ProjectReference Include="..\bundle-switching-sdk\bundle-switching-sdk.csproj" />
     </ItemGroup>
 
 </Project>

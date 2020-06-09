@@ -38,7 +38,7 @@ namespace Coin.Sdk.BS.Messages.V4
 
         [DataMember(Name = "messageid", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "messageid")]
-        public string Messageid { get; set; }
+        public string MessageId { get; set; }
 
         [DataMember(Name = "timestamp", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "timestamp")]
