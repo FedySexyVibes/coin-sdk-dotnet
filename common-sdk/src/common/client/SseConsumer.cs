@@ -167,7 +167,7 @@ namespace Coin.Sdk.Common.Client
         #region IDisposable Support
 
         protected override IEnumerable<IDisposable> DisposableFields =>
-            base.DisposableFields.Append(_eventSourceReader);
+            base.DisposableFields.Concat(new IDisposable[] {_eventSourceReader, _timer });
 
         #endregion
     }

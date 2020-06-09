@@ -11,8 +11,8 @@ namespace Coin.Sdk.Common.Client
 {
     public abstract class CtpApiRestTemplateSupport : IDisposable
     {
-        protected HttpClient HttpClient { get; private set; }
-        protected CoinHttpClientHandler CoinHttpClientHandler { get; private set; }
+        protected HttpClient HttpClient { get; }
+        protected CoinHttpClientHandler CoinHttpClientHandler { get; }
 
         protected CtpApiRestTemplateSupport(string consumerName, string privateKeyFile, string encryptedHmacSecretFile)
             : this(consumerName, ReadPrivateKeyFile(privateKeyFile), encryptedHmacSecretFile) { }
