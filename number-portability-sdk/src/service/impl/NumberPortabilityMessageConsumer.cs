@@ -165,7 +165,7 @@ namespace Coin.Sdk.NP.Service.Impl
             }
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
-#pragma warning disable CA1031 // Do not catch general exception types
+#pragma warning restore CA1031 // Do not catch general exception types
             {
                 _logger.Error(ex);
                 listener.OnException(ex);
