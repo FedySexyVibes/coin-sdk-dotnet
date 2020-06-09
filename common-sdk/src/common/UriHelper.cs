@@ -12,16 +12,17 @@ namespace Coin.Sdk.Common
             var query = HttpUtility.ParseQueryString(builder.Query);
             foreach (var param in parameters)
             {
-                var value = string.Join(",", param.Value);
+                var value = string.Join(",", param.Value ?? new string[] { });
                 if (string.IsNullOrEmpty(value))
                 {
                     query.Remove(value);
                 }
                 else
                 {
-                    query[param.Key] = string.Join(",", param.Value);
+                    query[param.Key] = value;
                 }
             }
+
             builder.Query = query.ToString();
             return new Uri(builder.ToString());
         }

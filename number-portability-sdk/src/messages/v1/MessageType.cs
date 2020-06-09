@@ -6,7 +6,6 @@ namespace Coin.Sdk.NP.Messages.V1
     {
         ActivationServiceNumberV1,
         CancelV1,
-        ConfirmationV1,
         DeactivationV1,
         DeactivationServiceNumberV1,
         EnumActivationNumberV1,
@@ -33,7 +32,6 @@ namespace Coin.Sdk.NP.Messages.V1
         {
             [MessageType.ActivationServiceNumberV1] = "activationsn",
             [MessageType.CancelV1] = "cancel",
-            [MessageType.ConfirmationV1] = "confirmations",
             [MessageType.DeactivationV1] = "deactivation",
             [MessageType.DeactivationServiceNumberV1] = "deactivationsn",
             [MessageType.EnumActivationNumberV1] = "enumactivationnumber",
