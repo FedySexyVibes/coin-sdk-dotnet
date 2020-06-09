@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <RootNamespace>Coin.Sdk.BS</RootNamespace>
+        <Version>0.0.0</Version>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Company>Vereniging COIN</Company>
+        <Authors />
+        <RepositoryUrl>https://gitlab.com/verenigingcoin-public/coin-sdk-dotnet/-/tree/master/bundle-switching-sdk</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="3v.EvtSource" Version="2.0.0" />
+        <PackageReference Include="NLog" Version="4.6.4" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\common-sdk\common-sdk.csproj" />
+    </ItemGroup>
+
+</Project>

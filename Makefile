@@ -1,6 +1,6 @@
 include Makefile.mk
 
-ALL=common-sdk number-portability-sdk number-portability-sdk-samples
+ALL=common-sdk number-portability-sdk number-portability-sdk-samples bundle-switching-sdk
 
 tag-all-patch-release:
 	set -e ; for DIR in $(ALL); do $(MAKE) -C $$DIR tag-patch-release ; done

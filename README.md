@@ -58,7 +58,8 @@ Once the public key has been registered, the following are needed to gain access
 
 ## Choose an API
 
-[Number Portability](number-portability-sdk/README.md)
+- [Number Portability](number-portability-sdk/README.md)
+- [Bundle Switching](bundle-switching-sdk/README.md)
 
 ## Additional Resources
 
