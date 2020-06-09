@@ -26,7 +26,7 @@ For secure access credentials are required.
     - a private key file (or a `System.Security.Cryptography.RSA` instance containing this key)
     - a file containing the encrypted Hmac secret
     (or a `System.Security.Cryptography.HMACSHA256` instance containing this (decrypted) secret)
-- These can be used to create instances of the `NumberPortabilityService` and  the `NumberPortabilityMessageConsumer`.
+- These can be used to create instances of the `NumberPortabilityService` and the `SseConsumer`, which is needed for the `NumberPortabilityMessageConsumer`.
 
 ## Messages
 
@@ -41,27 +41,26 @@ to the API.
 
 ## Consume Messages
 
-An instance of the `INumberPortabilityMessageListener` needs to be passed to the `NumberPortabilityMessageConsumer` which will then start consuming messages.
+### Create Message Listener
+For message consumption, the number portability API makes use of HTTP's [ServerSentEvents](https://en.wikipedia.org/wiki/Server-sent_events).
+The SDK offers a Listener interface `INumberPortabilityMessageListener` which is triggered upon reception of a message payload.
 
-By default, the `NumberPortabilityMessageConsumer` consumes all ***Unconfirmed*** messages. 
+### Start consuming messages 
+The `NumberPortabilityMessageConsumer` has three `startConsuming...()` methods for consuming messages, of which `startConsumingUnconfirmed()` is most useful.
+All these methods need an instance of the `INumberPortabilityMessageListener`.
 
-
-#### Consume specific messages using filters
+### Consume specific messages using filters
 The `NumberPortabilityMessageConsumer` provides various filters for message consumption. The filters are:
 - `MessageType`: All possible message types, including errors. Use the `MessageType`-enumeration to indicate which messages have to be consumed.
-- ConfirmationStatus: 
-    - `ConfirmationStatus.Unconfirmed`: consumes all unconfirmed messages. Upon (re)-connection all unconfirmed messages are served.
-    - `ConfirmationStatus.All`: consumes confirmed and unconfirmed messages.  
-    **Note:** this filter enables the consumption of the *whole message history*.
-    Therefore, this filter requires you to supply an implementation of the `IOffsetPersister` interface.
+- confirmation status: By using `startConsumingAll()`, all messages will be received, both confirmed and unconfirmed.   
+    **Note:** this enables the consumption of the *whole message history*.
+    Therefore, this requires you to supply an implementation of the `IOffsetPersister` interface.
     The purpose of this interface is to track the `message-id` of the last received and processed message.
     In the case of a reconnect, message consumption will then resume where it left off.
-- `offset`: starts consuming messages based on the given `message-id` offset.
-When using `ConfirmationStatus.Unconfirmed` the `offset` is in most cases not very useful. The `ConfirmationStatus.All` filter is better.
-***Note:*** it is the responsibility of the client to keep track of the `offset`.
+- `offset`: starts consuming messages based on the given `message-id` offset. ***Note:*** it is the responsibility of the client to keep track of the `offset`.
 
 #### Confirm Messages
-Once a consumed message is processed it needs to be confirmed.
+Once a consumed message has been processed it needs to be confirmed.
 To confirm a message use the `NumberPortabilityService.sendConfirmation(id)` method.
 
 
