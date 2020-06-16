@@ -9,12 +9,12 @@ namespace Coin.Sdk.BS.Tests
 {
     public class BundleSwitchingServiceTests
     {
-        private BundleSwitchingService _numberPortabilityService;
+        private BundleSwitchingService _bundleSwitchingService;
 
         [SetUp]
         public void Setup()
         {
-            _numberPortabilityService = new BundleSwitchingService(ApiUrl, Consumer, PrivateKeyFile, EncryptedHmacSecretFile);
+            _bundleSwitchingService = new BundleSwitchingService(ApiUrl, Consumer, PrivateKeyFile, EncryptedHmacSecretFile);
         }
 
         private MessageResponse SendContractTerminationRequest(string dossierId)
@@ -72,7 +72,7 @@ namespace Coin.Sdk.BS.Tests
                     }
                 }
             };
-            return _numberPortabilityService.SendMessageAsync(message).Result;
+            return _bundleSwitchingService.SendMessageAsync(message).Result;
         }
 
         [Test]
