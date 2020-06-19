@@ -10,3 +10,7 @@ tag-all-minor-release:
 
 tag-all-major-release:
 	set -e ; for DIR in $(ALL); do $(MAKE) -C $$DIR tag-major-release ; done
+
+publish-nuget:
+	docker build -t publish-dotnet-sdk -f publish-Dockerfile . && docker run -it --rm -v ~/.aws:/root/.aws:ro -e AWS_CONTAINER_CREDENTIALS_RELATIVE_URI=$$AWS_CONTAINER_CREDENTIALS_RELATIVE_URI publish-dotnet-sdk
+	

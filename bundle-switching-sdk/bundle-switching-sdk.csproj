@@ -4,7 +4,7 @@
         <TargetFramework>netstandard2.0</TargetFramework>
         <RootNamespace>Coin.Sdk.BS</RootNamespace>
         <Version>1.0.0</Version>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <PackageId>VerenigingCOIN.Sdk.BS</PackageId>
         <Company>Vereniging COIN</Company>
         <Authors />
         <RepositoryUrl>https://gitlab.com/verenigingcoin-public/coin-sdk-dotnet/-/tree/master/bundle-switching-sdk</RepositoryUrl>

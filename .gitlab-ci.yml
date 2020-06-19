@@ -1,12 +1,17 @@
 variables:
   AWS_DEFAULT_REGION: eu-central-1
 
+stages:
+  - test
+  - deploy
+
 workflow:
   rules:
     - if: $CI_MERGE_REQUEST_ID               # Execute jobs in merge request context
     - if: $CI_COMMIT_BRANCH == 'master'      # Execute jobs when a new commit is pushed to master branch
 
 test:
+  stage: test
   before_script:
     - aws ecr get-login --no-include-email | sh
     - ./setup/start-docker-compose
@@ -15,3 +20,10 @@ test:
     - ./setup/run-tests
   after_script:
     - ./setup/stop-docker-compose
+
+deploy:
+  stage: deploy
+  only:
+    - master
+  script:
+    - make publish-nuget

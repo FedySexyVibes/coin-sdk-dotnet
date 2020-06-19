@@ -1,0 +1,21 @@
+FROM binxio/ssm-get-parameter:0.3.0
+
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1
+
+COPY --from=0 /ssm-get-parameter /usr/local/bin/
+
+COPY coin-sdk-dotnet.sln ./
+COPY common-sdk/ ./common-sdk/
+COPY number-portability-sdk/ ./number-portability-sdk/
+COPY number-portability-sdk-tests/number-portability-sdk-tests.csproj ./number-portability-sdk-tests/
+COPY number-portability-sdk-samples/number-portability-sdk-samples.csproj ./number-portability-sdk-samples/
+COPY bundle-switching-sdk/ ./bundle-switching-sdk/
+COPY bundle-switching-sdk-tests/bundle-switching-sdk-tests.csproj ./bundle-switching-sdk-tests/
+COPY bundle-switching-sdk-samples/bundle-switching-sdk-samples.csproj ./bundle-switching-sdk-samples/
+
+ENV AWS_REGION=eu-central-1
+ENV API_KEY=ssm:///alm/nuget/api_key
+ENTRYPOINT ["/usr/local/bin/ssm-get-parameter"]
+
+# You cannot override the same version, so only the versions created after tagging will be published
+CMD [ "/bin/bash", "-c", "dotnet pack -o ../nupkgs && dotnet nuget push 'nupkgs/*.nupkg' --skip-duplicate -s NuGet.org -k $API_KEY"]
