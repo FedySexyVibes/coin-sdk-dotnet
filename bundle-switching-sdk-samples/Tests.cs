@@ -61,32 +61,32 @@ namespace Coin.Sdk.BS.Sample
                             DossierId = dossierId,
                             RecipientServiceProvider = Sender,
                             DonorServiceProvider = Receiver,
-                            Business = "Y",
+                            Business = "N",
                             EarlyTermination = "N",
-                            Name = "Vereniging COIN",
+                            Name = "Someone Withaname",
                             AddressBlock = new AddressBlock
                             {
                                 Housenr = "123",
                                 HousenrExt = "A",
                                 Postcode = "1234AB"
                             },
-                            /*NumberSeries = new List<NumberSeries>
+                            NumberSeries = new List<NumberSeries>
                             {
                                 new NumberSeries
                                 {
                                     Start = PhoneNumber,
-                                    End = PhoneNumber
+                                    //End = PhoneNumber
                                 }
-                            },
+                            }/*,
                             ValidationBlock = new List<ValidationBlock>
                             {
                                 new ValidationBlock
                                 {
-                                    Name = "",
-                                    Value = ""
+                                    Name = "contractid",
+                                    Value = "some contractid"
                                 }
                             },
-                            Note = "Some note"*/
+                            Note = "A note"*/
                         }
                     }
                 }
@@ -107,7 +107,7 @@ namespace Coin.Sdk.BS.Sample
             _messageConsumer.StartConsumingUnconfirmed(new Listener(), e => Assert.Fail("Disconnected"));
             Thread.Sleep(1000);
         }
-        
+
         [Test]
         public void SendConfirmation()
         {
