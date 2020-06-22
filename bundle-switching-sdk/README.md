@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This SDK supports secured access to the bundle switching API. We are still working on the part of making the SDK available as a NuGet package. At this moment the dll files should be built in the project.
+This SDK supports secured access to the bundle switching API.
 
 For a quick start, follow the steps below:
 * [Setup](#setup)
@@ -15,7 +15,10 @@ For a quick start, follow the steps below:
 ## Setup
 
 ### Sample Project for the Bundle Switching API
-- A sample project is provided in the `bundle-switching-sdk-samples` directory.
+A sample project is provided in the `bundle-switching-sdk-samples` directory.
+
+### NuGet Package
+This sdk is published as the NuGet package 'Vereniging-COIN.Sdk.BS'.
 
 ## Configure Credentials
 

@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This SDK supports secured access to the number portability API. We are still working on the part of making the SDK available as a NuGet package. At this moment the dll files should be built in the project.
+This SDK supports secured access to the number portability API.
 
 For a quick start, follow the steps below:
 * [Setup](#setup)
@@ -15,7 +15,10 @@ For a quick start, follow the steps below:
 ## Setup
 
 ### Sample Project for the Number Portability API
-- A sample project is provided in the `number-portability-sdk-samples` directory.
+A sample project is provided in the `number-portability-sdk-samples` directory.
+
+### NuGet Package
+This sdk is published as the NuGet package 'Vereniging-COIN.Sdk.NP'.
 
 ## Configure Credentials
 

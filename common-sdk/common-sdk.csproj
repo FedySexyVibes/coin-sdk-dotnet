@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Coin.Sdk</RootNamespace>
     <Version>1.0.0</Version>
-    <PackageId>VerenigingCOIN.Sdk.Common</PackageId>
+    <PackageId>Vereniging-COIN.Sdk.Common</PackageId>
     <Company>Vereniging COIN</Company>
     <Authors />
     <Copyright />
