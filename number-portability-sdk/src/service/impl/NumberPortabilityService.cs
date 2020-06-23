@@ -17,11 +17,11 @@ namespace Coin.Sdk.NP.Service.Impl
     {
         private readonly Uri _apiUrl;
 
-        public NumberPortabilityService(string apiUrl, string consumerName, string privateKeyFile, string encryptedHmacSecretFile)
-            : this(new Uri(apiUrl), consumerName, privateKeyFile, encryptedHmacSecretFile) { }
+        public NumberPortabilityService(string apiUrl, string consumerName, string privateKeyFile, string encryptedHmacSecretFile, string privateKeyFilePassword = null)
+            : this(new Uri(apiUrl), consumerName, privateKeyFile, encryptedHmacSecretFile, privateKeyFilePassword) { }
 
-        public NumberPortabilityService(Uri apiUrl, string consumerName, string privateKeyFile, string encryptedHmacSecretFile)
-            : this(apiUrl, consumerName, ReadPrivateKeyFile(privateKeyFile), encryptedHmacSecretFile) { }
+        public NumberPortabilityService(Uri apiUrl, string consumerName, string privateKeyFile, string encryptedHmacSecretFile, string privateKeyFilePassword = null)
+            : this(apiUrl, consumerName, ReadPrivateKeyFile(privateKeyFile, privateKeyFilePassword), encryptedHmacSecretFile) { }
 
         public NumberPortabilityService(string apiUrl, string consumerName, RSA privateKey, string encryptedHmacSecretFile)
             : this(new Uri(apiUrl), consumerName, privateKey, encryptedHmacSecretFile) { }

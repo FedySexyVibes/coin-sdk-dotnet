@@ -31,15 +31,15 @@ namespace Coin.Sdk.Common.Client
         }
 
         public SseConsumer(string consumerName, string sseUri, string privateKeyFile, string encryptedHmacSecretFile,
-            int backOffPeriod = 1, int numberOfRetries = DefaultNumberOfRetries) :
-            this(consumerName, new Uri(sseUri), ReadPrivateKeyFile(privateKeyFile), encryptedHmacSecretFile,
+            int backOffPeriod = 1, int numberOfRetries = DefaultNumberOfRetries, string privateKeyFilePassword = null) :
+            this(consumerName, new Uri(sseUri), ReadPrivateKeyFile(privateKeyFile, privateKeyFilePassword), encryptedHmacSecretFile,
                 backOffPeriod, numberOfRetries)
         {
         }
 
         public SseConsumer(string consumerName, Uri sseUri, string privateKeyFile, string encryptedHmacSecretFile,
-            int backOffPeriod = 1, int numberOfRetries = DefaultNumberOfRetries) :
-            this(consumerName, sseUri, ReadPrivateKeyFile(privateKeyFile), encryptedHmacSecretFile, backOffPeriod,
+            int backOffPeriod = 1, int numberOfRetries = DefaultNumberOfRetries, string privateKeyFilePassword = null) :
+            this(consumerName, sseUri, ReadPrivateKeyFile(privateKeyFile, privateKeyFilePassword), encryptedHmacSecretFile, backOffPeriod,
                 numberOfRetries)
         {
         }

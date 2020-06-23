@@ -66,11 +66,12 @@ namespace Coin.Sdk.Common.Crypto
         private static string GenerateHmacMessage(Dictionary<string, string> headers, string requestLine) =>
             string.Join("\n", headers.Select(p => $"{p.Key}: {p.Value}")) + "\n" + requestLine;
 
-        public static RSA ReadPrivateKeyFile(string path)
+        public static RSA ReadPrivateKeyFile(string path, string password = null)
         {
+            var passwordFinder = password == null ? null : new PasswordFinder(password);
             using (var reader = File.OpenText(path))
             {
-                var keyPair = (AsymmetricCipherKeyPair) new PemReader(reader).ReadObject();
+                var keyPair = (AsymmetricCipherKeyPair) new PemReader(reader, passwordFinder).ReadObject();
                 var parameters = DotNetUtilities.ToRSAParameters((RsaPrivateCrtKeyParameters)keyPair.Private);
 
                 return Create(parameters);
@@ -104,6 +105,13 @@ namespace Coin.Sdk.Common.Crypto
                 hmacHeaders["digest"] = "SHA-256=" + Convert.ToBase64String(sha.ComputeHash(body ?? Array.Empty<byte>()));
             }
             return hmacHeaders;
+        }
+
+        private class PasswordFinder : IPasswordFinder
+        {
+            private readonly char[] _password;
+            public PasswordFinder(string password) => _password = password.ToCharArray();
+            public char[] GetPassword() => _password;
         }
     }
 }

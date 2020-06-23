@@ -14,8 +14,8 @@ namespace Coin.Sdk.Common.Client
         protected HttpClient HttpClient { get; }
         protected CoinHttpClientHandler CoinHttpClientHandler { get; }
 
-        protected CtpApiRestTemplateSupport(string consumerName, string privateKeyFile, string encryptedHmacSecretFile)
-            : this(consumerName, ReadPrivateKeyFile(privateKeyFile), encryptedHmacSecretFile) { }
+        protected CtpApiRestTemplateSupport(string consumerName, string privateKeyFile, string encryptedHmacSecretFile, string privateKeyFilePassword = null)
+            : this(consumerName, ReadPrivateKeyFile(privateKeyFile, privateKeyFilePassword), encryptedHmacSecretFile) { }
 
         private CtpApiRestTemplateSupport(string consumerName, RSA privateKey, string encryptedHmacSecretFile)
             : this(consumerName, privateKey, HmacFromEncryptedBase64EncodedSecretFile(encryptedHmacSecretFile, privateKey)) { }

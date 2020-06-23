@@ -17,11 +17,11 @@ namespace Coin.Sdk.BS.Service.Impl
     {
         private readonly Uri _apiUrl;
 
-        public BundleSwitchingService(string apiUrl, string consumerName, string privateKeyFile, string encryptedHmacSecretFile)
-            : this(new Uri(apiUrl), consumerName, privateKeyFile, encryptedHmacSecretFile) { }
+        public BundleSwitchingService(string apiUrl, string consumerName, string privateKeyFile, string encryptedHmacSecretFile, string privateKeyFilePassword = null)
+            : this(new Uri(apiUrl), consumerName, privateKeyFile, encryptedHmacSecretFile, privateKeyFilePassword) { }
 
-        public BundleSwitchingService(Uri apiUrl, string consumerName, string privateKeyFile, string encryptedHmacSecretFile)
-            : this(apiUrl, consumerName, ReadPrivateKeyFile(privateKeyFile), encryptedHmacSecretFile) { }
+        public BundleSwitchingService(Uri apiUrl, string consumerName, string privateKeyFile, string encryptedHmacSecretFile, string privateKeyFilePassword = null)
+            : this(apiUrl, consumerName, ReadPrivateKeyFile(privateKeyFile, privateKeyFilePassword), encryptedHmacSecretFile) { }
 
         public BundleSwitchingService(string apiUrl, string consumerName, RSA privateKey, string encryptedHmacSecretFile)
             : this(new Uri(apiUrl), consumerName, privateKey, encryptedHmacSecretFile) { }

@@ -21,8 +21,8 @@ namespace Coin.Sdk.Common.Client
         public CancellationTokenSource CancellationTokenSource { get; set; }
 
         public CoinHttpClientHandler(string consumerName, string privateKeyFile, string encryptedHmacSecretFile,
-            int validPeriodInSeconds = DefaultValidPeriodInSecs) :
-            this(consumerName, ReadPrivateKeyFile(privateKeyFile), encryptedHmacSecretFile, validPeriodInSeconds)
+            int validPeriodInSeconds = DefaultValidPeriodInSecs, string privateKeyFilePassword = null) :
+            this(consumerName, ReadPrivateKeyFile(privateKeyFile, privateKeyFilePassword), encryptedHmacSecretFile, validPeriodInSeconds)
         { }
 
         private CoinHttpClientHandler(string consumerName, RSA privateKey, string encryptedHmacSecretFile, int validPeriodInSeconds) :
