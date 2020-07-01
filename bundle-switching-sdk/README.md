@@ -77,9 +77,10 @@ The bundle switching API can return errors in one of two ways:
     Any errors in these checks are immediately returned as an error reply.
     The `BundleSwitchingService.SendMessage` method returns these as `ErrorResponse`.
     Other http errors are thrown as `HttpListenerException`.
-    
+
 2. As a ServerSentEvent containing an `ErrorFoundMessage` (asynchronous)
 
-    The system performs detailed functional validation in an asynchronous fashion.
-    Errors in this stage are sent asynchronously via a `ServerSentEvent`.
-    ***Note:*** `ErrorFound` messages need to be confirmed like any other message received via `ServerSentEvent`.
+    The system performs detailed functional validation asynchronously.
+    Errors in this stage are sent via a `ServerSentEvent`.
+
+    ***Note:*** `ErrorFound` messages need to be confirmed like any other message received via a `ServerSentEvent`.
