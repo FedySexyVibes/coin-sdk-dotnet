@@ -85,80 +85,74 @@ namespace Coin.Sdk.NP.Service.Impl
         {
             try
             {
-                var message = JObject.Parse(eventArgs.Message).First.First;
                 switch (eventArgs.Event)
                 {
                     case "activationsn-v1":
-                        listener.OnActivationServiceNumber(eventArgs.Id,
-                            message.ToObject<ActivationServiceNumberMessage>());
+                        listener.OnActivationServiceNumber(eventArgs.Id, GetNpMessage<ActivationServiceNumberMessage>(eventArgs));
                         return true;
                     case "cancel-v1":
-                        listener.OnCancel(eventArgs.Id, message.ToObject<CancelMessage>());
+                        listener.OnCancel(eventArgs.Id, GetNpMessage<CancelMessage>(eventArgs));
                         return true;
                     case "deactivation-v1":
-                        listener.OnDeactivation(eventArgs.Id, message.ToObject<DeactivationMessage>());
+                        listener.OnDeactivation(eventArgs.Id, GetNpMessage<DeactivationMessage>(eventArgs));
                         return true;
                     case "deactivationsn-v1":
-                        listener.OnDeactivationServiceNumber(eventArgs.Id,
-                            message.ToObject<DeactivationServiceNumberMessage>());
+                        listener.OnDeactivationServiceNumber(eventArgs.Id, GetNpMessage<DeactivationServiceNumberMessage>(eventArgs));
                         return true;
                     case "enumactivationnumber-v1":
-                        listener.OnEnumActivationNumber(eventArgs.Id, message.ToObject<EnumActivationNumberMessage>());
+                        listener.OnEnumActivationNumber(eventArgs.Id, GetNpMessage<EnumActivationNumberMessage>(eventArgs));
                         return true;
                     case "enumactivationoperator-v1":
-                        listener.OnEnumActivationOperator(eventArgs.Id,
-                            message.ToObject<EnumActivationOperatorMessage>());
+                        listener.OnEnumActivationOperator(eventArgs.Id, GetNpMessage<EnumActivationOperatorMessage>(eventArgs));
                         return true;
                     case "enumactivationrange-v1":
-                        listener.OnEnumActivationRange(eventArgs.Id, message.ToObject<EnumActivationRangeMessage>());
+                        listener.OnEnumActivationRange(eventArgs.Id, GetNpMessage<EnumActivationRangeMessage>(eventArgs));
                         return true;
                     case "enumdeactivationnumber-v1":
-                        listener.OnEnumDeactivationNumber(eventArgs.Id,
-                            message.ToObject<EnumDeactivationNumberMessage>());
+                        listener.OnEnumDeactivationNumber(eventArgs.Id, GetNpMessage<EnumDeactivationNumberMessage>(eventArgs));
                         return true;
                     case "enumdeactivationoperator-v1":
-                        listener.OnEnumDeactivationOperator(eventArgs.Id,
-                            message.ToObject<EnumDeactivationOperatorMessage>());
+                        listener.OnEnumDeactivationOperator(eventArgs.Id, GetNpMessage<EnumDeactivationOperatorMessage>(eventArgs));
                         return true;
                     case "enumdeactivationrange-v1":
-                        listener.OnEnumDeactivationRange(eventArgs.Id,
-                            message.ToObject<EnumDeactivationRangeMessage>());
+                        listener.OnEnumDeactivationRange(eventArgs.Id, GetNpMessage<EnumDeactivationRangeMessage>(eventArgs));
                         return true;
                     case "enumprofileactivation-v1":
-                        listener.OnEnumProfileActivation(eventArgs.Id,
-                            message.ToObject<EnumProfileActivationMessage>());
+                        listener.OnEnumProfileActivation(eventArgs.Id, GetNpMessage<EnumProfileActivationMessage>(eventArgs));
                         return true;
                     case "enumprofiledeactivation-v1":
-                        listener.OnEnumProfileDeactivation(eventArgs.Id,
-                            message.ToObject<EnumProfileDeactivationMessage>());
+                        listener.OnEnumProfileDeactivation(eventArgs.Id, GetNpMessage<EnumProfileDeactivationMessage>(eventArgs));
                         return true;
                     case "errorfound-v1":
-                        listener.OnErrorFound(eventArgs.Id, message.ToObject<ErrorFoundMessage>());
+                        listener.OnErrorFound(eventArgs.Id, GetNpMessage<ErrorFoundMessage>(eventArgs));
                         return true;
                     case "portingperformed-v1":
-                        listener.OnPortingPerformed(eventArgs.Id, message.ToObject<PortingPerformedMessage>());
+                        listener.OnPortingPerformed(eventArgs.Id, GetNpMessage<PortingPerformedMessage>(eventArgs));
                         return true;
                     case "portingrequest-v1":
-                        listener.OnPortingRequest(eventArgs.Id, message.ToObject<PortingRequestMessage>());
+                        listener.OnPortingRequest(eventArgs.Id, GetNpMessage<PortingRequestMessage>(eventArgs));
                         return true;
                     case "portingrequestanswer-v1":
-                        listener.OnPortingRequestAnswer(eventArgs.Id, message.ToObject<PortingRequestAnswerMessage>());
+                        listener.OnPortingRequestAnswer(eventArgs.Id, GetNpMessage<PortingRequestAnswerMessage>(eventArgs));
                         return true;
                     case "pradelayed-v1":
-                        listener.OnPortingRequestAnswerDelayed(eventArgs.Id,
-                            message.ToObject<PortingRequestAnswerDelayedMessage>());
+                        listener.OnPortingRequestAnswerDelayed(eventArgs.Id, GetNpMessage<PortingRequestAnswerDelayedMessage>(eventArgs));
                         return true;
                     case "rangeactivation-v1":
-                        listener.OnRangeActivation(eventArgs.Id, message.ToObject<RangeActivationMessage>());
+                        listener.OnRangeActivation(eventArgs.Id, GetNpMessage<RangeActivationMessage>(eventArgs));
                         return true;
                     case "rangedeactivation-v1":
-                        listener.OnRangeDeactivation(eventArgs.Id, message.ToObject<RangeDeactivationMessage>());
+                        listener.OnRangeDeactivation(eventArgs.Id, GetNpMessage<RangeDeactivationMessage>(eventArgs));
                         return true;
                     case "tariffchangesn-v1":
-                        listener.OnTariffChangeServiceNumber(eventArgs.Id,
-                            message.ToObject<TariffChangeServiceNumberMessage>());
+                        listener.OnTariffChangeServiceNumber(eventArgs.Id, GetNpMessage<TariffChangeServiceNumberMessage>(eventArgs));
                         return true;
                     default:
+                        if (eventArgs.Message == null)
+                        {
+                            listener.OnKeepAlive();
+                            return true;
+                        }
                         listener.OnUnknownMessage(eventArgs.Id, eventArgs.Message);
                         return true;
                 }
@@ -171,6 +165,11 @@ namespace Coin.Sdk.NP.Service.Impl
                 listener.OnException(ex);
                 return false;
             }
+        }
+
+        private static T GetNpMessage<T>(EventSourceMessageEventArgs eventArgs)
+        {
+            return JObject.Parse(eventArgs.Message).First.First.ToObject<T>();
         }
     }
 }

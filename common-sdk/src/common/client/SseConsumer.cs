@@ -127,11 +127,12 @@ namespace Coin.Sdk.Common.Client
                 _timer.UpdateTimestamp();
 
                 var success = handleSse(messageEvent);
-                if (success && offsetPersister != null)
+                _timer.Reset();
+                if (!success) return;
+                if (offsetPersister != null && messageEvent.Id != null)
                     offsetPersister.Offset = long.Parse(messageEvent.Id, CultureInfo.InvariantCulture);
 
                 _backoffHandler.Reset();
-                _timer.Reset();
             }
 
             void HandleDisconnect(DisconnectEventArgs e)

@@ -101,25 +101,29 @@ namespace Coin.Sdk.BS.Service.Impl
         {
             try
             {
-                var message = JObject.Parse(eventArgs.Message).First.First;
                 switch (eventArgs.Event)
                 {
                     case "cancel-v4":
-                        listener.OnCancel(eventArgs.Id, message.ToObject<CancelMessage>());
+                        listener.OnCancel(eventArgs.Id, GetBsMessage<CancelMessage>(eventArgs));
                         return true;
                     case "errorfound-v4":
-                        listener.OnErrorFound(eventArgs.Id, message.ToObject<ErrorFoundMessage>());
+                        listener.OnErrorFound(eventArgs.Id, GetBsMessage<ErrorFoundMessage>(eventArgs));
                         return true;
                     case "contractterminationperformed-v4":
-                        listener.OnContractTerminationPerformed(eventArgs.Id, message.ToObject<ContractTerminationPerformedMessage>());
+                        listener.OnContractTerminationPerformed(eventArgs.Id, GetBsMessage<ContractTerminationPerformedMessage>(eventArgs));
                         return true;
                     case "contractterminationrequest-v4":
-                        listener.OnContractTerminationRequest(eventArgs.Id, message.ToObject<ContractTerminationRequestMessage>());
+                        listener.OnContractTerminationRequest(eventArgs.Id, GetBsMessage<ContractTerminationRequestMessage>(eventArgs));
                         return true;
                     case "contractterminationrequestanswer-v4":
-                        listener.OnContractTerminationRequestAnswer(eventArgs.Id, message.ToObject<ContractTerminationRequestAnswerMessage>());
+                        listener.OnContractTerminationRequestAnswer(eventArgs.Id, GetBsMessage<ContractTerminationRequestAnswerMessage>(eventArgs));
                         return true;
                     default:
+                        if (eventArgs.Message == null)
+                        {
+                            listener.OnKeepAlive();
+                            return true;
+                        }
                         listener.OnUnknownMessage(eventArgs.Id, eventArgs.Message);
                         return true;
                 }
@@ -132,6 +136,11 @@ namespace Coin.Sdk.BS.Service.Impl
                 listener.OnException(ex);
                 return false;
             }
+        }
+
+        private static T GetBsMessage<T>(EventSourceMessageEventArgs eventArgs)
+        {
+            return JObject.Parse(eventArgs.Message).First.First.ToObject<T>();
         }
     }
 }
