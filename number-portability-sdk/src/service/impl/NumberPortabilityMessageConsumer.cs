@@ -148,7 +148,7 @@ namespace Coin.Sdk.NP.Service.Impl
                         listener.OnTariffChangeServiceNumber(eventArgs.Id, GetNpMessage<TariffChangeServiceNumberMessage>(eventArgs));
                         return true;
                     default:
-                        if (eventArgs.Message == null)
+                        if (string.IsNullOrWhiteSpace(eventArgs.Message))
                         {
                             listener.OnKeepAlive();
                             return true;

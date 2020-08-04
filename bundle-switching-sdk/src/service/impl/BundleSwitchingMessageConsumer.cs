@@ -119,7 +119,7 @@ namespace Coin.Sdk.BS.Service.Impl
                         listener.OnContractTerminationRequestAnswer(eventArgs.Id, GetBsMessage<ContractTerminationRequestAnswerMessage>(eventArgs));
                         return true;
                     default:
-                        if (eventArgs.Message == null)
+                        if (string.IsNullOrWhiteSpace(eventArgs.Message))
                         {
                             listener.OnKeepAlive();
                             return true;
