@@ -32,20 +32,20 @@ namespace Coin.Sdk.Common.Client
 
         public SseConsumer(string consumerName, string sseUri, string privateKeyFile, string encryptedHmacSecretFile,
             int backOffPeriod = 1, int numberOfRetries = DefaultNumberOfRetries, string privateKeyFilePassword = null) :
-            this(consumerName, new Uri(sseUri), ReadPrivateKeyFile(privateKeyFile, privateKeyFilePassword), encryptedHmacSecretFile,
-                backOffPeriod, numberOfRetries)
+            this(consumerName, new Uri(sseUri), ReadPrivateKeyFile(privateKeyFile, privateKeyFilePassword),
+                encryptedHmacSecretFile, backOffPeriod, numberOfRetries)
         {
         }
 
         public SseConsumer(string consumerName, Uri sseUri, string privateKeyFile, string encryptedHmacSecretFile,
             int backOffPeriod = 1, int numberOfRetries = DefaultNumberOfRetries, string privateKeyFilePassword = null) :
-            this(consumerName, sseUri, ReadPrivateKeyFile(privateKeyFile, privateKeyFilePassword), encryptedHmacSecretFile, backOffPeriod,
-                numberOfRetries)
+            this(consumerName, sseUri, ReadPrivateKeyFile(privateKeyFile, privateKeyFilePassword),
+                encryptedHmacSecretFile, backOffPeriod, numberOfRetries)
         {
         }
 
-        private SseConsumer(string consumerName, Uri sseUri, RSA privateKey, string encryptedHmacSecretFile, int backOffPeriod,
-            int numberOfRetries) :
+        private SseConsumer(string consumerName, Uri sseUri, RSA privateKey, string encryptedHmacSecretFile,
+            int backOffPeriod, int numberOfRetries) :
             this(consumerName, sseUri, privateKey,
                 HmacFromEncryptedBase64EncodedSecretFile(encryptedHmacSecretFile, privateKey), backOffPeriod,
                 numberOfRetries)
@@ -54,7 +54,7 @@ namespace Coin.Sdk.Common.Client
 
         public SseConsumer(string consumerName, string sseUri, RSA privateKey, HMACSHA256 signer, int backOffPeriod = 1,
             int numberOfRetries = DefaultNumberOfRetries) : this(consumerName, new Uri(sseUri), privateKey, signer,
-            backOffPeriod)
+            backOffPeriod, numberOfRetries)
         {
         }
 
@@ -110,14 +110,14 @@ namespace Coin.Sdk.Common.Client
             _timer.SetToken(CoinHttpClientHandler.CancellationTokenSource);
             _eventSourceReader = new EventSourceReader(CreateUri(offset, confirmationStatus, messageTypes, otherParams),
                 CoinHttpClientHandler);
+            _eventSourceReader.MessageReceived += (sender, e) => HandleEvent(e);
+            _eventSourceReader.Disconnected += (sender, e) => HandleDisconnect(e);
 
             StartReading();
 
             void StartReading()
             {
-                _eventSourceReader.MessageReceived += (sender, e) => HandleEvent(e);
                 _eventSourceReader.Start();
-                _eventSourceReader.Disconnected += (sender, e) => HandleDisconnect(e);
                 _logger.Info("Stream started");
                 _timer.Start();
             }
@@ -168,7 +168,7 @@ namespace Coin.Sdk.Common.Client
         #region IDisposable Support
 
         protected override IEnumerable<IDisposable> DisposableFields =>
-            base.DisposableFields.Concat(new IDisposable[] {_eventSourceReader, _timer });
+            base.DisposableFields.Concat(new IDisposable[] {_eventSourceReader, _timer});
 
         #endregion
     }
