@@ -110,13 +110,13 @@ namespace Coin.Sdk.Common.Client
             _timer.SetToken(CoinHttpClientHandler.CancellationTokenSource);
             _eventSourceReader = new EventSourceReader(CreateUri(offset, confirmationStatus, messageTypes, otherParams),
                 CoinHttpClientHandler);
-            _eventSourceReader.MessageReceived += (sender, e) => HandleEvent(e);
-            _eventSourceReader.Disconnected += (sender, e) => HandleDisconnect(e);
 
             StartReading();
 
             void StartReading()
             {
+                _eventSourceReader.MessageReceived += (sender, e) => HandleEvent(e);
+                _eventSourceReader.Disconnected += (sender, e) => HandleDisconnect(e);
                 _eventSourceReader.Start();
                 _logger.Info("Stream started");
                 _timer.Start();
@@ -138,7 +138,7 @@ namespace Coin.Sdk.Common.Client
             void HandleDisconnect(DisconnectEventArgs e)
             {
                 _timer.Stop();
-                _logger.Debug($"Error: {e.Exception.Message}");
+                _logger.Warn($"Error: {e.Exception.Message}");
                 var persistedOffset = offsetPersister?.Offset ?? offset;
                 if (_backoffHandler.MaximumNumberOfRetriesUsed())
                 {
@@ -149,7 +149,8 @@ namespace Coin.Sdk.Common.Client
 
                 _backoffHandler.WaitBackOffPeriod();
 
-                _logger.Debug("Restarting stream");
+                _logger.Info("Restarting stream");
+                _eventSourceReader.Dispose();
                 _eventSourceReader = new EventSourceReader(
                     CreateUri(persistedOffset, confirmationStatus, messageTypes, otherParams), CoinHttpClientHandler);
                 CoinHttpClientHandler.CancellationTokenSource = new CancellationTokenSource();
