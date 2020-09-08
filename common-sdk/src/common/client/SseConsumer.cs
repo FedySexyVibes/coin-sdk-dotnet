@@ -150,7 +150,6 @@ namespace Coin.Sdk.Common.Client
                 _backoffHandler.WaitBackOffPeriod();
 
                 _logger.Info("Restarting stream");
-                _eventSourceReader.Dispose();
                 _eventSourceReader = new EventSourceReader(
                     CreateUri(persistedOffset, confirmationStatus, messageTypes, otherParams), CoinHttpClientHandler);
                 CoinHttpClientHandler.CancellationTokenSource = new CancellationTokenSource();
