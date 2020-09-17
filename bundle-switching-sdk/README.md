@@ -47,6 +47,7 @@ to the API.
 ### Create Message Listener
 For message consumption, the bundle switching API makes use of HTTP's [ServerSentEvents](https://en.wikipedia.org/wiki/Server-sent_events).
 The SDK offers a Listener interface `IBundleSwitchingMessageListener` which is triggered upon reception of a message payload.
+Whenever the API doesn't send any other message for 20 seconds, it sends an empty 'heartbeat' message, which triggers the OnKeepAlive() method.
 
 ### Start consuming messages 
 The `BundleSwitchingMessageConsumer` has three `startConsuming...()` methods for consuming messages, of which `startConsumingUnconfirmed()` is most useful.
