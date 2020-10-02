@@ -13,28 +13,31 @@ namespace Coin.Sdk.Common.Client
     {
         protected HttpClient HttpClient { get; }
         protected CoinHttpClientHandler CoinHttpClientHandler { get; }
+        protected Encoding Encoding { get; }
 
-        protected CtpApiRestTemplateSupport(string consumerName, string privateKeyFile, string encryptedHmacSecretFile, string privateKeyFilePassword = null)
-            : this(consumerName, ReadPrivateKeyFile(privateKeyFile, privateKeyFilePassword), encryptedHmacSecretFile) { }
+        protected CtpApiRestTemplateSupport(string consumerName, string privateKeyFile, string encryptedHmacSecretFile, string privateKeyFilePassword = null, Encoding encoding = null)
+            : this(consumerName, ReadPrivateKeyFile(privateKeyFile, privateKeyFilePassword), encryptedHmacSecretFile, encoding) { }
 
-        private CtpApiRestTemplateSupport(string consumerName, RSA privateKey, string encryptedHmacSecretFile)
-            : this(consumerName, privateKey, HmacFromEncryptedBase64EncodedSecretFile(encryptedHmacSecretFile, privateKey)) { }
+        private CtpApiRestTemplateSupport(string consumerName, RSA privateKey, string encryptedHmacSecretFile, Encoding encoding = null)
+            : this(consumerName, privateKey, HmacFromEncryptedBase64EncodedSecretFile(encryptedHmacSecretFile, privateKey), DefaultValidPeriodInSecs, encoding) { }
 
         protected CtpApiRestTemplateSupport(string consumerName, RSA privateKey, HMACSHA256 signer,
-            int validPeriodInSeconds = DefaultValidPeriodInSecs)
+            int validPeriodInSeconds = DefaultValidPeriodInSecs, Encoding encoding = null)
         {
             CoinHttpClientHandler = new CoinHttpClientHandler(consumerName, privateKey, signer, validPeriodInSeconds);
             HttpClient = new HttpClient(CoinHttpClientHandler);
+            Encoding = encoding ?? Encoding.UTF8;
         }
 
-        protected async Task<HttpResponseMessage> SendWithTokenAsync<T>(HttpMethod method, Uri url, T content)
+        protected async Task<HttpResponseMessage> SendWithTokenAsync<T>(HttpMethod method, Uri url, T content = null)
+            where T : class
         {
             using (var request = new HttpRequestMessage(method, url))
             {
                 if (content != null)
                 {
                     var bodyAsString = JsonConvert.SerializeObject(content);
-                    request.Content = new StringContent(bodyAsString, Encoding.Default, "application/json");
+                    request.Content = new StringContent(bodyAsString, Encoding, "application/json");
                 }
                 return await HttpClient.SendAsync(request).ConfigureAwait(false);
             }
