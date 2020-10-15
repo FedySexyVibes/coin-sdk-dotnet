@@ -1,9 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 using Coin.Sdk.Common.Client;
 using Coin.Sdk.BS.Messages.V4;
 using Coin.Sdk.BS.Service.Impl;
+using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
 using static Coin.Sdk.BS.Sample.TestUtils;
 
@@ -22,14 +23,16 @@ namespace Coin.Sdk.BS.Sample
         [SetUp]
         public void Setup()
         {
+            var logger = NullLogger.Instance;
+
             const string apiUrl = "https://test-api.coin.nl/bundle-switching/v4";
             const string sseUrl = apiUrl + "/dossiers/events"; 
             const string consumer = "<YOUR CONSUMER>";
             var privateKeyFile = GetPath("private-key.pem");
             var encryptedHmacSecretFile =  GetPath("sharedkey.encrypted");
             _contractTerminationService = new BundleSwitchingService(apiUrl, consumer, privateKeyFile, encryptedHmacSecretFile);
-            var sseConsumer = new SseConsumer(consumer, sseUrl, privateKeyFile, encryptedHmacSecretFile, 1, 0);
-            _messageConsumer = new BundleSwitchingMessageConsumer(sseConsumer);
+            var sseConsumer = new SseConsumer(logger, consumer, sseUrl, privateKeyFile, encryptedHmacSecretFile, 1, 0);
+            _messageConsumer = new BundleSwitchingMessageConsumer(sseConsumer, logger);
         }
 
         [Test]

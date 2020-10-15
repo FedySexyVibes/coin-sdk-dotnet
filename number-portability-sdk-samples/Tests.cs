@@ -1,9 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 using Coin.Sdk.Common.Client;
 using Coin.Sdk.NP.Messages.V1;
 using Coin.Sdk.NP.Service.Impl;
+using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
 using static Coin.Sdk.NP.Sample.TestUtils;
 
@@ -17,18 +18,20 @@ namespace Coin.Sdk.NP.Sample
         private const string Operator = "<YOUR OPERATOR>";
         private readonly string _timestamp = DateTime.Now.ToString("yyyyMMddhhmmss");
         private const string PhoneNumber = "0612345678";
-
+        
         [SetUp]
         public void Setup()
         {
+            var logger = NullLogger.Instance;
+            
             const string apiUrl = "https://test-api.coin.nl/number-portability/v1";
             const string sseUrl = apiUrl + "/dossiers/events"; 
             const string consumer = "<YOUR CONSUMER>";
             var privateKeyFile = GetPath("private-key.pem");
             var encryptedHmacSecretFile =  GetPath("sharedkey.encrypted");
             _numberPortabilityService = new NumberPortabilityService(apiUrl, consumer, privateKeyFile, encryptedHmacSecretFile);
-            var sseConsumer = new SseConsumer(consumer, sseUrl, privateKeyFile, encryptedHmacSecretFile, 1, 0);
-            _messageConsumer = new NumberPortabilityMessageConsumer(sseConsumer);
+            var sseConsumer = new SseConsumer(logger, consumer, sseUrl, privateKeyFile, encryptedHmacSecretFile, 1, 0);
+            _messageConsumer = new NumberPortabilityMessageConsumer(sseConsumer, logger);
         }
 
         [Test]
