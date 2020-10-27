@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Coin.Sdk.Common.Client;
 using Coin.Sdk.BS.Messages.V4;
 using EvtSource;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
-using NLog;
 
 namespace Coin.Sdk.BS.Service.Impl
 {
@@ -13,11 +13,12 @@ namespace Coin.Sdk.BS.Service.Impl
     {
         private const long DefaultOffset = -1;
         private readonly SseConsumer _sseConsumer;
-        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        private readonly ILogger _logger;
 
-        public BundleSwitchingMessageConsumer(SseConsumer sseConsumer)
+        public BundleSwitchingMessageConsumer(SseConsumer sseConsumer, ILogger logger)
         {
             _sseConsumer = sseConsumer;
+            _logger = logger;
         }
 
         public void StopConsuming()
@@ -132,7 +133,7 @@ namespace Coin.Sdk.BS.Service.Impl
             catch (Exception ex)
 #pragma warning restore CA1031 // Do not catch general exception types
             {
-                _logger.Error(ex);
+                _logger.LogError(ex, @"An error occured");
                 listener.OnException(ex);
                 return false;
             }

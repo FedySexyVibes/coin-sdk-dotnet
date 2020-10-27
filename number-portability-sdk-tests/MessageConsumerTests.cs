@@ -1,7 +1,8 @@
-using System.Threading;
+﻿using System.Threading;
 using Coin.Sdk.Common.Client;
 using Coin.Sdk.NP.Messages.V1;
 using Coin.Sdk.NP.Service.Impl;
+using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
 using static Coin.Sdk.NP.Tests.TestSettings;
 
@@ -15,8 +16,10 @@ namespace Coin.Sdk.NP.Tests
         [SetUp]
         public void Setup()
         {
-            var sseConsumer = new SseConsumer(Consumer, SseUrl, PrivateKeyFile, EncryptedHmacSecretFile);
-            _messageConsumer = new NumberPortabilityMessageConsumer(sseConsumer);
+            var logger = NullLogger.Instance;
+
+            var sseConsumer = new SseConsumer(logger, Consumer, SseUrl, PrivateKeyFile, EncryptedHmacSecretFile);
+            _messageConsumer = new NumberPortabilityMessageConsumer(sseConsumer, logger);
             _listener = new TestListener();
         }
 
