@@ -47,11 +47,10 @@ namespace Coin.Sdk.Common.Client
 
         private SseConsumer(ILogger logger, string consumerName, Uri sseUri, RSA privateKey, string encryptedHmacSecretFile,
             int backOffPeriod, int numberOfRetries) :
-            this(logger, consumerName, sseUri, privateKey,
+            this(logger, consumerName, sseUri, privateKey, 
                 HmacFromEncryptedBase64EncodedSecretFile(encryptedHmacSecretFile, privateKey), backOffPeriod,
                 numberOfRetries)
         {
-            _logger = logger;
         }
 
         public SseConsumer(ILogger logger, string consumerName, string sseUri, RSA privateKey, HMACSHA256 signer, int backOffPeriod = 1,
@@ -63,7 +62,9 @@ namespace Coin.Sdk.Common.Client
         public SseConsumer(ILogger logger, string consumerName, Uri sseUri, RSA privateKey, HMACSHA256 signer, int backOffPeriod = 1,
             int numberOfRetries = DefaultNumberOfRetries) : base(consumerName, privateKey, signer)
         {
-            _sseUri = sseUri;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger), @"Logger can't be null");
+            _sseUri = sseUri ?? throw new ArgumentNullException(nameof(sseUri), @"SseURI can't be null");
+
             _backoffHandler = new BackoffHandler(backOffPeriod, numberOfRetries);
         }
 
