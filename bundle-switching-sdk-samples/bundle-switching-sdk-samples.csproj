@@ -4,7 +4,7 @@
         <IsPackable>false</IsPackable>
         <TargetFramework>net47</TargetFramework>
         <RootNamespace>Coin.Sdk.BS.Sample</RootNamespace>
-        <Version>1.1.0</Version>
+        <Version>1.1.1</Version>
     </PropertyGroup>
 
     <ItemGroup>
