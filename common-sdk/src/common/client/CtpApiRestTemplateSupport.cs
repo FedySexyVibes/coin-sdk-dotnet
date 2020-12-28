@@ -11,15 +11,24 @@ namespace Coin.Sdk.Common.Client
 {
     public abstract class CtpApiRestTemplateSupport : IDisposable
     {
-        protected HttpClient HttpClient { get; }
-        protected CoinHttpClientHandler CoinHttpClientHandler { get; }
+        protected HttpClient HttpClient { get; private set; }
+        protected CoinHttpClientHandler CoinHttpClientHandler { get; private set; }
         protected Encoding Encoding { get; }
 
-        protected CtpApiRestTemplateSupport(string consumerName, string privateKeyFile, string encryptedHmacSecretFile, string privateKeyFilePassword = null, Encoding encoding = null)
-            : this(consumerName, ReadPrivateKeyFile(privateKeyFile, privateKeyFilePassword), encryptedHmacSecretFile, encoding) { }
+        protected CtpApiRestTemplateSupport(string consumerName, string privateKeyFile, string encryptedHmacSecretFile,
+            string privateKeyFilePassword = null, Encoding encoding = null)
+            : this(consumerName, ReadPrivateKeyFile(privateKeyFile, privateKeyFilePassword), encryptedHmacSecretFile,
+                encoding)
+        {
+        }
 
-        private CtpApiRestTemplateSupport(string consumerName, RSA privateKey, string encryptedHmacSecretFile, Encoding encoding = null)
-            : this(consumerName, privateKey, HmacFromEncryptedBase64EncodedSecretFile(encryptedHmacSecretFile, privateKey), DefaultValidPeriodInSecs, encoding) { }
+        private CtpApiRestTemplateSupport(string consumerName, RSA privateKey, string encryptedHmacSecretFile,
+            Encoding encoding = null)
+            : this(consumerName, privateKey,
+                HmacFromEncryptedBase64EncodedSecretFile(encryptedHmacSecretFile, privateKey), DefaultValidPeriodInSecs,
+                encoding)
+        {
+        }
 
         protected CtpApiRestTemplateSupport(string consumerName, RSA privateKey, HMACSHA256 signer,
             int validPeriodInSeconds = DefaultValidPeriodInSecs, Encoding encoding = null)
@@ -27,6 +36,12 @@ namespace Coin.Sdk.Common.Client
             CoinHttpClientHandler = new CoinHttpClientHandler(consumerName, privateKey, signer, validPeriodInSeconds);
             HttpClient = new HttpClient(CoinHttpClientHandler);
             Encoding = encoding ?? Encoding.UTF8;
+        }
+
+        protected void RefreshCoinHttpClientHandler()
+        {
+            CoinHttpClientHandler = CoinHttpClientHandler.Copy();
+            HttpClient = new HttpClient(CoinHttpClientHandler);
         }
 
         protected async Task<HttpResponseMessage> SendWithTokenAsync<T>(HttpMethod method, Uri url, T content = null)

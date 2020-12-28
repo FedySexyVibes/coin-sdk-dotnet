@@ -31,11 +31,7 @@ namespace Coin.Sdk.NP.Tests
         public void ConsumeUnconfirmed()
         {
             _messageConsumer.StartConsumingUnconfirmed(_listener, e => Assert.Fail("Disconnected"));
-            for (var i = 0; i < 30; i++)
-            {
-                Thread.Sleep(1000);
-            }
-
+            Thread.Sleep(5000);
             _messageConsumer.StopConsuming();
         }
 
@@ -49,13 +45,9 @@ namespace Coin.Sdk.NP.Tests
                 if (messageId == "5") _stopStreamService.StopStream();
             };
             _messageConsumer.StartConsumingUnconfirmed(_listener, e => Assert.Fail("Disconnected"));
-            for (var i = 0; i < 30; i++)
-            {
-                Thread.Sleep(1000);
-            }
-
+            Thread.Sleep(10_000);
             _messageConsumer.StopConsuming();
-            Assert.Greater(numberMessages, 20);
+            Assert.Greater(numberMessages, 10);
         }
 
         [Test]
@@ -63,11 +55,34 @@ namespace Coin.Sdk.NP.Tests
         {
             _messageConsumer.StartConsumingAll(_listener, new TestOffsetPersister(), 3,
                 e => Assert.Fail("Disconnected"), MessageType.PortingRequestV1, MessageType.PortingPerformedV1);
-            for (var i = 0; i < 5; i++)
-            {
-                Thread.Sleep(1000);
-            }
+            Thread.Sleep(5000);
+            _messageConsumer.StopConsuming();
+        }
 
+        [Test]
+        public void StopAndResumeConsuming()
+        {
+            var numberMessages = 0;
+            _listener.SideEffect = messageId => numberMessages++;
+            _messageConsumer.StartConsumingUnconfirmed(_listener, e => Assert.Fail("Disconnected"));
+            Thread.Sleep(5000);
+            _messageConsumer.StopConsuming();
+            var numberMessagesAfterStop = numberMessages;
+            Assert.Greater(numberMessagesAfterStop, 5);
+            Thread.Sleep(3000);
+            Assert.AreEqual(numberMessages, numberMessagesAfterStop);
+            _messageConsumer.StartConsumingUnconfirmed(_listener, e => Assert.Fail("Disconnected"));
+            Thread.Sleep(3000);
+            Assert.Greater(numberMessages, numberMessagesAfterStop);
+            _messageConsumer.StopConsuming();
+        }
+
+        [Test]
+        public void CannotConsumeTwice()
+        {
+            _messageConsumer.StartConsumingUnconfirmed(_listener, e => Assert.Fail("Disconnected"));
+            Assert.Throws(typeof(SynchronizationLockException),
+                () => _messageConsumer.StartConsumingUnconfirmed(_listener, e => Assert.Fail("Disconnected")));
             _messageConsumer.StopConsuming();
         }
     }

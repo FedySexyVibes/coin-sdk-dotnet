@@ -39,6 +39,11 @@ namespace Coin.Sdk.Common.Client
             UseCookies = true;
         }
 
+        public CoinHttpClientHandler Copy() => new CoinHttpClientHandler(_consumerName, _privateKey, _signer, _validPeriodInSeconds)
+        {
+            CancellationTokenSource = CancellationTokenSource
+        };
+
         private static async Task<Dictionary<string, string>> GetHmacHeadersAsync(HttpRequestMessage request)
         {
             // In the .NET 4.7 & 4.8 Runtime the implementation throws an exception when a body is added 

@@ -8,9 +8,9 @@ using System.Threading;
 using System.Timers;
 using EvtSource;
 using Microsoft.Extensions.Logging;
-using Timer = System.Timers.Timer;
 using SseHandler = System.Func<EvtSource.EventSourceMessageEventArgs, bool>;
 using static Coin.Sdk.Common.Crypto.CtpApiClientUtil;
+using Timer = System.Timers.Timer;
 
 namespace Coin.Sdk.Common.Client
 {
@@ -24,12 +24,16 @@ namespace Coin.Sdk.Common.Client
         private EventSourceReader _eventSourceReader;
         private readonly ReadTimeoutTimer _timer = new ReadTimeoutTimer();
         private readonly BackoffHandler _backoffHandler;
+        private readonly Semaphore _eventStreamLock = new Semaphore(1, 1);
 
         private enum ConfirmationStatus
         {
             Unconfirmed,
             All
         }
+
+        private EventSourceReader.MessageReceivedHandler handleEvent;
+        private EventSourceReader.DisconnectEventHandler handleDisconnect;
 
         public SseConsumer(ILogger logger, string consumerName, string sseUri, string privateKeyFile, string encryptedHmacSecretFile,
             int backOffPeriod = 1, int numberOfRetries = DefaultNumberOfRetries, string privateKeyFilePassword = null) :
@@ -70,9 +74,14 @@ namespace Coin.Sdk.Common.Client
 
         public void StopConsuming()
         {
-            Debug.WriteLine("Stopped consuming messages");
-            _timer.Stop();
-            if (_eventSourceReader?.IsDisposed == false) _eventSourceReader.Dispose();
+            if (_eventSourceReader?.IsDisposed == false)
+            {
+                _eventSourceReader.MessageReceived -= handleEvent;
+                _eventSourceReader.Disconnected -= handleDisconnect;
+                Debug.WriteLine("Stopped consuming messages");
+                _eventStreamLock.Release(1);
+                DisposeEventSourceReader();
+            }
         }
 
         public void StartConsumingUnconfirmed(
@@ -110,22 +119,13 @@ namespace Coin.Sdk.Common.Client
             IOffsetPersister offsetPersister = null,
             long offset = DefaultOffset)
         {
+            if (_eventStreamLock.WaitOne(10_000) == false)
+                throw new SynchronizationLockException("Could not acquire lock for stream consumption");
             _timer.SetToken(CoinHttpClientHandler.CancellationTokenSource);
             _eventSourceReader = new EventSourceReader(CreateUri(offset, confirmationStatus, messageTypes, otherParams),
                 CoinHttpClientHandler);
 
-            StartReading();
-
-            void StartReading()
-            {
-                _eventSourceReader.MessageReceived += (sender, e) => HandleEvent(e);
-                _eventSourceReader.Disconnected += (sender, e) => HandleDisconnect(e);
-                _eventSourceReader.Start();
-                _logger.LogInformation("Stream started");
-                _timer.Start();
-            }
-
-            void HandleEvent(EventSourceMessageEventArgs messageEvent)
+            handleEvent = (sender, messageEvent) =>
             {
                 _timer.UpdateTimestamp();
 
@@ -136,29 +136,43 @@ namespace Coin.Sdk.Common.Client
                     offsetPersister.Offset = long.Parse(messageEvent.Id, CultureInfo.InvariantCulture);
 
                 _backoffHandler.Reset();
-            }
-
-            void HandleDisconnect(DisconnectEventArgs e)
+            };
+            handleDisconnect = (sender, e) =>
             {
                 _timer.Stop();
                 _logger.LogWarning(e.Exception, @"Error: {Message}", e.Exception.Message);
-                var persistedOffset = offsetPersister?.Offset ?? offset;
+
                 if (_backoffHandler.MaximumNumberOfRetriesUsed())
                 {
+                    _eventStreamLock.Release(1);
                     _logger.LogError("Reached maximum number of connection retries, stopped consuming event stream.");
                     onFinalDisconnect?.Invoke(e.Exception);
+                    DisposeEventSourceReader();
                     return;
                 }
 
                 _backoffHandler.WaitBackOffPeriod();
 
                 _logger.LogInformation("Restarting stream");
+
+                var persistedOffset = offsetPersister?.Offset ?? offset;
                 _eventSourceReader = new EventSourceReader(
                     CreateUri(persistedOffset, confirmationStatus, messageTypes, otherParams), CoinHttpClientHandler);
                 CoinHttpClientHandler.CancellationTokenSource = new CancellationTokenSource();
                 _timer.SetToken(CoinHttpClientHandler.CancellationTokenSource);
                 StartReading();
-            }
+            };
+
+            StartReading();
+        }
+
+        private void StartReading()
+        {
+            _eventSourceReader.MessageReceived += handleEvent;
+            _eventSourceReader.Disconnected += handleDisconnect;
+            _eventSourceReader.Start();
+            _logger.LogInformation("Stream started");
+            _timer.Start();
         }
 
         private Uri CreateUri(long offset, ConfirmationStatus confirmationStatus, IEnumerable<string> messageTypes = null,
@@ -167,6 +181,12 @@ namespace Coin.Sdk.Common.Client
             .AddQueryArg(nameof(confirmationStatus), $"{confirmationStatus}")
             .AddQueryArg(nameof(messageTypes), messageTypes ?? new string[] { })
             .AddQueryArgs(otherParams ?? new Dictionary<string, IEnumerable<string>>());
+
+        private void DisposeEventSourceReader()
+        {
+            RefreshCoinHttpClientHandler();
+            _eventSourceReader.Dispose();
+        }
 
         #region IDisposable Support
 

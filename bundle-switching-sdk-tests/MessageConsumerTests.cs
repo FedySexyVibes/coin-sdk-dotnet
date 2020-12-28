@@ -27,11 +27,7 @@ namespace Coin.Sdk.BS.Tests
         public void ConsumeUnconfirmed()
         {
             _messageConsumer.StartConsumingUnconfirmed(_listener, e => Assert.Fail("Disconnected"));
-            for (var i = 0; i < 30; i++)
-            {
-                Thread.Sleep(1000);
-            }
-
+            Thread.Sleep(5000);
             _messageConsumer.StopConsuming();
         }
 
@@ -39,12 +35,9 @@ namespace Coin.Sdk.BS.Tests
         public void ConsumeAllFiltered()
         {
             _messageConsumer.StartConsumingAll(_listener, new TestOffsetPersister(), 3,
-                e => Assert.Fail("Disconnected"), null, MessageType.ContractTerminationRequestV4, MessageType.ContractTerminationPerformedV4);
-            for (var i = 0; i < 5; i++)
-            {
-                Thread.Sleep(1000);
-            }
-
+                e => Assert.Fail("Disconnected"), null, MessageType.ContractTerminationRequestV4,
+                MessageType.ContractTerminationPerformedV4);
+            Thread.Sleep(5000);
             _messageConsumer.StopConsuming();
         }
     }
