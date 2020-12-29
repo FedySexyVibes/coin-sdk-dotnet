@@ -24,7 +24,6 @@ namespace Coin.Sdk.Common.Client
         private EventSourceReader _eventSourceReader;
         private readonly ReadTimeoutTimer _timer = new ReadTimeoutTimer();
         private readonly BackoffHandler _backoffHandler;
-        private readonly Semaphore _eventStreamLock = new Semaphore(1, 1);
 
         private enum ConfirmationStatus
         {
@@ -79,7 +78,6 @@ namespace Coin.Sdk.Common.Client
                 _eventSourceReader.MessageReceived -= handleEvent;
                 _eventSourceReader.Disconnected -= handleDisconnect;
                 Debug.WriteLine("Stopped consuming messages");
-                _eventStreamLock.Release(1);
                 DisposeEventSourceReader();
             }
         }
@@ -119,8 +117,7 @@ namespace Coin.Sdk.Common.Client
             IOffsetPersister offsetPersister = null,
             long offset = DefaultOffset)
         {
-            if (_eventStreamLock.WaitOne(10_000) == false)
-                throw new SynchronizationLockException("Could not acquire lock for stream consumption");
+            StopConsuming();
             _timer.SetToken(CoinHttpClientHandler.CancellationTokenSource);
             _eventSourceReader = new EventSourceReader(CreateUri(offset, confirmationStatus, messageTypes, otherParams),
                 CoinHttpClientHandler);
@@ -144,7 +141,6 @@ namespace Coin.Sdk.Common.Client
 
                 if (_backoffHandler.MaximumNumberOfRetriesUsed())
                 {
-                    _eventStreamLock.Release(1);
                     _logger.LogError("Reached maximum number of connection retries, stopped consuming event stream.");
                     onFinalDisconnect?.Invoke(e.Exception);
                     DisposeEventSourceReader();

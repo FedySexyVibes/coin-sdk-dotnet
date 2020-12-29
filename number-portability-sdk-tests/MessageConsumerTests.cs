@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Threading;
+﻿using System.Threading;
 using Coin.Sdk.Common.Client;
 using Coin.Sdk.NP.Messages.V1;
 using Coin.Sdk.NP.Service.Impl;
@@ -78,12 +76,17 @@ namespace Coin.Sdk.NP.Tests
         }
 
         [Test]
-        public void CannotConsumeTwice()
+        public void DoesNotConsumeTwice()
         {
+            var firstListener = new TestListener();
+            var numberMessages = 0;
+            _listener.SideEffect = messageId => numberMessages++;
+            _messageConsumer.StartConsumingUnconfirmed(firstListener, e => Assert.Fail("Disconnected"));
             _messageConsumer.StartConsumingUnconfirmed(_listener, e => Assert.Fail("Disconnected"));
-            Assert.Throws(typeof(SynchronizationLockException),
-                () => _messageConsumer.StartConsumingUnconfirmed(_listener, e => Assert.Fail("Disconnected")));
+            firstListener.SideEffect = e => Assert.Fail("First event stream has not been closed");
+            Thread.Sleep(3000);
             _messageConsumer.StopConsuming();
+            Assert.Greater(numberMessages, 5);
         }
     }
 }
