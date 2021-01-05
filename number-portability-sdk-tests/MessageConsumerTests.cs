@@ -25,68 +25,68 @@ namespace Coin.Sdk.NP.Tests
             _listener = new TestListener();
         }
 
-        [Test]
+        [Test, Timeout(5000)]
         public void ConsumeUnconfirmed()
         {
+            var cde = new CountdownEvent(5);
+            _listener.SideEffect = messageId => cde.Signal();
             _messageConsumer.StartConsumingUnconfirmed(_listener, e => Assert.Fail("Disconnected"));
-            Thread.Sleep(5000);
+            cde.Wait();
             _messageConsumer.StopConsuming();
         }
 
-        [Test]
+        [Test, Timeout(8000)]
         public void ConsumeUnconfirmedWithInterrupt()
         {
-            var numberMessages = 0;
-            _listener.SideEffect = messageId =>
-            {
-                numberMessages++;
-                if (messageId == "5") _stopStreamService.StopStream();
-            };
+            var cde = new CountdownEvent(5);
+            _listener.SideEffect = messageId => cde.Signal();
             _messageConsumer.StartConsumingUnconfirmed(_listener, e => Assert.Fail("Disconnected"));
-            Thread.Sleep(10_000);
+            cde.Wait();
+            _stopStreamService.StopStream();
+            cde.Reset();
+            cde.Wait();
             _messageConsumer.StopConsuming();
-            Assert.Greater(numberMessages, 10);
         }
 
-        [Test]
+        [Test, Timeout(5000)]
         public void ConsumeAllFiltered()
         {
+            var cde = new CountdownEvent(3);
+            _listener.SideEffect = messageId => cde.Signal();
             _messageConsumer.StartConsumingAll(_listener, new TestOffsetPersister(), 3,
                 e => Assert.Fail("Disconnected"), MessageType.PortingRequestV1, MessageType.PortingPerformedV1);
-            Thread.Sleep(5000);
+            cde.Wait();
             _messageConsumer.StopConsuming();
         }
 
-        [Test]
+        [Test, Timeout(15000)]
         public void StopAndResumeConsuming()
         {
-            var numberMessages = 0;
-            _listener.SideEffect = messageId => numberMessages++;
+            var cde = new CountdownEvent(5);
+            _listener.SideEffect = messageId => cde.Signal();
             _messageConsumer.StartConsumingUnconfirmed(_listener, e => Assert.Fail("Disconnected"));
-            Thread.Sleep(5000);
+            cde.Wait();
             _messageConsumer.StopConsuming();
-            var numberMessagesAfterStop = numberMessages;
-            Assert.Greater(numberMessagesAfterStop, 5);
+            cde.Reset();
             Thread.Sleep(3000);
-            Assert.AreEqual(numberMessages, numberMessagesAfterStop);
+            Assert.AreEqual(cde.CurrentCount, cde.InitialCount);
             _messageConsumer.StartConsumingUnconfirmed(_listener, e => Assert.Fail("Disconnected"));
-            Thread.Sleep(3000);
-            Assert.Greater(numberMessages, numberMessagesAfterStop);
+            cde.Wait();
             _messageConsumer.StopConsuming();
         }
 
-        [Test]
+        [Test, Timeout(5000)]
         public void DoesNotConsumeTwice()
         {
             var firstListener = new TestListener();
-            var numberMessages = 0;
-            _listener.SideEffect = messageId => numberMessages++;
+            var cde = new CountdownEvent(5);
+            _listener.SideEffect = messageId => cde.Signal();
             _messageConsumer.StartConsumingUnconfirmed(firstListener, e => Assert.Fail("Disconnected"));
             _messageConsumer.StartConsumingUnconfirmed(_listener, e => Assert.Fail("Disconnected"));
             firstListener.SideEffect = e => Assert.Fail("First event stream has not been closed");
-            Thread.Sleep(3000);
+            cde.Wait();
             _messageConsumer.StopConsuming();
-            Assert.Greater(numberMessages, 5);
+            
         }
     }
 }

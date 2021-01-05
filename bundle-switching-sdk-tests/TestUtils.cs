@@ -20,11 +20,11 @@ namespace Coin.Sdk.BS.Tests
         public const string PrivateKeyFile = "../../../../keys/private-key.pem";
         public const string EncryptedHmacSecretFile = "../../../../keys/sharedkey.encrypted";
 
-        public static string ApiUrl =
+        public static readonly string ApiUrl =
             "http://" + (Environment.GetEnvironmentVariable("STUB_HOST_AND_PORT") ?? "localhost:8000") +
             "/bundle-switching/v4";
 
-        public static string SseUrl = ApiUrl + "/dossiers/events";
+        public static readonly string SseUrl = ApiUrl + "/dossiers/events";
 
         public const string Consumer = "loadtest-loada";
         public const string Recipient = "LOADA";
@@ -35,14 +35,23 @@ namespace Coin.Sdk.BS.Tests
 
     public class TestListener : IBundleSwitchingMessageListener
     {
+        private Action<string> _sideEffect = _ => { };
+
+        public Action<string> SideEffect
+        {
+            set => _sideEffect = value;
+        }
+
         public void OnCancel(string messageId, CancelMessage message)
         {
             Debug.WriteLine($"Received message with id {messageId} of type {message.GetType()}");
+            _sideEffect(messageId);
         }
 
         public void OnErrorFound(string messageId, ErrorFoundMessage message)
         {
             Debug.WriteLine($"Received message with id {messageId} of type {message.GetType()}");
+            _sideEffect(messageId);
         }
 
         public void OnException(Exception exception)
@@ -58,16 +67,19 @@ namespace Coin.Sdk.BS.Tests
         public void OnContractTerminationPerformed(string messageId, ContractTerminationPerformedMessage message)
         {
             Debug.WriteLine($"Received message with id {messageId} of type {message.GetType()}");
+            _sideEffect(messageId);
         }
 
         public void OnContractTerminationRequest(string messageId, ContractTerminationRequestMessage message)
         {
             Debug.WriteLine($"Received message with id {messageId} of type {message.GetType()}");
+            _sideEffect(messageId);
         }
 
         public void OnContractTerminationRequestAnswer(string messageId, ContractTerminationRequestAnswerMessage message)
         {
             Debug.WriteLine($"Received message with id {messageId} of type {message.GetType()}");
+            _sideEffect(messageId);
         }
 
         public void OnUnknownMessage(string messageId, string message)

@@ -26,11 +26,11 @@ namespace Coin.Sdk.NP.Tests
         public const string EncryptedHmacSecretFile = "../../../../keys/sharedkey.encrypted";
         public const int NumberOfRetries = 1;
 
-        public static string ApiUrl =
+        public static readonly string ApiUrl =
             "http://" + (Environment.GetEnvironmentVariable("STUB_HOST_AND_PORT") ?? "localhost:8000") +
             "/number-portability/v1";
 
-        public static string SseUrl = ApiUrl + "/dossiers/events";
+        public static readonly string SseUrl = ApiUrl + "/dossiers/events";
 
         public const string Consumer = "loadtest-loada";
         public const string CrdbReceiver = "CRDB";

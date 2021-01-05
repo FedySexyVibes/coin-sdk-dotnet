@@ -23,21 +23,25 @@ namespace Coin.Sdk.BS.Tests
             _listener = new TestListener();
         }
 
-        [Test]
+        [Test, Timeout(5000)]
         public void ConsumeUnconfirmed()
         {
+            var cde = new CountdownEvent(5);
+            _listener.SideEffect = messageId => cde.Signal();
             _messageConsumer.StartConsumingUnconfirmed(_listener, e => Assert.Fail("Disconnected"));
-            Thread.Sleep(5000);
+            cde.Wait();
             _messageConsumer.StopConsuming();
         }
 
-        [Test]
+        [Test, Timeout(5000)]
         public void ConsumeAllFiltered()
         {
+            var cde = new CountdownEvent(3);
+            _listener.SideEffect = messageId => cde.Signal();
             _messageConsumer.StartConsumingAll(_listener, new TestOffsetPersister(), 3,
-                e => Assert.Fail("Disconnected"), null, MessageType.ContractTerminationRequestV4,
-                MessageType.ContractTerminationPerformedV4);
-            Thread.Sleep(5000);
+                e => Assert.Fail("Disconnected"), null,
+                MessageType.ContractTerminationRequestV4, MessageType.ContractTerminationPerformedV4);
+            cde.Wait();
             _messageConsumer.StopConsuming();
         }
     }
