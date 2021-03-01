@@ -70,7 +70,7 @@ namespace Coin.Sdk.Common.Client
 
             var requestLine = $"{request.Method} {request.RequestUri.LocalPath} HTTP/1.1";
             request.Headers.Add("authorization", CalculateHttpRequestHmac(_signer, _consumerName, hmacHeaders, requestLine));
-            request.Headers.Add("User-Agent", $"coin-sdk-dotnet-{SdkInfo.UserAgent}");
+            request.Headers.Add("User-Agent", SdkInfo.UserAgent);
 
             var jwt = CreateJwt(_privateKey, _consumerName, _validPeriodInSeconds);
             CookieContainer.Add(request.RequestUri, new Cookie("jwt", jwt));
