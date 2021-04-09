@@ -12,8 +12,8 @@ namespace Coin.Sdk.NP.Sample
 {
     public class Tests
     {
-        private NumberPortabilityService _numberPortabilityService;
-        private NumberPortabilityMessageConsumer _messageConsumer;
+        private NumberPortabilityService _numberPortabilityService = null!;
+        private NumberPortabilityMessageConsumer _messageConsumer = null!;
 
         private const string Operator = "<YOUR OPERATOR>";
         private readonly string _timestamp = DateTime.Now.ToString("yyyyMMddhhmmss");
@@ -69,7 +69,7 @@ namespace Coin.Sdk.NP.Sample
                             //RecipientServiceProvider = "",
                             Repeats = new List<PortingRequestRepeats>
                             {
-                                new PortingRequestRepeats
+                                new()
                                 {
                                     Seq = new PortingRequestSeq
                                     {
@@ -107,7 +107,7 @@ namespace Coin.Sdk.NP.Sample
             };
             var response = _numberPortabilityService.SendMessageAsync(message).Result;
             Console.WriteLine($"Transaction id: {response.TransactionId}");
-            if (!(response is ErrorResponse error)) return;
+            if (response is not ErrorResponse error) return;
             foreach (var content in error.Errors)
             {
                 Console.WriteLine($"Error {content.Code}: {content.Message}");
@@ -118,7 +118,7 @@ namespace Coin.Sdk.NP.Sample
         [Test]
         public void ConsumeMessages()
         {
-            _messageConsumer.StartConsumingUnconfirmed(new Listener(), e => Assert.Fail("Disconnected"));
+            _messageConsumer.StartConsumingUnconfirmed(new Listener(), _ => Assert.Fail("Disconnected"));
             Thread.Sleep(1000);
         }
         

@@ -12,8 +12,8 @@ namespace Coin.Sdk.BS.Sample
 {
     public class Tests
     {
-        private BundleSwitchingService _contractTerminationService;
-        private BundleSwitchingMessageConsumer _messageConsumer;
+        private BundleSwitchingService _contractTerminationService = null!;
+        private BundleSwitchingMessageConsumer _messageConsumer = null!;
 
         private const string Sender = "<YOUR PROVIDER>";
         private const string Receiver = "<DONOR PROVIDER>";
@@ -75,7 +75,7 @@ namespace Coin.Sdk.BS.Sample
                             },
                             NumberSeries = new List<NumberSeries>
                             {
-                                new NumberSeries
+                                new()
                                 {
                                     Start = PhoneNumber,
                                     //End = PhoneNumber
@@ -96,7 +96,7 @@ namespace Coin.Sdk.BS.Sample
             };
             var response = _contractTerminationService.SendMessageAsync(message).Result;
             Console.WriteLine($"Transaction id: {response.TransactionId}");
-            if (!(response is ErrorResponse error)) return;
+            if (response is not ErrorResponse error) return;
             foreach (var content in error.Errors)
             {
                 Console.WriteLine($"Error {content.Code}: {content.Message}");

@@ -9,7 +9,7 @@ namespace Coin.Sdk.BS.Tests
 {
     public class BundleSwitchingServiceTests
     {
-        private BundleSwitchingService _bundleSwitchingService;
+        private BundleSwitchingService _bundleSwitchingService = null!;
 
         [SetUp]
         public void Setup()

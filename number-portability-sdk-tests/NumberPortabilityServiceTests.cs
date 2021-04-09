@@ -9,7 +9,7 @@ namespace Coin.Sdk.NP.Tests
 {
     public class NumberPortabilityServiceTests
     {
-        private NumberPortabilityService _numberPortabilityService;
+        private NumberPortabilityService _numberPortabilityService = null!;
 
         [SetUp]
         public void Setup()
@@ -43,7 +43,7 @@ namespace Coin.Sdk.NP.Tests
                             RecipientNetworkOperator = Operator,
                             Repeats = new List<PortingRequestRepeats>
                             {
-                                new PortingRequestRepeats
+                                new()
                                 {
                                     Seq = new PortingRequestSeq
                                     {

@@ -1,3 +1,4 @@
 #!/bin/bash
 
-docker-compose --project-name coin-sdk-dotnet-${CI_JOB_ID} --file /tmp/docker-compose.yaml --project-directory ${PWD} run --no-deps coin-sdk
+docker-compose --project-name coin-sdk-dotnet-${CI_JOB_ID} --file docker-compose.yaml --file docker-compose-test.yaml --project-directory ${PWD} up --no-deps --no-start --build coin-sdk
+docker-compose --project-name coin-sdk-dotnet-${CI_JOB_ID} --file docker-compose.yaml --file docker-compose-test.yaml --project-directory ${PWD} run --no-deps coin-sdk

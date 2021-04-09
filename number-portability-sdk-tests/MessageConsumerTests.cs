@@ -10,9 +10,9 @@ namespace Coin.Sdk.NP.Tests
 {
     public class MessageConsumerTests
     {
-        private NumberPortabilityMessageConsumer _messageConsumer;
-        private StopStreamService _stopStreamService;
-        private TestListener _listener;
+        private NumberPortabilityMessageConsumer _messageConsumer = null!;
+        private StopStreamService _stopStreamService = null!;
+        private TestListener _listener = null!;
 
         [SetUp]
         public void Setup()
@@ -29,8 +29,8 @@ namespace Coin.Sdk.NP.Tests
         public void ConsumeUnconfirmed()
         {
             var cde = new CountdownEvent(5);
-            _listener.SideEffect = messageId => cde.Signal();
-            _messageConsumer.StartConsumingUnconfirmed(_listener, e => Assert.Fail("Disconnected"));
+            _listener.SideEffect = _ => cde.Signal();
+            _messageConsumer.StartConsumingUnconfirmed(_listener, _ => Assert.Fail("Disconnected"));
             cde.Wait();
             _messageConsumer.StopConsuming();
         }
@@ -39,8 +39,8 @@ namespace Coin.Sdk.NP.Tests
         public void ConsumeUnconfirmedWithInterrupt()
         {
             var cde = new CountdownEvent(5);
-            _listener.SideEffect = messageId => cde.Signal();
-            _messageConsumer.StartConsumingUnconfirmed(_listener, e => Assert.Fail("Disconnected"));
+            _listener.SideEffect = _ => cde.Signal();
+            _messageConsumer.StartConsumingUnconfirmed(_listener, _ => Assert.Fail("Disconnected"));
             cde.Wait();
             _stopStreamService.StopStream();
             cde.Reset();
@@ -52,7 +52,7 @@ namespace Coin.Sdk.NP.Tests
         public void ConsumeAllFiltered()
         {
             var cde = new CountdownEvent(3);
-            _listener.SideEffect = messageId => cde.Signal();
+            _listener.SideEffect = _ => cde.Signal();
             _messageConsumer.StartConsumingAll(_listener, new TestOffsetPersister(), 3,
                 e => Assert.Fail("Disconnected"), MessageType.PortingRequestV1, MessageType.PortingPerformedV1);
             cde.Wait();
@@ -63,14 +63,14 @@ namespace Coin.Sdk.NP.Tests
         public void StopAndResumeConsuming()
         {
             var cde = new CountdownEvent(5);
-            _listener.SideEffect = messageId => cde.Signal();
-            _messageConsumer.StartConsumingUnconfirmed(_listener, e => Assert.Fail("Disconnected"));
+            _listener.SideEffect = _ => cde.Signal();
+            _messageConsumer.StartConsumingUnconfirmed(_listener, _ => Assert.Fail("Disconnected"));
             cde.Wait();
             _messageConsumer.StopConsuming();
             cde.Reset();
             Thread.Sleep(3000);
             Assert.AreEqual(cde.CurrentCount, cde.InitialCount);
-            _messageConsumer.StartConsumingUnconfirmed(_listener, e => Assert.Fail("Disconnected"));
+            _messageConsumer.StartConsumingUnconfirmed(_listener, _ => Assert.Fail("Disconnected"));
             cde.Wait();
             _messageConsumer.StopConsuming();
         }
@@ -80,10 +80,10 @@ namespace Coin.Sdk.NP.Tests
         {
             var firstListener = new TestListener();
             var cde = new CountdownEvent(5);
-            _listener.SideEffect = messageId => cde.Signal();
-            _messageConsumer.StartConsumingUnconfirmed(firstListener, e => Assert.Fail("Disconnected"));
-            _messageConsumer.StartConsumingUnconfirmed(_listener, e => Assert.Fail("Disconnected"));
-            firstListener.SideEffect = e => Assert.Fail("First event stream has not been closed");
+            _listener.SideEffect = _ => cde.Signal();
+            _messageConsumer.StartConsumingUnconfirmed(firstListener, _ => Assert.Fail("Disconnected"));
+            _messageConsumer.StartConsumingUnconfirmed(_listener, _ => Assert.Fail("Disconnected"));
+            firstListener.SideEffect = _ => Assert.Fail("First event stream has not been closed");
             cde.Wait();
             _messageConsumer.StopConsuming();
             

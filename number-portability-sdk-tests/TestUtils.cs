@@ -34,7 +34,6 @@ namespace Coin.Sdk.NP.Tests
 
         public const string Consumer = "loadtest-loada";
         public const string CrdbReceiver = "CRDB";
-        public const string AllOperatorsReceiver = "ALLO";
         public const string Operator = "LOADA";
         public const string PhoneNumber = "0612345678";
         public static readonly string Timestamp = DateTime.Now.ToString("yyyyMMddhhmmss");
@@ -45,14 +44,13 @@ namespace Coin.Sdk.NP.Tests
         private readonly Uri _apiUrl;
 
         public StopStreamService(string apiUrl, string consumerName, string privateKeyFile,
-            string encryptedHmacSecretFile, string privateKeyFilePassword = null)
+            string encryptedHmacSecretFile, string? privateKeyFilePassword = null)
             : this(new Uri(apiUrl), consumerName, ReadPrivateKeyFile(privateKeyFile, privateKeyFilePassword),
                 encryptedHmacSecretFile)
         {
         }
 
-        public StopStreamService(Uri apiUrl, string consumerName, RSA privateKey, string encryptedHmacSecretFile,
-            string privateKeyFilePassword = null)
+        public StopStreamService(Uri apiUrl, string consumerName, RSA privateKey, string encryptedHmacSecretFile)
             : this(apiUrl, consumerName, HmacFromEncryptedBase64EncodedSecretFile(encryptedHmacSecretFile, privateKey),
                 privateKey)
         {

@@ -10,8 +10,8 @@ namespace Coin.Sdk.BS.Tests
 {
     public class MessageConsumerTests
     {
-        private BundleSwitchingMessageConsumer _messageConsumer;
-        private TestListener _listener;
+        private BundleSwitchingMessageConsumer _messageConsumer = null!;
+        private TestListener _listener = null!;
 
         [SetUp]
         public void Setup()
@@ -27,8 +27,8 @@ namespace Coin.Sdk.BS.Tests
         public void ConsumeUnconfirmed()
         {
             var cde = new CountdownEvent(5);
-            _listener.SideEffect = messageId => cde.Signal();
-            _messageConsumer.StartConsumingUnconfirmed(_listener, e => Assert.Fail("Disconnected"));
+            _listener.SideEffect = _ => cde.Signal();
+            _messageConsumer.StartConsumingUnconfirmed(_listener, _ => Assert.Fail("Disconnected"));
             cde.Wait();
             _messageConsumer.StopConsuming();
         }
@@ -37,9 +37,9 @@ namespace Coin.Sdk.BS.Tests
         public void ConsumeAllFiltered()
         {
             var cde = new CountdownEvent(3);
-            _listener.SideEffect = messageId => cde.Signal();
+            _listener.SideEffect = _ => cde.Signal();
             _messageConsumer.StartConsumingAll(_listener, new TestOffsetPersister(), 3,
-                e => Assert.Fail("Disconnected"), null,
+                _ => Assert.Fail("Disconnected"), null,
                 MessageType.ContractTerminationRequestV4, MessageType.ContractTerminationPerformedV4);
             cde.Wait();
             _messageConsumer.StopConsuming();

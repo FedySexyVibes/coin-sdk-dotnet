@@ -13,4 +13,3 @@ tag-all-major-release:
 
 publish-nuget:
 	docker build -t publish-dotnet-sdk -f publish-Dockerfile . && docker run --rm -v ~/.aws:/root/.aws:ro -e AWS_CONTAINER_CREDENTIALS_RELATIVE_URI=$$AWS_CONTAINER_CREDENTIALS_RELATIVE_URI publish-dotnet-sdk
-	
