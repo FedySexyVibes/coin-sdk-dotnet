@@ -3,7 +3,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Coin.Sdk.NP.Messages.V1
+namespace Coin.Sdk.NP.Messages.V3
 {
     public static class Utils
     {
@@ -51,26 +51,26 @@ namespace Coin.Sdk.NP.Messages.V1
             var message = JObject.Parse(json).First.First;
             switch (type)
             {
-                case "activationsn-v1": return message.ToObject<ActivationServiceNumberMessage>();
-                case "cancel-v1": return message.ToObject<CancelMessage>();
-                case "deactivation-v1": return message.ToObject<DeactivationMessage>();
-                case "deactivationsn-v1": return message.ToObject<DeactivationServiceNumberMessage>();
-                case "enumactivationnumber-v1": return message.ToObject<EnumActivationNumberMessage>();
-                case "enumactivationoperator-v1": return message.ToObject<EnumActivationOperatorMessage>();
-                case "enumactivationrange-v1": return message.ToObject<EnumActivationRangeMessage>();
-                case "enumdeactivationnumber-v1": return message.ToObject<EnumDeactivationNumberMessage>();
-                case "enumdeactivationoperator-v1": return message.ToObject<EnumDeactivationOperatorMessage>();
-                case "enumdeactivationrange-v1": return message.ToObject<EnumDeactivationRangeMessage>();
-                case "enumprofileactivation-v1": return message.ToObject<EnumProfileActivationMessage>();
-                case "enumprofiledeactivation-v1": return message.ToObject<EnumProfileDeactivationMessage>();
-                case "errorfound-v1": return message.ToObject<ErrorFoundMessage>();
-                case "portingperformed-v1": return message.ToObject<PortingPerformedMessage>();
-                case "portingrequest-v1": return message.ToObject<PortingRequestMessage>();
-                case "portingrequestanswer-v1": return message.ToObject<PortingRequestAnswerMessage>();
-                case "pradelayed-v1": return message.ToObject<PortingRequestAnswerDelayedMessage>();
-                case "rangeactivation-v1": return message.ToObject<RangeActivationMessage>();
-                case "rangedeactivation-v1": return message.ToObject<RangeDeactivationMessage>();
-                case "tariffchangesn-v1": return message.ToObject<TariffChangeServiceNumberMessage>();
+                case "activationsn-v3": return message.ToObject<ActivationServiceNumberMessage>();
+                case "cancel-v3": return message.ToObject<CancelMessage>();
+                case "deactivation-v3": return message.ToObject<DeactivationMessage>();
+                case "deactivationsn-v3": return message.ToObject<DeactivationServiceNumberMessage>();
+                case "enumactivationnumber-v3": return message.ToObject<EnumActivationNumberMessage>();
+                case "enumactivationoperator-v3": return message.ToObject<EnumActivationOperatorMessage>();
+                case "enumactivationrange-v3": return message.ToObject<EnumActivationRangeMessage>();
+                case "enumdeactivationnumber-v3": return message.ToObject<EnumDeactivationNumberMessage>();
+                case "enumdeactivationoperator-v3": return message.ToObject<EnumDeactivationOperatorMessage>();
+                case "enumdeactivationrange-v3": return message.ToObject<EnumDeactivationRangeMessage>();
+                case "enumprofileactivation-v3": return message.ToObject<EnumProfileActivationMessage>();
+                case "enumprofiledeactivation-v3": return message.ToObject<EnumProfileDeactivationMessage>();
+                case "errorfound-v3": return message.ToObject<ErrorFoundMessage>();
+                case "portingperformed-v3": return message.ToObject<PortingPerformedMessage>();
+                case "portingrequest-v3": return message.ToObject<PortingRequestMessage>();
+                case "portingrequestanswer-v3": return message.ToObject<PortingRequestAnswerMessage>();
+                case "pradelayed-v3": return message.ToObject<PortingRequestAnswerDelayedMessage>();
+                case "rangeactivation-v3": return message.ToObject<RangeActivationMessage>();
+                case "rangedeactivation-v3": return message.ToObject<RangeDeactivationMessage>();
+                case "tariffchangesn-v3": return message.ToObject<TariffChangeServiceNumberMessage>();
                 default: throw new JsonException($"Unknown message type {type}");
             }
         }

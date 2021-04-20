@@ -1,7 +1,7 @@
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Coin.Sdk.NP.Messages.V1;
+using Coin.Sdk.NP.Messages.V3;
 
 namespace Coin.Sdk.NP.Service
 {

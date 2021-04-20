@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Coin.Sdk.Common.Client;
-using Coin.Sdk.NP.Messages.V1;
+using Coin.Sdk.NP.Messages.V3;
 using EvtSource;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
@@ -88,64 +88,64 @@ namespace Coin.Sdk.NP.Service.Impl
             {
                 switch (eventArgs.Event)
                 {
-                    case "activationsn-v1":
+                    case "activationsn-v3":
                         listener.OnActivationServiceNumber(eventArgs.Id, GetNpMessage<ActivationServiceNumberMessage>(eventArgs));
                         return true;
-                    case "cancel-v1":
+                    case "cancel-v3":
                         listener.OnCancel(eventArgs.Id, GetNpMessage<CancelMessage>(eventArgs));
                         return true;
-                    case "deactivation-v1":
+                    case "deactivation-v3":
                         listener.OnDeactivation(eventArgs.Id, GetNpMessage<DeactivationMessage>(eventArgs));
                         return true;
-                    case "deactivationsn-v1":
+                    case "deactivationsn-v3":
                         listener.OnDeactivationServiceNumber(eventArgs.Id, GetNpMessage<DeactivationServiceNumberMessage>(eventArgs));
                         return true;
-                    case "enumactivationnumber-v1":
+                    case "enumactivationnumber-v3":
                         listener.OnEnumActivationNumber(eventArgs.Id, GetNpMessage<EnumActivationNumberMessage>(eventArgs));
                         return true;
-                    case "enumactivationoperator-v1":
+                    case "enumactivationoperator-v3":
                         listener.OnEnumActivationOperator(eventArgs.Id, GetNpMessage<EnumActivationOperatorMessage>(eventArgs));
                         return true;
-                    case "enumactivationrange-v1":
+                    case "enumactivationrange-v3":
                         listener.OnEnumActivationRange(eventArgs.Id, GetNpMessage<EnumActivationRangeMessage>(eventArgs));
                         return true;
-                    case "enumdeactivationnumber-v1":
+                    case "enumdeactivationnumber-v3":
                         listener.OnEnumDeactivationNumber(eventArgs.Id, GetNpMessage<EnumDeactivationNumberMessage>(eventArgs));
                         return true;
-                    case "enumdeactivationoperator-v1":
+                    case "enumdeactivationoperator-v3":
                         listener.OnEnumDeactivationOperator(eventArgs.Id, GetNpMessage<EnumDeactivationOperatorMessage>(eventArgs));
                         return true;
-                    case "enumdeactivationrange-v1":
+                    case "enumdeactivationrange-v3":
                         listener.OnEnumDeactivationRange(eventArgs.Id, GetNpMessage<EnumDeactivationRangeMessage>(eventArgs));
                         return true;
-                    case "enumprofileactivation-v1":
+                    case "enumprofileactivation-v3":
                         listener.OnEnumProfileActivation(eventArgs.Id, GetNpMessage<EnumProfileActivationMessage>(eventArgs));
                         return true;
-                    case "enumprofiledeactivation-v1":
+                    case "enumprofiledeactivation-v3":
                         listener.OnEnumProfileDeactivation(eventArgs.Id, GetNpMessage<EnumProfileDeactivationMessage>(eventArgs));
                         return true;
-                    case "errorfound-v1":
+                    case "errorfound-v3":
                         listener.OnErrorFound(eventArgs.Id, GetNpMessage<ErrorFoundMessage>(eventArgs));
                         return true;
-                    case "portingperformed-v1":
+                    case "portingperformed-v3":
                         listener.OnPortingPerformed(eventArgs.Id, GetNpMessage<PortingPerformedMessage>(eventArgs));
                         return true;
-                    case "portingrequest-v1":
+                    case "portingrequest-v3":
                         listener.OnPortingRequest(eventArgs.Id, GetNpMessage<PortingRequestMessage>(eventArgs));
                         return true;
-                    case "portingrequestanswer-v1":
+                    case "portingrequestanswer-v3":
                         listener.OnPortingRequestAnswer(eventArgs.Id, GetNpMessage<PortingRequestAnswerMessage>(eventArgs));
                         return true;
-                    case "pradelayed-v1":
+                    case "pradelayed-v3":
                         listener.OnPortingRequestAnswerDelayed(eventArgs.Id, GetNpMessage<PortingRequestAnswerDelayedMessage>(eventArgs));
                         return true;
-                    case "rangeactivation-v1":
+                    case "rangeactivation-v3":
                         listener.OnRangeActivation(eventArgs.Id, GetNpMessage<RangeActivationMessage>(eventArgs));
                         return true;
-                    case "rangedeactivation-v1":
+                    case "rangedeactivation-v3":
                         listener.OnRangeDeactivation(eventArgs.Id, GetNpMessage<RangeDeactivationMessage>(eventArgs));
                         return true;
-                    case "tariffchangesn-v1":
+                    case "tariffchangesn-v3":
                         listener.OnTariffChangeServiceNumber(eventArgs.Id, GetNpMessage<TariffChangeServiceNumberMessage>(eventArgs));
                         return true;
                     default:

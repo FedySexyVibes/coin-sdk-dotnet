@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 
-namespace Coin.Sdk.NP.Messages.V1
+namespace Coin.Sdk.NP.Messages.V3
 {
-    public class EnumDeactivationOperatorMessage : INpMessage<EnumDeactivationOperator>
+    public class EnumDeactivationNumberMessage : INpMessage<EnumDeactivationNumber>
     {
         [DataMember(Name = "header", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "header")]
@@ -12,18 +12,18 @@ namespace Coin.Sdk.NP.Messages.V1
 
         [DataMember(Name = "body", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "body")]
-        [JsonConverter(typeof(ConcreteConverter<EnumDeactivationOperatorBody>))]
-        public INpMessageBody<EnumDeactivationOperator> Body { get; set; }
+        [JsonConverter(typeof(ConcreteConverter<EnumDeactivationNumberBody>))]
+        public INpMessageBody<EnumDeactivationNumber> Body { get; set; }
     }
 
-    public class EnumDeactivationOperatorBody : INpMessageBody<EnumDeactivationOperator>
+    public class EnumDeactivationNumberBody : INpMessageBody<EnumDeactivationNumber>
     {
-        [DataMember(Name = "enumdeactivationoperator", EmitDefaultValue = false)]
-        [JsonProperty(PropertyName = "enumdeactivationoperator")]
-        public EnumDeactivationOperator Content { get; set; }
+        [DataMember(Name = "enumdeactivationnumber", EmitDefaultValue = false)]
+        [JsonProperty(PropertyName = "enumdeactivationnumber")]
+        public EnumDeactivationNumber Content { get; set; }
     }
 
-    public class EnumDeactivationOperator : INpMessageContent
+    public class EnumDeactivationNumber : INpMessageContent
     {
         [DataMember(Name = "dossierid", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "dossierid")]

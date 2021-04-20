@@ -2,10 +2,9 @@ using System;
 using System.Diagnostics;
 using System.Net.Http;
 using System.Security.Cryptography;
-using System.Threading.Tasks;
 using Coin.Sdk.Common;
 using Coin.Sdk.Common.Client;
-using Coin.Sdk.NP.Messages.V1;
+using Coin.Sdk.NP.Messages.V3;
 using Coin.Sdk.NP.Service;
 using static Coin.Sdk.Common.Crypto.CtpApiClientUtil;
 
@@ -28,7 +27,7 @@ namespace Coin.Sdk.NP.Tests
 
         public static readonly string ApiUrl =
             "http://" + (Environment.GetEnvironmentVariable("STUB_HOST_AND_PORT") ?? "localhost:8000") +
-            "/number-portability/v1";
+            "/number-portability/v3";
 
         public static readonly string SseUrl = ApiUrl + "/dossiers/events";
 

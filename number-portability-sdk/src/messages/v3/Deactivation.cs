@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 
-namespace Coin.Sdk.NP.Messages.V1
+namespace Coin.Sdk.NP.Messages.V3
 {
     public class DeactivationMessage : INpMessage<Deactivation>
     {

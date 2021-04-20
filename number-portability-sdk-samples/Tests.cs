@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using Coin.Sdk.Common.Client;
-using Coin.Sdk.NP.Messages.V1;
+using Coin.Sdk.NP.Messages.V3;
 using Coin.Sdk.NP.Service.Impl;
 using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
@@ -18,13 +18,13 @@ namespace Coin.Sdk.NP.Sample
         private const string Operator = "<YOUR OPERATOR>";
         private readonly string _timestamp = DateTime.Now.ToString("yyyyMMddhhmmss");
         private const string PhoneNumber = "0612345678";
-        
+
         [SetUp]
         public void Setup()
         {
             var logger = NullLogger.Instance;
-            
-            const string apiUrl = "https://test-api.coin.nl/number-portability/v1";
+
+            const string apiUrl = "https://test-api.coin.nl/number-portability/v3";
             const string sseUrl = apiUrl + "/dossiers/events"; 
             const string consumer = "<YOUR CONSUMER>";
             var privateKeyFile = GetPath("private-key.pem");
@@ -100,6 +100,7 @@ namespace Coin.Sdk.NP.Sample
                                 //HouseNr = "",
                                 //HouseNrExt = ""
                             },
+                            Contract = "CONTINUATION",
                             Note = ""*/
                         }
                     }

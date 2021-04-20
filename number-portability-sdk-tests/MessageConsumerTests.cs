@@ -1,6 +1,6 @@
 ﻿using System.Threading;
 using Coin.Sdk.Common.Client;
-using Coin.Sdk.NP.Messages.V1;
+using Coin.Sdk.NP.Messages.V3;
 using Coin.Sdk.NP.Service.Impl;
 using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
@@ -54,7 +54,7 @@ namespace Coin.Sdk.NP.Tests
             var cde = new CountdownEvent(3);
             _listener.SideEffect = _ => cde.Signal();
             _messageConsumer.StartConsumingAll(_listener, new TestOffsetPersister(), 3,
-                e => Assert.Fail("Disconnected"), MessageType.PortingRequestV1, MessageType.PortingPerformedV1);
+                e => Assert.Fail("Disconnected"), MessageType.PortingRequestV3, MessageType.PortingPerformedV3);
             cde.Wait();
             _messageConsumer.StopConsuming();
         }
