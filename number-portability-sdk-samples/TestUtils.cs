@@ -6,8 +6,7 @@ namespace Coin.Sdk.NP.Sample
 
         public static string GenerateDossierId(string operatorCode)
         {
-            var randomNumber5Digits = (Math.Round(new Random().Next() * 10000.0) + 9999).ToString();
-            return operatorCode + "-" + randomNumber5Digits;
+            return operatorCode + "-" + new Random().Next(1000000, 9999999);
         }
 
         public static string CrdbReceiver = "CRDB";
