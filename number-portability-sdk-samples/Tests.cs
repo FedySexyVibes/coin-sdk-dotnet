@@ -16,8 +16,9 @@ namespace Coin.Sdk.NP.Sample
         private NumberPortabilityMessageConsumer _messageConsumer = null!;
 
         private const string Operator = "<YOUR OPERATOR>";
+        private const string ReceivingOperator = "<RECEIVING OPERATOR>";
         private readonly string _timestamp = DateTime.Now.ToString("yyyyMMddhhmmss");
-        private const string PhoneNumber = "0612345678";
+        private const string PhoneNumber = "0303800007";
 
         [SetUp]
         public void Setup()
@@ -91,17 +92,275 @@ namespace Coin.Sdk.NP.Sample
                                     }
                                 }
                             }
-                            /*CustomerInfo = new CustomerInfo
+                        }
+                    }
+                }
+            };
+            var response = _numberPortabilityService.SendMessageAsync(message).Result;
+            Console.WriteLine($"Transaction id: {response.TransactionId}");
+            if (response is not ErrorResponse error) return;
+            foreach (var content in error.Errors)
+            {
+                Console.WriteLine($"Error {content.Code}: {content.Message}");
+            }
+            Assert.Fail();
+        }
+
+        [Test]
+        public void SendPortingRequestAnswer()
+        {
+            var dossierId = "<dossier-id>"; // dossier id of an existing porting request should be used here
+            Console.WriteLine($"Sending porting request answer with dossier id {dossierId}");
+
+            var message = new MessageEnvelope<PortingRequestAnswer>
+            {
+                Message = new PortingRequestAnswerMessage()
+                {
+                    Header = new Header
+                    {
+                        Sender = new Sender
+                        {
+                            NetworkOperator = Operator,
+                            ServiceProvider = Operator
+                        },
+                        Receiver = new Receiver
+                        {
+                            NetworkOperator = ReceivingOperator
+                            //ServiceProvider = ""
+                        },
+                        Timestamp = _timestamp
+                    },
+                    Body = new PortingRequestAnswerBody
+                    {
+                        Content = new PortingRequestAnswer
+                        {
+                            DossierId = dossierId,
+                            Blocking = "N",
+                            Repeats = new List<PortingRequestAnswerRepeats>
                             {
-                                //CustomerId = "",
-                                //Companyname = "",
-                                //Lastname = "",
-                                //Postcode = "",
-                                //HouseNr = "",
-                                //HouseNrExt = ""
-                            },
-                            Contract = "CONTINUATION",
-                            Note = ""*/
+                                new()
+                                {
+                                    Seq = new PortingRequestAnswerSeq
+                                    {
+                                        DonorNetworkOperator = Operator,
+                                        DonorServiceProvider = Operator,
+                                        FirstPossibleDate = DateTime.Now.ToString("yyyyMMddhhmmss"),
+                                        NumberSeries = new NumberSeries
+                                        {
+                                            Start = PhoneNumber,
+                                            End = PhoneNumber
+                                        },
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+            var response = _numberPortabilityService.SendMessageAsync(message).Result;
+            Console.WriteLine($"Transaction id: {response.TransactionId}");
+            if (response is not ErrorResponse error) return;
+            foreach (var content in error.Errors)
+            {
+                Console.WriteLine($"Error {content.Code}: {content.Message}");
+            }
+            Assert.Fail();
+        }
+
+        [Test]
+        public void SendPortingRequestAnswerDelayed()
+        {
+            var dossierId = "<dossier-id>"; // dossier id of an existing porting request should be used here
+            Console.WriteLine($"Sending porting request answer with dossier id {dossierId}");
+
+            var message = new MessageEnvelope<PortingRequestAnswerDelayed>
+            {
+                Message = new PortingRequestAnswerDelayedMessage()
+                {
+                    Header = new Header
+                    {
+                        Sender = new Sender
+                        {
+                            NetworkOperator = Operator,
+                            ServiceProvider = Operator
+                        },
+                        Receiver = new Receiver
+                        {
+                            NetworkOperator = ReceivingOperator
+                            //ServiceProvider = ""
+                        },
+                        Timestamp = _timestamp
+                    },
+                    Body = new PortingRequestAnswerDelayedBody
+                    {
+                        Content = new PortingRequestAnswerDelayed
+                        {
+                            DossierId = dossierId,
+                            DonorNetworkOperator = Operator,
+                            ReasonCode = "99"
+                        }
+                    }
+                }
+            };
+            var response = _numberPortabilityService.SendMessageAsync(message).Result;
+            Console.WriteLine($"Transaction id: {response.TransactionId}");
+            if (response is not ErrorResponse error) return;
+            foreach (var content in error.Errors)
+            {
+                Console.WriteLine($"Error {content.Code}: {content.Message}");
+            }
+            Assert.Fail();
+        }
+
+        [Test]
+        public void SendPortingPerformed()
+        {
+            var dossierId = "<dossier-id>"; // dossier id of an existing porting request should be used here
+            Console.WriteLine($"Sending porting request answer with dossier id {dossierId}");
+
+            var message = new MessageEnvelope<PortingPerformed>
+            {
+                Message = new PortingPerformedMessage()
+                {
+                    Header = new Header
+                    {
+                        Sender = new Sender
+                        {
+                            NetworkOperator = Operator,
+                            ServiceProvider = Operator
+                        },
+                        Receiver = new Receiver
+                        {
+                            NetworkOperator = ReceivingOperator
+                            //ServiceProvider = ""
+                        },
+                        Timestamp = _timestamp
+                    },
+                    Body = new PortingPerformedBody
+                    {
+                        Content = new PortingPerformed
+                        {
+                            DossierId = dossierId,
+                            DonorNetworkOperator = Operator,
+                            RecipientNetworkOperator = Operator,
+                            
+                            Repeats = new List<PortingPerformedRepeats>
+                            {
+                                new()
+                                {
+                                    Seq = new PortingPerformedSeq
+                                    {
+                                        NumberSeries = new NumberSeries
+                                        {
+                                            Start = PhoneNumber,
+                                            End = PhoneNumber
+                                        },
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+            var response = _numberPortabilityService.SendMessageAsync(message).Result;
+            Console.WriteLine($"Transaction id: {response.TransactionId}");
+            if (response is not ErrorResponse error) return;
+            foreach (var content in error.Errors)
+            {
+                Console.WriteLine($"Error {content.Code}: {content.Message}");
+            }
+            Assert.Fail();
+        }
+
+        [Test]
+        public void SendCancel()
+        {
+            var dossierId = "<dossier-id>"; // dossier id of an existing porting request should be used here
+            Console.WriteLine($"Sending porting request answer with dossier id {dossierId}");
+
+            var message = new MessageEnvelope<Cancel>
+            {
+                Message = new CancelMessage()
+                {
+                    Header = new Header
+                    {
+                        Sender = new Sender
+                        {
+                            NetworkOperator = Operator,
+                            ServiceProvider = Operator
+                        },
+                        Receiver = new Receiver
+                        {
+                            NetworkOperator = ReceivingOperator
+                            //ServiceProvider = ""
+                        },
+                        Timestamp = _timestamp
+                    },
+                    Body = new CancelBody
+                    {
+                        Content = new Cancel
+                        {
+                            DossierId = dossierId,
+                            Note = "some additional information"
+                        }
+                    }
+                }
+            };
+            var response = _numberPortabilityService.SendMessageAsync(message).Result;
+            Console.WriteLine($"Transaction id: {response.TransactionId}");
+            if (response is not ErrorResponse error) return;
+            foreach (var content in error.Errors)
+            {
+                Console.WriteLine($"Error {content.Code}: {content.Message}");
+            }
+            Assert.Fail();
+        }
+
+        [Test]
+        public void SendDeactivation()
+        {
+            var dossierId = "<dossier-id>"; // dossier id of an existing porting request should be used here
+            Console.WriteLine($"Sending porting request answer with dossier id {dossierId}");
+
+            var message = new MessageEnvelope<Deactivation>
+            {
+                Message = new DeactivationMessage()
+                {
+                    Header = new Header
+                    {
+                        Sender = new Sender
+                        {
+                            NetworkOperator = Operator,
+                            ServiceProvider = Operator
+                        },
+                        Receiver = new Receiver
+                        {
+                            NetworkOperator = AllOperators
+                            //ServiceProvider = ""
+                        },
+                        Timestamp = _timestamp
+                    },
+                    Body = new DeactivationBody
+                    {
+                        Content = new Deactivation
+                        {
+                            DossierId = dossierId,
+                            OriginalNetworkOperator = ReceivingOperator,
+                            CurrentNetworkOperator = Operator,
+                            Repeats = new List<DeactivationRepeats>
+                            {
+                                new()
+                                {
+                                    Seq = new DeactivationSeq
+                                    {
+                                        NumberSeries = new NumberSeries
+                                        {
+                                            Start = PhoneNumber,
+                                            End = PhoneNumber
+                                        },
+                                    }
+                                }
+                            }
                         }
                     }
                 }

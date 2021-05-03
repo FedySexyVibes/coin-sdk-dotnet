@@ -10,6 +10,7 @@ namespace Coin.Sdk.NP.Sample
         }
 
         public static string CrdbReceiver = "CRDB";
+        public static string AllOperators = "ALLO";
 
         public static string GetPath(string relativePath) => $"../../../{relativePath}";
 
