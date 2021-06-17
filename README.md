@@ -1,5 +1,14 @@
 # COIN REST APIs
 
+[![NuGet version](https://badge.fury.io/nu/Vereniging-COIN.Sdk.NP.svg)](https://badge.fury.io/nu/Vereniging-COIN.Sdk.NP)
+[![CI Status](https://gitlab.com/verenigingcoin-public/coin-sdk-nodejs/badges/master/pipeline.svg)](https://gitlab.com/verenigingcoin-public/coin-sdk-nodejs/-/pipelines/latest)
+
+| Api                 | SDK Version | Api Version    | Changelog |
+|---------------------|-------------|----------------|----------------
+| [number-portability](https://coin.nl/en/services/nummerportabiliteit) | 1.3.0       | [v3](https://api.coin.nl/docs/number-portability/v3)             | [click](CHANGELOG.md#version-1.3.0)
+|                    | 0.0.1 - 1.2.1   | [v1](https://api.coin.nl/docs/number-portability/v1)             | -
+| [bundle-switching](https://coin.nl/en/services/overstappen)   | 0.0.1 - 1.3.0         | [v4](https://api.coin.nl/docs/bundle-switching/v4)            | -
+
 ## Introduction
 
 The COIN RESTful APIs serve as modern replacements for the outdated MQ and SOAP interfaces.

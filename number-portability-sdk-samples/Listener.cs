@@ -1,5 +1,5 @@
 using System;
-using Coin.Sdk.NP.Messages.V1;
+using Coin.Sdk.NP.Messages.V3;
 using Coin.Sdk.NP.Service;
 
 namespace Coin.Sdk.NP.Sample

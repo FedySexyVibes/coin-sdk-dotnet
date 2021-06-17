@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 
-namespace Coin.Sdk.NP.Messages.V1
+namespace Coin.Sdk.NP.Messages.V3
 {
-    public class RangeDeactivationMessage : INpMessage<RangeDeactivation>
+    public class RangeActivationMessage : INpMessage<RangeActivation>
     {
         [DataMember(Name = "header", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "header")]
@@ -12,18 +12,18 @@ namespace Coin.Sdk.NP.Messages.V1
 
         [DataMember(Name = "body", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "body")]
-        [JsonConverter(typeof(ConcreteConverter<RangeDeactivationBody>))]
-        public INpMessageBody<RangeDeactivation> Body { get; set; }
+        [JsonConverter(typeof(ConcreteConverter<RangeActivationBody>))]
+        public INpMessageBody<RangeActivation> Body { get; set; }
     }
 
-    public class RangeDeactivationBody : INpMessageBody<RangeDeactivation>
+    public class RangeActivationBody : INpMessageBody<RangeActivation>
     {
-        [DataMember(Name = "rangedeactivation", EmitDefaultValue = false)]
-        [JsonProperty(PropertyName = "rangedeactivation")]
-        public RangeDeactivation Content { get; set; }
+        [DataMember(Name = "rangeactivation", EmitDefaultValue = false)]
+        [JsonProperty(PropertyName = "rangeactivation")]
+        public RangeActivation Content { get; set; }
     }
 
-    public class RangeDeactivation : INpMessageContent
+    public class RangeActivation : INpMessageContent
     {
         [DataMember(Name = "dossierid", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "dossierid")]

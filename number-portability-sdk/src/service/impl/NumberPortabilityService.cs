@@ -5,10 +5,10 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Coin.Sdk.Common;
 using Coin.Sdk.Common.Client;
-using Coin.Sdk.NP.Messages.V1;
+using Coin.Sdk.NP.Messages.V3;
 using Newtonsoft.Json.Linq;
 using static Coin.Sdk.Common.Crypto.CtpApiClientUtil;
-using static Coin.Sdk.NP.Messages.V1.Utils;
+using static Coin.Sdk.NP.Messages.V3.Utils;
 
 namespace Coin.Sdk.NP.Service.Impl
 {

@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 
-namespace Coin.Sdk.NP.Messages.V1
+namespace Coin.Sdk.NP.Messages.V3
 {
-    public class EnumActivationOperatorMessage : INpMessage<EnumActivationOperator>
+    public class EnumActivationRangeMessage : INpMessage<EnumActivationRange>
     {
         [DataMember(Name = "header", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "header")]
@@ -12,18 +12,18 @@ namespace Coin.Sdk.NP.Messages.V1
 
         [DataMember(Name = "body", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "body")]
-        [JsonConverter(typeof(ConcreteConverter<EnumActivationOperatorBody>))]
-        public INpMessageBody<EnumActivationOperator> Body { get; set; }
+        [JsonConverter(typeof(ConcreteConverter<EnumActivationRangeBody>))]
+        public INpMessageBody<EnumActivationRange> Body { get; set; }
     }
 
-    public class EnumActivationOperatorBody : INpMessageBody<EnumActivationOperator>
+    public class EnumActivationRangeBody : INpMessageBody<EnumActivationRange>
     {
-        [DataMember(Name = "enumactivationoperator", EmitDefaultValue = false)]
-        [JsonProperty(PropertyName = "enumactivationoperator")]
-        public EnumActivationOperator Content { get; set; }
+        [DataMember(Name = "enumactivationrange", EmitDefaultValue = false)]
+        [JsonProperty(PropertyName = "enumactivationrange")]
+        public EnumActivationRange Content { get; set; }
     }
 
-    public class EnumActivationOperator : INpMessageContent
+    public class EnumActivationRange : INpMessageContent
     {
         [DataMember(Name = "dossierid", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "dossierid")]

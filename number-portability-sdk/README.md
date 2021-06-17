@@ -35,7 +35,7 @@ For secure access credentials are required.
 
 NpMessage.cs shows how the number portability domain has been structured.
 The interfaces from this file can be used to define methods that can accept any message.
-Coin.Sdk.NP.Messages.V1.Utils contains the useful static methods `TypeName` and `Deserialize`.
+Coin.Sdk.NP.Messages.V3.Utils contains the useful static methods `TypeName` and `Deserialize`.
 
 ## Send Messages
 

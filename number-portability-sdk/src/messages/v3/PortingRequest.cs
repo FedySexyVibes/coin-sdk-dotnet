@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 
-namespace Coin.Sdk.NP.Messages.V1
+namespace Coin.Sdk.NP.Messages.V3
 {
     public class PortingRequestMessage : INpMessage<PortingRequest>
     {
@@ -48,6 +48,10 @@ namespace Coin.Sdk.NP.Messages.V1
         [DataMember(Name = "customerinfo", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "customerinfo")]
         public CustomerInfo CustomerInfo { get; set; }
+
+        [DataMember(Name = "contract", EmitDefaultValue = false)]
+        [JsonProperty(PropertyName = "contract")]
+        public string Contract { get; set; }
 
         [DataMember(Name = "note", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "note")]

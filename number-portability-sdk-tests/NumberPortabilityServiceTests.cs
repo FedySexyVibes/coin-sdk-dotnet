@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Coin.Sdk.NP.Messages.V1;
+using Coin.Sdk.NP.Messages.V3;
 using Coin.Sdk.NP.Service.Impl;
 using NUnit.Framework;
 using static Coin.Sdk.NP.Tests.TestSettings;
@@ -41,6 +41,7 @@ namespace Coin.Sdk.NP.Tests
                         {
                             DossierId = dossierId,
                             RecipientNetworkOperator = Operator,
+                            Contract = "CONTINUATION",
                             Repeats = new List<PortingRequestRepeats>
                             {
                                 new()
