@@ -32,6 +32,6 @@ MR-test:
 deploy:
   stage: deploy
   only:
-    - master
+    - tags
   script:
     - make publish-nuget
