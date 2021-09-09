@@ -16,6 +16,19 @@ test:
   after_script:
     - ./setup/stop-docker-compose
 
+MR-test:
+  stage: test
+  before_script:
+    - aws ecr get-login --no-include-email | sh
+    - ./setup/start-docker-compose
+    - ./setup/setup-kong.sh ./keys
+  script:
+    - ./setup/run-tests
+  after_script:
+    - ./setup/stop-docker-compose
+  only:
+    - merge_requests
+
 deploy:
   stage: deploy
   only:
