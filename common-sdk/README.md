@@ -8,7 +8,7 @@ It contains no specific API implementation.
 ## Configure Credentials
 
 For secure access credentials are required.
-- Check the [README introduction](../README.md#introduction) to find out how to configure these.
+- Check [this README](https://gitlab.com/verenigingcoin-public/consumer-configuration/-/blob/master/README.md) to find out how to configure these.
 - In summary you will need:
     - a consumer name
     - a private key file (or a `System.Security.Cryptography.RSA` instance containing this key)
