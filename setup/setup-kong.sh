@@ -52,7 +52,7 @@ route_id_bs=$(curl -s -X POST ${KONG_ADMIN_URL}/routes/ \
 	--data 'methods[]=GET' \
 	--data 'methods[]=PUT' \
 	--data 'methods[]=POST' \
-	--data 'paths[]=/bundle-switching/v4' \
+	--data 'paths[]=/bundle-switching/v5' \
 	--data 'strip_path=false' \
 	--data "service.id=$service_id_bs" | jq -r '.id')
 echo " done"
