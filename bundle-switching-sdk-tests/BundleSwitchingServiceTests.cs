@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Coin.Sdk.BS.Messages.V4;
+using Coin.Sdk.BS.Messages.V5;
 using Coin.Sdk.BS.Service.Impl;
 using NUnit.Framework;
 using static Coin.Sdk.BS.Tests.TestSettings;
@@ -42,7 +42,6 @@ namespace Coin.Sdk.BS.Tests
                             DossierId = dossierId,
                             RecipientServiceProvider = Recipient,
                             DonorServiceProvider = Donor,
-                            Business = "Y",
                             EarlyTermination = "N",
                             Name = "Vereniging COIN",
                             AddressBlock = new AddressBlock

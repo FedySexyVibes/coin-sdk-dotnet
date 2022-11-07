@@ -1,7 +1,7 @@
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 
-namespace Coin.Sdk.BS.Messages.V4
+namespace Coin.Sdk.BS.Messages.V5
 {
     public class ConfirmationMessage
     {

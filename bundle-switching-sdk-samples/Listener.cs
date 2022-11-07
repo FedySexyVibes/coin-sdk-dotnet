@@ -1,5 +1,5 @@
 using System;
-using Coin.Sdk.BS.Messages.V4;
+using Coin.Sdk.BS.Messages.V5;
 using Coin.Sdk.BS.Service;
 
 namespace Coin.Sdk.BS.Sample

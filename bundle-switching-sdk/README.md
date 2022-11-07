@@ -35,7 +35,7 @@ For secure access credentials are required.
 
 BsMessage.cs shows how the bundle switching domain has been structured.
 The interfaces from this file can be used to define methods that can accept any message.
-Coin.Sdk.BS.Messages.V4.Utils contains the useful static methods `TypeName` and `Deserialize`.
+Coin.Sdk.BS.Messages.V5.Utils contains the useful static methods `TypeName` and `Deserialize`.
 
 ## Send Messages
 

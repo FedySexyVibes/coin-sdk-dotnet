@@ -1,6 +1,6 @@
 ﻿using System.Threading;
 using Coin.Sdk.Common.Client;
-using Coin.Sdk.BS.Messages.V4;
+using Coin.Sdk.BS.Messages.V5;
 using Coin.Sdk.BS.Service.Impl;
 using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
@@ -40,7 +40,7 @@ namespace Coin.Sdk.BS.Tests
             _listener.SideEffect = _ => cde.Signal();
             _messageConsumer.StartConsumingAll(_listener, new TestOffsetPersister(), 3,
                 _ => Assert.Fail("Disconnected"), null,
-                MessageType.ContractTerminationRequestV4, MessageType.ContractTerminationPerformedV4);
+                MessageType.ContractTerminationRequestV5, MessageType.ContractTerminationPerformedV5);
             cde.Wait();
             _messageConsumer.StopConsuming();
         }

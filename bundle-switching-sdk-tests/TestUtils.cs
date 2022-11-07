@@ -1,7 +1,7 @@
 using System;
 using System.Diagnostics;
 using Coin.Sdk.Common.Client;
-using Coin.Sdk.BS.Messages.V4;
+using Coin.Sdk.BS.Messages.V5;
 using Coin.Sdk.BS.Service;
 
 namespace Coin.Sdk.BS.Tests
@@ -21,7 +21,7 @@ namespace Coin.Sdk.BS.Tests
 
         public static readonly string ApiUrl =
             "http://" + (Environment.GetEnvironmentVariable("STUB_HOST_AND_PORT") ?? "localhost:8000") +
-            "/bundle-switching/v4";
+            "/bundle-switching/v5";
 
         public static readonly string SseUrl = ApiUrl + "/dossiers/events";
 

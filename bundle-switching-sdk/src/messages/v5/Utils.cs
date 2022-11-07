@@ -3,7 +3,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Coin.Sdk.BS.Messages.V4
+namespace Coin.Sdk.BS.Messages.V5
 {
     public static class Utils
     {
@@ -44,11 +44,11 @@ namespace Coin.Sdk.BS.Messages.V4
             var message = JObject.Parse(json).First.First;
             switch (type)
             {
-                case "cancel-v4": return message.ToObject<CancelMessage>();
-                case "errorfound-v4": return message.ToObject<ErrorFoundMessage>();
-                case "contractterminationperformed-v4": return message.ToObject<ContractTerminationPerformedMessage>();
-                case "contractterminationrequest-v4": return message.ToObject<ContractTerminationRequestMessage>();
-                case "contractterminationrequestanswer-v4":
+                case "cancel-v5": return message.ToObject<CancelMessage>();
+                case "errorfound-v5": return message.ToObject<ErrorFoundMessage>();
+                case "contractterminationperformed-v5": return message.ToObject<ContractTerminationPerformedMessage>();
+                case "contractterminationrequest-v5": return message.ToObject<ContractTerminationRequestMessage>();
+                case "contractterminationrequestanswer-v5":
                     return message.ToObject<ContractTerminationRequestAnswerMessage>();
                 default: throw new JsonException($"Unknown message type {type}");
             }

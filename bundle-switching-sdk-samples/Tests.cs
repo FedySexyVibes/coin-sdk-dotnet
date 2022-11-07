@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using Coin.Sdk.Common.Client;
-using Coin.Sdk.BS.Messages.V4;
+using Coin.Sdk.BS.Messages.V5;
 using Coin.Sdk.BS.Service.Impl;
 using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
@@ -25,7 +25,7 @@ namespace Coin.Sdk.BS.Sample
         {
             var logger = NullLogger.Instance;
 
-            const string apiUrl = "https://test-api.coin.nl/bundle-switching/v4";
+            const string apiUrl = "https://test-api.coin.nl/bundle-switching/v5";
             const string sseUrl = apiUrl + "/dossiers/events"; 
             const string consumer = "<YOUR CONSUMER>";
             var privateKeyFile = GetPath("private-key.pem");
@@ -64,7 +64,6 @@ namespace Coin.Sdk.BS.Sample
                             DossierId = dossierId,
                             RecipientServiceProvider = Sender,
                             DonorServiceProvider = Receiver,
-                            Business = "N",
                             EarlyTermination = "N",
                             Name = "Someone Withaname",
                             AddressBlock = new AddressBlock

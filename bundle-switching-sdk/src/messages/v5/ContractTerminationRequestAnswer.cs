@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 
-namespace Coin.Sdk.BS.Messages.V4
+namespace Coin.Sdk.BS.Messages.V5
 {
     public class ContractTerminationRequestAnswerMessage : IBsMessage<ContractTerminationRequestAnswer>
     {
@@ -31,13 +31,6 @@ namespace Coin.Sdk.BS.Messages.V4
         [DataMember(Name = "dossierid", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "dossierid")]
         public string DossierId { get; set; }
-
-        /// <summary>
-        /// Indicates whether the dossier is a business request or not
-        /// </summary>
-        [DataMember(Name = "business", EmitDefaultValue = false)]
-        [JsonProperty(PropertyName = "business")]
-        public string Business { get; set; }
 
         /// <summary>
         /// Blocking indicator as a response to the contract termination request message. 

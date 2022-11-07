@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Coin.Sdk.Common.Client;
-using Coin.Sdk.BS.Messages.V4;
+using Coin.Sdk.BS.Messages.V5;
 using EvtSource;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
@@ -104,19 +104,19 @@ namespace Coin.Sdk.BS.Service.Impl
             {
                 switch (eventArgs.Event)
                 {
-                    case "cancel-v4":
+                    case "cancel-v5":
                         listener.OnCancel(eventArgs.Id, GetBsMessage<CancelMessage>(eventArgs));
                         return true;
-                    case "errorfound-v4":
+                    case "errorfound-v5":
                         listener.OnErrorFound(eventArgs.Id, GetBsMessage<ErrorFoundMessage>(eventArgs));
                         return true;
-                    case "contractterminationperformed-v4":
+                    case "contractterminationperformed-v5":
                         listener.OnContractTerminationPerformed(eventArgs.Id, GetBsMessage<ContractTerminationPerformedMessage>(eventArgs));
                         return true;
-                    case "contractterminationrequest-v4":
+                    case "contractterminationrequest-v5":
                         listener.OnContractTerminationRequest(eventArgs.Id, GetBsMessage<ContractTerminationRequestMessage>(eventArgs));
                         return true;
-                    case "contractterminationrequestanswer-v4":
+                    case "contractterminationrequestanswer-v5":
                         listener.OnContractTerminationRequestAnswer(eventArgs.Id, GetBsMessage<ContractTerminationRequestAnswerMessage>(eventArgs));
                         return true;
                     default:
