@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker-compose --project-name coin-sdk-dotnet-${CI_JOB_ID} --file docker-compose.yaml --file docker-compose-test.yaml --project-directory ${PWD} down -v
+docker-compose --project-name coin-sdk-dotnet-${CI_JOB_ID:-local} --file docker-compose.yaml --file docker-compose-test.yaml --project-directory ${PWD} down -v
