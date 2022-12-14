@@ -29,7 +29,7 @@ namespace Coin.Sdk.BS.Tests
         public const string Recipient = "LOADA";
         public const string Donor = "LOADB";
         public const string PhoneNumber = "0612345678";
-        public static readonly string Timestamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss");
+        public static readonly string Timestamp = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss");
     }
 
     public class TestListener : IBundleSwitchingMessageListener

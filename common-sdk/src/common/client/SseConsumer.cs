@@ -196,7 +196,7 @@ namespace Coin.Sdk.Common.Client
     {
         private const int ThresholdTimeout = 300_000_000;
         private readonly Timer _timer = new Timer();
-        private long _timestamp = DateTime.Now.Ticks;
+        private long _timestamp = DateTime.UtcNow.Ticks;
         private CancellationTokenSource _cancellationTokenSource;
 
         public ReadTimeoutTimer()
@@ -205,7 +205,7 @@ namespace Coin.Sdk.Common.Client
             _timer.Elapsed += OnTimedEvent;
         }
 
-        public void UpdateTimestamp() => _timestamp = DateTime.Now.Ticks;
+        public void UpdateTimestamp() => _timestamp = DateTime.UtcNow.Ticks;
 
         public void Start() => _timer.Start();
 
@@ -214,7 +214,7 @@ namespace Coin.Sdk.Common.Client
         public void Reset()
         {
             _timer.Stop();
-            _timestamp = DateTime.Now.Ticks;
+            _timestamp = DateTime.UtcNow.Ticks;
             _timer.Start();
         }
 
@@ -222,7 +222,7 @@ namespace Coin.Sdk.Common.Client
 
         private void OnTimedEvent(object source, ElapsedEventArgs e)
         {
-            var now = DateTime.Now.Ticks;
+            var now = DateTime.UtcNow.Ticks;
             var elapsedTime = now - _timestamp;
             Debug.WriteLine("Timestamp: " + _timestamp);
             Debug.WriteLine("Elapsed Time: " + elapsedTime);

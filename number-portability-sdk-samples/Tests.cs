@@ -17,7 +17,7 @@ namespace Coin.Sdk.NP.Sample
 
         private const string Operator = "<YOUR OPERATOR>";
         private const string ReceivingOperator = "<RECEIVING OPERATOR>";
-        private readonly string _timestamp = DateTime.Now.ToString("yyyyMMddhhmmss");
+        private readonly string _timestamp = DateTime.UtcNow.ToString("yyyyMMddhhmmss");
         private const string PhoneNumber = "0303800007";
 
         [SetUp]
@@ -144,7 +144,7 @@ namespace Coin.Sdk.NP.Sample
                                     {
                                         DonorNetworkOperator = Operator,
                                         DonorServiceProvider = Operator,
-                                        FirstPossibleDate = DateTime.Now.ToString("yyyyMMddhhmmss"),
+                                        FirstPossibleDate = DateTime.UtcNow.ToString("yyyyMMddhhmmss"),
                                         NumberSeries = new NumberSeries
                                         {
                                             Start = PhoneNumber,

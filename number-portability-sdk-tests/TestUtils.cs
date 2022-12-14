@@ -34,7 +34,7 @@ namespace Coin.Sdk.NP.Tests
         public const string CrdbReceiver = "CRDB";
         public const string Operator = "LOADA";
         public const string PhoneNumber = "0612345678";
-        public static readonly string Timestamp = DateTime.Now.ToString("yyyyMMddhhmmss");
+        public static readonly string Timestamp = DateTime.UtcNow.ToString("yyyyMMddhhmmss");
     }
 
     public class StopStreamService : CtpApiRestTemplateSupport

@@ -17,7 +17,7 @@ namespace Coin.Sdk.BS.Sample
 
         private const string Sender = "<YOUR PROVIDER>";
         private const string Receiver = "<DONOR PROVIDER>";
-        private readonly string _timestamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss");
+        private readonly string _timestamp = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss");
         private const string PhoneNumber = "0612345678";
 
         [SetUp]

@@ -39,8 +39,8 @@ namespace Coin.Sdk.Common.Crypto
             var securityKey = new RsaSecurityKey(privateKey);
 
             var credentials = new SigningCredentials(securityKey, "RS256");
-            var nbf = DateTime.Now.AddSeconds(-30);
-            var exp = DateTime.Now.AddSeconds(30 + validPeriodInSeconds);
+            var nbf = DateTime.UtcNow.AddSeconds(-30);
+            var exp = DateTime.UtcNow.AddSeconds(30 + validPeriodInSeconds);
 
             var jwtToken = new JwtSecurityToken(
                 consumerName,
