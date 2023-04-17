@@ -39,6 +39,6 @@ namespace Coin.Sdk.NP.Messages.V3
 
         [DataMember(Name = "repeats", EmitDefaultValue = false)]
         [JsonProperty(PropertyName = "repeats")]
-        public List<EnumNumberRepeats> Repeats { get; set; }
+        public List<EnumOperatorRepeats> Repeats { get; set; }
     }
 }
